@@ -10,10 +10,9 @@ import random
 import time
 import math
 import apprise
-
-
+from random_words import RandomWords
 apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
-
+rw = "Random"
 # Functions
 
 
@@ -26,14 +25,13 @@ def apprise_init():
 alerts = apprise_init()
 # Loop through all accounts doing edge and mobile searches
 def mainLoop():
-
+    rw = RandomWords()
     EMAIL = os.environ['EMAIL']
     PASSWORD = os.environ['PASS']
     accounts = [f"{EMAIL}:{PASSWORD}"]
     alerts.notify(title=f'Bing Rewards:',body=f'Bing Automation Booting...\nPoints: {getPoints(EMAIL, PASSWORD)}')
     # numSearch is number of PC searches
     numSearch = 34
-
     # numSearch1 is number of mobile searches
     numSearch1 = 21
 
@@ -100,22 +98,8 @@ def mainLoop():
 
             # Main search loop
             for x in range(1, numSearch+1):
-                # Open txt file
-                fo = open("words.txt", "r")
-                words = fo.readlines()
-
-                # retrieve random word
-                numWords = len(words)
-                randomVal = random.randint(1, numWords)
-
-                # keyword 1
-                keyword1 = words[randomVal-1]
-
-                # keyword 2
-                keyword2 = 'define '
-
-                # Create string to send
-                value = keyword2 + keyword1
+              # Create string to send
+                value = 'define ' + rw.random_word()
 
                 # Clear search bar
                 ping = driver.find_element_by_id("sb_form_q")
@@ -185,22 +169,7 @@ def mainLoop():
 
             # Main search loop
             for x in range(1, numSearch1 + 1):
-                # Open txt file
-                fo = open("words.txt", "r")
-                words = fo.readlines()
-
-                # retrieve random word
-                numWords = len(words)
-                randomVal = random.randint(1, numWords)
-
-                # keyword 1
-                keyword1 = words[randomVal-1]
-
-                # keyword 2
-                keyword2 = 'define '
-
-                # Create string to send
-                value = keyword2 + keyword1
+                value = 'define ' + rw.random_word()
 
                 # Clear search bar
                 ping = driver.find_element_by_id("sb_form_q")
