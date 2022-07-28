@@ -30,7 +30,7 @@ def mainLoop():
     EMAIL = os.environ['EMAIL']
     PASSWORD = os.environ['PASS']
     accounts = [f"{EMAIL}:{PASSWORD}"]
-
+    alerts.notify(title=f'Bing Rewards:',body=f'Bing Automation Booting...\nPoints: {getPoints(EMAIL, PASSWORD)}')
     # numSearch is number of PC searches
     numSearch = 34
 
@@ -70,6 +70,7 @@ def mainLoop():
         try:
             url = os.environ['URL']
             driver.get(url)
+            driver.maximize_window()
             driver.find_element(
                 By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
             driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
@@ -157,6 +158,7 @@ def mainLoop():
         driver = webdriver.Chrome(chrome_options=chrome_options)
         driver.implicitly_wait(3)
         driver.get("https://login.live.com/")
+        driver.maximize_window()
         driver.find_element(
                 By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
         driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
@@ -226,14 +228,37 @@ def mainLoop():
                 print("% done.")
             print("Account [" + user + "] has completed mobile searches]")
         mobile()
+        alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Successful!\nPoints:{getPoints(EMAIL, PASSWORD)}')
+def getPoints(EMAIL, PASSWORD):
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
 
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.implicitly_wait(3)
+    driver.get('https://rewards.microsoft.com/')
+    try:
+        driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
+        driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
+        driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+        time.sleep(3)
+        driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
+        driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+        time.sleep(3)
+        driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+    except Exception as e:
+        pass
+    time.sleep(5)
+    points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
+    print(points)
+    driver.quit()
+    return points
+        
+        
 while True:
     try:
-      alerts.notify(title=f'Bing Rewards:',body='Bing Automation Booting...')
       mainLoop()
-      alerts.notify(title=f'Bing Rewards',body='Bing Automation Successful!')
       time.sleep(86400)
-      
     except Exception as e:
         print(e)
         print("Error. Restarting...")
