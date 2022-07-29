@@ -60,37 +60,34 @@ def main():
         return points
     rw = RandomWords()
   
-    EMAIL = os.environ['EMAIL']
-    PASSWORD = os.environ['PASS']
-    # LOGIN EXAMPLE
+    # LOGIN EXAMPLE:
     # "EMAIL:PASSWORD,EMAIL:PASSWORD"
-    # accounts = os.environ["LOGIN"].split(",")
-    accounts = [f"{EMAIL}:{PASSWORD}"]
-
+    accounts = os.environ["LOGIN"].split(",")
     delay = 3
 
     # Loop through the array of accounts, splitting each string into an username and a password, then doing edge and mobile searches
     for x in accounts:
         import time
         
-
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-
         driver = webdriver.Chrome(options=chrome_options)
-        driver.implicitly_wait(3)
+        driver.implicitly_wait(4)
 
-        points = getPoints(EMAIL, PASSWORD, driver)
-        alerts.notify(title=f'Bing Rewards:',body=f'Bing Automation Booting...\nPoints: {points}')
-        # Grab username
+        # Grab email
         colonIndex = x.index(":")+1
-        user = x[0:colonIndex-1]
+        EMAIL = x[0:colonIndex-1]
         # Grab password
         lastIndex = len(x)
-        pw = x[colonIndex:lastIndex]
+        PASSWORD = x[colonIndex:lastIndex]
+        # Set default search amount
         Number_Mobile_Search = 20
         Number_PC_Search = 34
+        # Retireve points before completing searches
+        points = getPoints(EMAIL, PASSWORD, driver)
+        alerts.notify(title=f'Bing Rewards:',body=f'Bing Automation Booting...\nPoints: {points}')
+
         try:
             time.sleep(3)
             driver.find_element(By.XPATH, value='//*[@id="rx-user-status-action"]').click()
@@ -218,7 +215,7 @@ def main():
                 print("This is ", end="")
                 print(percentDone, end="")
                 print("% done.")
-            print("Account [" + user + "] has completed mobile searches]")
+            print("Account [" + EMAIL + "] has completed mobile searches]")
             driver.quit()
             
         chrome_options = Options()
@@ -228,18 +225,23 @@ def main():
         driver = webdriver.Chrome(options=chrome_options)
         driver.implicitly_wait(3)
         points = getPoints(EMAIL, PASSWORD, driver)
-        print(f"{Number_Mobile_Search} mobile searches left.")
         
         alerts.notify(title=f'Bing Rewards Successful', body=f'Points: {points}')
+    time.sleep(43200)
+    
+    try:
+        driver.quit()
+    except Exception:
+        pass
+    
 
 
 while True:
     try:
         main()
-        time.sleep(43200)
     except Exception as e:
         print(f"Error.\n{e}\nRestarting...")
-        alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Failed!\n{e}\nRestarting!')
+        alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Failed!\n{e}\nAttempting to restart...')
         time.sleep(500)
         continue
 
