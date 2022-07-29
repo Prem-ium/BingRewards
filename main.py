@@ -12,8 +12,6 @@ import math
 import apprise
 from random_words import RandomWords
 os.system("pip install RandomWords")
-
-
 apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
 points = 0
 
