@@ -14,8 +14,7 @@ from random_words import RandomWords
 os.system("pip install RandomWords")
 
 apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
-points = 0
-
+points = -1
 def apprise_init():
     alerts = apprise.Apprise()
     # Add all services from .env
@@ -27,20 +26,22 @@ alerts = apprise_init()
 
 def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
-    driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+    driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
-    driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+    driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 
 def main():
     import time
+    points = -1
     rw = "Random"
     # Loop through all accounts doing edge and mobile searches
 
     def getPoints(EMAIL, PASSWORD, driver):
+        points = -1
         driver.implicitly_wait(3)
         driver.get('https://rewards.microsoft.com/')
         driver.maximize_window()
@@ -49,7 +50,7 @@ def main():
                 By.XPATH, '//*[@id="raf-signin-link-id"]').click()
             login(EMAIL, PASSWORD, driver)
         except Exception as e:
-            pass
+            print(e)
         try:
             time.sleep(7)
             points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
@@ -114,21 +115,21 @@ def main():
         except Exception as e:
             print(e)
             pass
-
-        driver.get(os.environ['URL'])
-        try:
-            login(EMAIL, PASSWORD, driver)
-        except Exception as e:
-            print(e)
-        # First test search
-        time.sleep(3)
-        first = driver.find_element(By.ID, value = "sb_form_q")
-        first.send_keys("test")
-        first.send_keys(Keys.RETURN)
-
         # Starts Edge Search Loop
 
-        if(Number_PC_Search > 0):
+        if (Number_PC_Search > 0):
+            driver.get(os.environ['URL'])
+            try:
+                login(EMAIL, PASSWORD, driver)
+            except Exception as e:
+                driver.get('https://www.bing.com/')
+                print(e)
+                pass
+            # First test search
+            time.sleep(3)
+            first = driver.find_element(By.ID, value = "sb_form_q")
+            first.send_keys("test")
+            first.send_keys(Keys.RETURN)
             # Main search loop
             for x in range(1, Number_PC_Search+1):
                 # Create string to send
@@ -172,8 +173,18 @@ def main():
 
             driver = webdriver.Chrome(options=chrome_options)
             driver.implicitly_wait(4)
-            driver.get("https://login.live.com/")
+            driver.get(os.environ['URL'])
+          
             driver.maximize_window()
+
+            
+            try:
+                driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
+                driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
+            except Exception as e:
+                print(e)
+                pass
+                      
             login(EMAIL, PASSWORD, driver)
             print("Account [" + user + "] logged in successfully! Auto search initiated.")
             driver.get('https://www.bing.com/')
@@ -227,7 +238,7 @@ while True:
         main()
         time.sleep(43200)
     except Exception as e:
-        print(f"Error.\n{e.__traceback__}\nRestarting...")
+        print(f"Error.\n{e}\nRestarting...")
         alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Failed!\n{e}\nRestarting!')
         time.sleep(500)
         continue
