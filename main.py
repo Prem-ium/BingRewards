@@ -14,7 +14,6 @@ from random_words import RandomWords
 os.system("pip install RandomWords")
 apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
 
-apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
 # Functions
 
 
