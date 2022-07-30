@@ -10,8 +10,8 @@ import random
 import time
 import math
 import apprise
-from random_words import RandomWords
 os.system("pip install RandomWords")
+from random_words import RandomWords
 
 apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
 points = -1
@@ -55,7 +55,7 @@ def main():
             time.sleep(7)
             points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
             print(points)
-        except Exception as e:
+        except Exception:
             pass
         return points
     rw = RandomWords()
@@ -86,7 +86,7 @@ def main():
         Number_PC_Search = 34
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
-        alerts.notify(title=f'Bing Rewards:',body=f'Bing Automation Booting...\nPoints: {points}')
+        alerts.notify(title=f'Bing Rewards {EMAIL}:',body=f'Bing Automation Booting...\nPoints: {points}')
 
         try:
             time.sleep(3)
@@ -183,7 +183,7 @@ def main():
                 pass
                       
             login(EMAIL, PASSWORD, driver)
-            print("Account [" + user + "] logged in successfully! Auto search initiated.")
+            print("Account [" + EMAIL + "] logged in successfully! Auto search initiated.")
             driver.get('https://www.bing.com/')
             # Main search loop
             for x in range(1, Number_Mobile_Search + 1):
@@ -226,22 +226,19 @@ def main():
         driver.implicitly_wait(3)
         points = getPoints(EMAIL, PASSWORD, driver)
         
-        alerts.notify(title=f'Bing Rewards Successful', body=f'Points: {points}')
-    time.sleep(43200)
-    
-    try:
+        alerts.notify(title=f'Bing Rewards {EMAIL} Successful', body=f'Points: {points}')
         driver.quit()
-    except Exception:
-        pass
+    time.sleep(21600)
+
     
 
-
-while True:
-    try:
-        main()
-    except Exception as e:
-        print(f"Error.\n{e}\nRestarting...")
-        alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Failed!\n{e}\nAttempting to restart...')
-        time.sleep(500)
-        continue
+if __name__ == "__main__":
+  while True:
+      try:
+          main()
+      except Exception as e:
+          print(f"Error.\n{e}\nRestarting...")
+          alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Failed!\n{e}\nAttempting to restart...')
+          time.sleep(500)
+          continue
 
