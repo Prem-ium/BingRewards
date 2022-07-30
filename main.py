@@ -52,7 +52,7 @@ def main():
         except Exception as e:
             print(e)
         try:
-            time.sleep(7)
+            time.sleep(10)
             points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
             print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
         except Exception:
@@ -63,7 +63,7 @@ def main():
     # LOGIN EXAMPLE:
     # "EMAIL:PASSWORD,EMAIL:PASSWORD"
     accounts = os.environ["LOGIN"].split(",")
-    delay = 5
+    delay = 6
 
     # Loop through the array of accounts, splitting each string into an username and a password, then doing edge and mobile searches
     for x in accounts:
@@ -178,7 +178,6 @@ def main():
                     driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
                     driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
                 except Exception as e:
-                    print(e)
                     pass
                         
                 login(EMAIL, PASSWORD, driver)
