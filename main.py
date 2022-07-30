@@ -13,8 +13,10 @@ import apprise
 os.system("pip install RandomWords")
 from random_words import RandomWords
 
-apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
+if os.environ["APPRISE_ALERTS"]:
+  apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
 points = -1
+
 def apprise_init():
     alerts = apprise.Apprise()
     # Add all services from .env
