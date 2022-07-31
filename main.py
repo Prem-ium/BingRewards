@@ -27,37 +27,35 @@ alerts = apprise_init()
 def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
-    time.sleep(3)
+    time.sleep(2)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
+def getPoints(EMAIL, PASSWORD, driver):
+    points = -1
+    driver.implicitly_wait(3)
+    driver.get('https://rewards.microsoft.com/')
+    driver.maximize_window()
+    try:
+        driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
+        login(EMAIL, PASSWORD, driver)
+    except Exception as e:
+        print(e)
+    try:
+        time.sleep(10)
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
+    except Exception:
+        pass
+    return points
 
 def main():
     import time
     points = -1
     rw = "Random"
     # Loop through all accounts doing edge and mobile searches
-
-    def getPoints(EMAIL, PASSWORD, driver):
-        points = -1
-        driver.implicitly_wait(3)
-        driver.get('https://rewards.microsoft.com/')
-        driver.maximize_window()
-        try:
-            driver.find_element(
-                By.XPATH, '//*[@id="raf-signin-link-id"]').click()
-            login(EMAIL, PASSWORD, driver)
-        except Exception as e:
-            print(e)
-        try:
-            time.sleep(10)
-            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
-            print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
-        except Exception:
-            pass
-        return points
     rw = RandomWords()
   
     # LOGIN EXAMPLE:
@@ -97,15 +95,17 @@ def main():
                 print(f'\tPC Searches Left:\t{Number_PC_Search}')
             else:
                 Number_PC_Search = 0
-                print(f'\tSearches Completed:\t{PC[0]}/{PC[1]}')
-                
-            MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
-            if (int(MOBILE[0]) < int(MOBILE[1])):
-                Number_Mobile_Search = int((int(MOBILE[1]) - int(MOBILE[0])) / 5)
-                print(f'\tMobile Searches Left:\t{Number_Mobile_Search}')
+                print(f'\tPC Searches Completed:\t{PC[0]}/{PC[1]}')
+            if (int(PC[1]) > 50):  
+                MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
+                if (int(MOBILE[0]) < int(MOBILE[1])):
+                    Number_Mobile_Search = int((int(MOBILE[1]) - int(MOBILE[0])) / 5)
+                    print(f'\tMobile Searches Left:\t{Number_Mobile_Search}')
+                else:
+                    Number_Mobile_Search = 0
+                    print(f'\tMobile Searches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
             else:
                 Number_Mobile_Search = 0
-                print(f'\tSearches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
         except Exception as e:
             print(e)
             pass
@@ -228,6 +228,7 @@ def main():
             driver.quit()
         else:
             driver.quit()
+
     time.sleep(21600)
 
     
