@@ -26,7 +26,6 @@ def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 def completeSet(driver):
-    driver.get('https://rewards.microsoft.com/')
     ranOnce = False
     try:
         if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
@@ -333,7 +332,8 @@ def main():
             driver.quit()
         else:
             driver.quit()
-        
+
+
     
 def apprise_init():
     alerts = apprise.Apprise()
