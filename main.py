@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-# os.system("pip install RandomWords")
+#os.system("pip install RandomWords")
 from random_words import RandomWords
 
 if os.environ["APPRISE_ALERTS"]:
@@ -35,7 +35,14 @@ def completeSet(driver):
     except Exception as e: 
         print(e)
         pass
-
+    try:
+        if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
+            dailyQuiz(driver)
+            ranOnce = True    
+    except Exception as e: 
+        print(e)
+        pass
+    
     try:
         if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
             dailyPoll(driver)
@@ -66,15 +73,59 @@ def dailyPoll(driver):
         driver.refresh()
         time.sleep(5)
         driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
-        time.sleep(5)
+        time.sleep(8)
         driver._switch_to.window(p)
         driver.refresh()
-    except Exception:
+    except Exception as e:
         driver._switch_to.window(p)
         driver.refresh()
+        print(e)
         pass
     time.sleep(5)
 
+def dailyQuiz(driver):
+    driver.get('https://rewards.microsoft.com/')
+    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+    time.sleep(2)
+    p = driver.current_window_handle
+    chwd = driver.window_handles
+    driver._switch_to.window(chwd[1])
+    driver.refresh()
+    time.sleep(5)
+    # //*[@id="slideexp6_950E60"] XPATH choice container
+
+
+    try:
+        numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1]
+        numberOfQuestions = numberOfQuestions[:-1]
+        for i in range(int(numberOfQuestions)):
+            driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
+            time.sleep(8)
+            next = driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
+            time.sleep(5)
+        driver._switch_to.window(chwd[0])
+        return
+    except Exception as e:
+        driver._switch_to.window(chwd[0])
+
+    # NOT WORKING:
+    try:
+        driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]').click()
+        answers = {}
+        while True:
+            time.sleep(3)
+            #posts = driver.find_element(By.CLASS_NAME, value='slide')
+            posts = driver.find_elements(By.CLASS_NAME, value='b_cards bt_lstcl_card btcc btcNoImg')
+            def check(posts):
+                for post in posts:
+                    if post.get_attribute('iscorrectoption') == 'True' and answers.get(post.get_attribute('id')) == None:
+                        answers.append(post.get_attribute('id'))
+                        #action.double_click(post).perform()
+                        return
+            check(posts)
+        driver._switch_to.window(p)
+    except Exception:
+        pass
 
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
@@ -279,6 +330,8 @@ def main():
             driver.quit()
         else:
             driver.quit()
+        
+
 
     
 def apprise_init():
