@@ -61,7 +61,8 @@ def exploreSet(driver):
     driver._switch_to.window(chwd[1])
     driver.refresh()
     time.sleep(5)
-    driver._switch_to.window(p)
+    driver.close()
+    #driver._switch_to.window(p)
     
 def dailyPoll(driver):
     driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
@@ -74,7 +75,8 @@ def dailyPoll(driver):
         time.sleep(5)
         driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
         time.sleep(8)
-        driver._switch_to.window(p)
+        driver.close()
+        #driver._switch_to.window(p)
         driver.refresh()
     except Exception as e:
         driver._switch_to.window(p)
@@ -84,7 +86,6 @@ def dailyPoll(driver):
     time.sleep(5)
 
 def dailyQuiz(driver):
-    driver.get('https://rewards.microsoft.com/')
     driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
     time.sleep(2)
     p = driver.current_window_handle
@@ -103,7 +104,8 @@ def dailyQuiz(driver):
             time.sleep(8)
             next = driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
             time.sleep(5)
-        driver._switch_to.window(chwd[0])
+        driver.close()
+        #driver._switch_to.window(chwd[0])
         return
     except Exception as e:
         driver._switch_to.window(chwd[0])
@@ -202,6 +204,7 @@ def main():
         except Exception as e:
             print(e)
             pass
+        driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
         print('\n\n')
         ranSets = False
         try:
@@ -331,8 +334,6 @@ def main():
         else:
             driver.quit()
         
-
-
     
 def apprise_init():
     alerts = apprise.Apprise()
