@@ -1,28 +1,20 @@
 import os
+#os.system("pip install apprise")
+import apprise
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-import time
-#os.system("pip install apprise")
-import apprise
-#os.system("pip install RandomWords")
+# os.system("pip install RandomWords")
 from random_words import RandomWords
 
 if os.environ["APPRISE_ALERTS"]:
-  apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
+    apprise_alerts = os.environ.get("APPRISE_ALERTS", "").split(",")
+
 points = -1
-
-def apprise_init():
-    alerts = apprise.Apprise()
-    # Add all services from .env
-    for service in apprise_alerts:
-        alerts.add(service)
-    return alerts
-alerts = apprise_init()
-
 
 def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
@@ -32,21 +24,56 @@ def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+
 def completeSet(driver):
     driver.get('https://rewards.microsoft.com/')
-
+    ranOnce = False
     try:
         if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
             exploreSet(driver)
+            ranOnce = True    
     except Exception as e: 
         print(e)
         pass
+
     try:
         if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
             dailyPoll(driver)
+            ranOnce = True
     except Exception as e: 
         print(e)
         pass
+
+    return ranOnce
+
+def exploreSet(driver):
+    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+    time.sleep(2)
+    p = driver.current_window_handle
+    chwd = driver.window_handles
+    driver._switch_to.window(chwd[1])
+    driver.refresh()
+    time.sleep(5)
+    driver._switch_to.window(p)
+    
+def dailyPoll(driver):
+    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+    time.sleep(2)
+    p = driver.current_window_handle
+    try:
+        chwd = driver.window_handles
+        driver._switch_to.window(chwd[1])
+        driver.refresh()
+        time.sleep(5)
+        driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
+        time.sleep(5)
+        driver._switch_to.window(p)
+        driver.refresh()
+    except Exception:
+        driver._switch_to.window(p)
+        driver.refresh()
+        pass
+    time.sleep(5)
 
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -66,35 +93,8 @@ def getPoints(EMAIL, PASSWORD, driver):
     except Exception:
         pass
     return points
-def exploreSet(driver):
-    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
-    time.sleep(2)
-    p = driver.current_window_handle
-    chwd = driver.window_handles
-    driver._switch_to.window(chwd[1])
-    driver.refresh()
-    time.sleep(5)
-    driver._switch_to.window(p)
-def dailyPoll(driver):
-    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
-    time.sleep(2)
-    p = driver.current_window_handle
-    try:
-        chwd = driver.window_handles
-        driver._switch_to.window(chwd[1])
-        driver.refresh()
-        time.sleep(5)
-        driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
-        time.sleep(5)
-        driver._switch_to.window(p)
-        driver.refresh()
-    except Exception:
-        driver._switch_to.window(p)
-        driver.refresh()
-        pass
-    time.sleep(5)
+
 def main():
-    import time
     points = -1
     rw = "Random"
     # Loop through all accounts doing edge and mobile searches
@@ -152,12 +152,13 @@ def main():
             print(e)
             pass
         print('\n\n')
+        ranSets = False
         try:
-            completeSet(driver)
+            ranSets = completeSet(driver)
         except Exception:
             pass
         # Starts Edge Search Loop
-        if (Number_PC_Search > 0 or Number_Mobile_Search > 0):
+        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets):
             alerts.notify(title=f'Bing Rewards {EMAIL} Automation Starting...', body=f'Points: {points}')
             if (Number_PC_Search > 0):
                 driver.get(os.environ['URL'])
@@ -223,7 +224,6 @@ def main():
                 driver.get(os.environ['URL'])
             
                 driver.maximize_window()
-
                 
                 try:
                     driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
@@ -280,8 +280,14 @@ def main():
         else:
             driver.quit()
 
-
     
+def apprise_init():
+    alerts = apprise.Apprise()
+    # Add all services from .env
+    for service in apprise_alerts:
+        alerts.add(service)
+    return alerts
+alerts = apprise_init()
 
 if __name__ == "__main__":
   while True:
