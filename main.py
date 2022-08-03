@@ -108,24 +108,27 @@ def dailyQuiz(driver):
         return
     except Exception as e:
         driver._switch_to.window(chwd[0])
+        pass
 
-    # NOT WORKING:
     try:
         driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]').click()
-        answers = {}
-        while True:
-            time.sleep(3)
-            #posts = driver.find_element(By.CLASS_NAME, value='slide')
-            posts = driver.find_elements(By.CLASS_NAME, value='b_cards bt_lstcl_card btcc btcNoImg')
-            def check(posts):
-                for post in posts:
-                    if post.get_attribute('iscorrectoption') == 'True' and answers.get(post.get_attribute('id')) == None:
-                        answers.append(post.get_attribute('id'))
-                        #action.double_click(post).perform()
-                        return
-            check(posts)
-        driver._switch_to.window(p)
-    except Exception:
+        time.sleep(3)
+        bubbles = len(driver.find_element(By.XPATH, value='//*[@id="rqHeaderCredits"]').find_elements(By.XPATH, value='*'))
+        for i in range(bubbles):
+            answers = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span').text
+            answers = answers[-1]
+            print(answers)
+            try:
+                for i in range(int(answers)*3):
+                    time.sleep(5)
+                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{i}"]')
+                    if (option.get_attribute('iscorrectoption') == 'True'):
+                        option.click()
+            except Exception:
+                continue
+        
+    except Exception as e:
+        print(e)
         pass
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -332,6 +335,7 @@ def main():
             driver.quit()
         else:
             driver.quit()
+        
 
 
     
