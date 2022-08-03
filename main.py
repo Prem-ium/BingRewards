@@ -32,6 +32,22 @@ def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+def completeSet(driver):
+    driver.get('https://rewards.microsoft.com/')
+
+    try:
+        if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
+            exploreSet(driver)
+    except Exception as e: 
+        print(e)
+        pass
+    try:
+        if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
+            dailyPoll(driver)
+    except Exception as e: 
+        print(e)
+        pass
+
 
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
@@ -50,7 +66,33 @@ def getPoints(EMAIL, PASSWORD, driver):
     except Exception:
         pass
     return points
-
+def exploreSet(driver):
+    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+    time.sleep(2)
+    p = driver.current_window_handle
+    chwd = driver.window_handles
+    driver._switch_to.window(chwd[1])
+    driver.refresh()
+    time.sleep(5)
+    driver._switch_to.window(p)
+def dailyPoll(driver):
+    driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+    time.sleep(2)
+    p = driver.current_window_handle
+    try:
+        chwd = driver.window_handles
+        driver._switch_to.window(chwd[1])
+        driver.refresh()
+        time.sleep(5)
+        driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
+        time.sleep(5)
+        driver._switch_to.window(p)
+        driver.refresh()
+    except Exception:
+        driver._switch_to.window(p)
+        driver.refresh()
+        pass
+    time.sleep(5)
 def main():
     import time
     points = -1
@@ -110,6 +152,10 @@ def main():
             print(e)
             pass
         print('\n\n')
+        try:
+            completeSet(driver)
+        except Exception:
+            pass
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0):
             alerts.notify(title=f'Bing Rewards {EMAIL} Automation Starting...', body=f'Points: {points}')
@@ -140,8 +186,13 @@ def main():
 
                     # add delay to prevent ban
                     time.sleep(4)
-                    go = driver.find_element(By.ID, value = "sb_form_go")
-                    go.click()
+                    try:
+                      go = driver.find_element(By.ID, value = "sb_form_go")
+                      go.click()
+                        
+                    except:
+                        driver.find_element(By.ID, value = "sb_form_go").send_keys(Keys.RETURN)
+                        pass
 
                     # add delay to prevent ban
                     time.sleep(delay)
@@ -199,7 +250,7 @@ def main():
                         time.sleep(4)
                         go = driver.find_element_by_id("sb_form_go")
                         go.click()
-                    except Exception as e:
+                    except Exception:
                         ping.send_keys(Keys.ENTER)
                         pass
                     time.sleep(delay)
@@ -229,7 +280,6 @@ def main():
         else:
             driver.quit()
 
-    time.sleep(21600)
 
     
 
@@ -242,4 +292,3 @@ if __name__ == "__main__":
           alerts.notify(title=f'Bing Rewards',body=f'Bing Automation Failed!\n{e}\nAttempting to restart...')
           time.sleep(500)
           continue
-
