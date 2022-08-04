@@ -51,8 +51,8 @@ def exploreSet(driver):
         driver.refresh()
         pass
     driver.close()
-    #driver.refresh()
-    #driver._switch_to.window(p)
+    driver.refresh()
+    driver._switch_to.window(p)
     print('Exploring Set completed')
     return
 
@@ -76,8 +76,8 @@ def dailyPoll(driver):
         time.sleep(8)
         print('Daily Poll completed')
         driver.close()
-        #driver._switch_to.window(p)
-        #driver.refresh()
+        driver._switch_to.window(p)
+        driver.refresh()
     except Exception as e:
         driver._switch_to.window(p)
         driver.refresh()
@@ -114,7 +114,7 @@ def dailyQuiz(driver):
             time.sleep(5)
         print('Daily Quiz completed')
         driver.close()
-        # driver._switch_to.window(chwd[0])
+        driver._switch_to.window(p)
         return
     except Exception as e:
         pass
@@ -142,6 +142,7 @@ def dailyQuiz(driver):
                         continue
                 print('Daily Quiz completed')
                 driver.close()
+                driver._switch_to.window(p)
                 return
 
             elif (driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]')):
@@ -152,7 +153,7 @@ def dailyQuiz(driver):
                     time.sleep(13)
                 print('Daily Quiz completed')
                 driver.close()
-                # driver._switch_to.window(chwd[0])
+                driver._switch_to.window(p)
                 return
         except Exception as e:
             print(e)
