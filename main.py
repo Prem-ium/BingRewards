@@ -3,7 +3,8 @@ import os
 import apprise
 import time
 import random
-#os.system("pip install RandomWords")
+import traceback
+os.system("pip install RandomWords")
 from random_words import RandomWords
 
 from selenium import webdriver
@@ -76,7 +77,7 @@ def dailyPoll(driver):
         print('Daily Poll completed')
         driver.close()
         #driver._switch_to.window(p)
-        driver.refresh()
+        #driver.refresh()
     except Exception as e:
         driver._switch_to.window(p)
         driver.refresh()
@@ -238,8 +239,8 @@ def main():
         except Exception as e:
             print(e)
             pass
-        #driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
-        driver.get('https://rewards.microsoft.com/')
+        driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
+        #driver.get('https://rewards.microsoft.com/')
         print('\n\n')
         ranSets = False
 
@@ -394,8 +395,8 @@ if __name__ == "__main__":
             main()
             time.sleep(21600)
         except Exception as e:
-            print(f"Error.\n{e}\nRestarting...")
+            print(f"Error.\n{e}\n\n{traceback.format_exc()}\nRestarting...")
             alerts.notify(title=f'Bing Rewards',
                           body=f'Bing Automation Failed!\n{e}\nAttempting to restart...')
-            time.sleep(500)
+            time.sleep(20)
             continue
