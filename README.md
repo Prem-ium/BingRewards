@@ -25,5 +25,5 @@ To run this project, you will need to add the following environment variables to
 
 # To-Do:
 - Bonus Sets on Microsoft Rewards Dashboard
-- Fixing Quiz Automation 
+- Fixing Quiz, Poll, and Explore Set Automation 
 - Code Cleanup
