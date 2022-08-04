@@ -3,9 +3,9 @@ import os
 import apprise
 import time
 import random
-
 #os.system("pip install RandomWords")
 from random_words import RandomWords
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -41,11 +41,17 @@ def exploreSet(driver):
     time.sleep(2)
     chwd = driver.window_handles
     driver._switch_to.window(chwd[1])
-    driver.refresh()
-    time.sleep(8)
+    try:
+        time.sleep(5)
+        driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
+        time.sleep(8)
+        driver.refresh()
+    except:
+        driver.refresh()
+        pass
     driver.close()
     #driver.refresh()
-    # driver._switch_to.window(p)
+    #driver._switch_to.window(p)
     print('Exploring Set completed')
     return
 
@@ -58,13 +64,18 @@ def dailyPoll(driver):
     try:
         chwd = driver.window_handles
         driver._switch_to.window(chwd[1])
-        driver.refresh()
+        try:
+            time.sleep(5)
+            driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
+        except:
+            driver.refresh()
+            pass
         time.sleep(5)
         driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
         time.sleep(8)
         print('Daily Poll completed')
         driver.close()
-        # driver._switch_to.window(p)
+        #driver._switch_to.window(p)
         driver.refresh()
     except Exception as e:
         driver._switch_to.window(p)
@@ -83,9 +94,15 @@ def dailyQuiz(driver):
     chwd = driver.window_handles
     driver._switch_to.window(chwd[1])
     time.sleep(8)
-    driver.refresh()
     # //*[@id="slideexp6_950E60"] XPATH choice container
-
+    try:
+        time.sleep(5)
+        driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
+        time.sleep(3)
+        driver.refresh()
+    except:
+        driver.refresh()
+        pass
     try:
         numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1]
         numberOfQuestions = numberOfQuestions[:-1]
@@ -291,7 +308,7 @@ def main():
 
                     # add delay to prevent ban
                     time.sleep(delay)
-                    print(f'Doing {x} search out of {Number_PC_Search} this is {x/Number_PC_Search*100} percent done.')
+                    print(f'Doing {x} search out of {Number_PC_Search} this is {int(x/Number_PC_Search*100)} percent done.')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -343,7 +360,7 @@ def main():
                         pass
                     time.sleep(delay)
 
-                    print(f'Doing {x} search out of {Number_PC_Search} this is {x/Number_PC_Search*100} percent done.')
+                    print(f'Doing {x} search out of {Number_Mobile_Search} this is {int(x/Number_Mobile_Search*100)} percent done.')
 
                 print("Account [" + EMAIL + "] has completed mobile searches]")
                 driver.quit()
