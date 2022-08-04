@@ -4,7 +4,7 @@ import apprise
 import time
 import random
 import traceback
-os.system("pip install RandomWords")
+#os.system("pip install RandomWords")
 from random_words import RandomWords
 
 from selenium import webdriver
