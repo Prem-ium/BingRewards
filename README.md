@@ -3,7 +3,7 @@ A selenium based python project which auto completes Bing Reward's daily PC and 
 
 ## Installation
 
-Install the following dependncies using pip:
+### - Install the following dependencies using pip:
 ```sh
    pip install RandomWords
    pip install Selenium
@@ -15,6 +15,10 @@ Alternatively, you can clone this repository and install using requirements.txt
    cd Bing-Rewards
    pip install -r requirements.txt
    ```
+### - Start the program
+```sh
+   python main.py
+```
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file. 
