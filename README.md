@@ -1,7 +1,20 @@
 # Bing Rewards Automation
 A selenium based python project which auto completes Bing Reward's daily PC and mobile bing searches across multiple accounts. 
 
+## Installation
 
+Install the following dependncies using pip:
+```sh
+   pip install RandomWords
+   pip install Selenium
+   pip install apprise
+   ```
+Alternatively, you can clone this repository and install using requirements.txt
+```sh
+   git clone https://github.com/sazncode/Bing-Rewards.git
+   cd Bing-Rewards
+   pip install -r requirements.txt
+   ```
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file. 
