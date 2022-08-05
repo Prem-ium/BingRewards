@@ -19,11 +19,9 @@ To run this project, you will need to add the following environment variables to
 ## Features
 
 - Multiple Bing Rewards Accounts
-- PC and Mobile Search Automation
+- PC & Mobile Search Automation
 - (some) Bing Quiz Automation
-- Daily notifications
+- Apprise Alerts
 
 # To-Do:
 - Bonus Sets on Microsoft Rewards Dashboard
-- Fixing Quiz, Poll, and Explore Set Automation 
-- Code Cleanup
