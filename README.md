@@ -3,11 +3,11 @@ A selenium based python project which auto completes Bing Reward's daily PC and 
 
 ## Installation
 
-### - Install the following dependencies using pip:
+### - Install the following dependencies using pip3:
 ```sh
-   pip install RandomWords
-   pip install Selenium
-   pip install apprise
+   pip3 install RandomWords
+   pip3 install Selenium
+   pip3 install apprise
    ```
 Alternatively, you can clone this repository and install using requirements.txt
 ```sh
