@@ -13,7 +13,7 @@ Alternatively, you can clone this repository and install using requirements.txt
 ```sh
    git clone https://github.com/sazncode/Bing-Rewards.git
    cd Bing-Rewards
-   pip install -r requirements.txt
+   pip3 install -r requirements.txt
    ```
 ### - Start the program
 ```sh
