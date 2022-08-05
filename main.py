@@ -4,7 +4,7 @@ import apprise
 import time
 import random
 import traceback
-#os.system("pip install RandomWords")
+os.system("pip install RandomWords")
 from random_words import RandomWords
 
 from selenium import webdriver
@@ -399,6 +399,7 @@ if __name__ == "__main__":
     while True:
         try:
             main()
+            print('Finished Bing Automation without any issues! Sleeping for a bit...')
             time.sleep(21600)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
