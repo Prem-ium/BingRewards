@@ -25,3 +25,4 @@ To run this project, you will need to add the following environment variables to
 
 # To-Do:
 - Bonus Sets on Microsoft Rewards Dashboard
+- Select Only Correct Answers on other formats of Quizzes (currently only serves as completition automation for set streak reward)
