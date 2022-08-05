@@ -8,7 +8,7 @@ To run this project, you will need to add the following environment variables to
 
 `LOGIN` = 'EMAIL:PASSWORD,EMAIL2:PASSWORD2'
 
-`URL` = '{SIGN IN LINK FROM https://bing.com/}'
+`URL` = 'Sign in link obtained through https://bing.com/'
 
 'APPRISE_ALERTS' = see .env example for more details
 
@@ -20,9 +20,9 @@ To run this project, you will need to add the following environment variables to
 
 - Multiple Bing Rewards Accounts
 - PC & Mobile Search Automation
-- (some) Bing Quiz Automation
+- More Activities/Bonus Automation
+- Bing Quiz, Poll, and Explore Automation
 - Apprise Alerts
 
 # To-Do:
-- Bonus Sets on Microsoft Rewards Dashboard
-- Select Only Correct Answers on other formats of Quizzes (currently only serves as completition automation for set streak reward)
+- Selecting correct answers only on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
