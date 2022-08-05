@@ -52,10 +52,7 @@ def completeQuiz(driver):
             time.sleep(8)
             driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
             time.sleep(5)
-            print('\n\tQuiz completed!')
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
+        print('\n\tQuiz completed!')
         return
     except Exception as e:
         pass
@@ -81,21 +78,14 @@ def completeQuiz(driver):
                     except Exception:
                         continue
                 print('\n\tQuiz completed!')
-                driver.close()
-                driver._switch_to.window(p)
-                driver.refresh()
                 return
 
             elif (driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]')):
                 numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]').text.strip().split("of ")[1]
-                print(numberOfQuestions)
                 for i in range(int(numberOfQuestions)):
                     driver.find_element(By.CLASS_NAME, value='btOptionCard').click()
                     time.sleep(13)
                 print('\n\tQuiz completed!')
-                driver.close()
-                driver._switch_to.window(p)
-                driver.refresh()
                 return
         except Exception as e:
             print(e)
@@ -142,7 +132,7 @@ def completePoll(driver):
 def completeMore(driver):
     driver.get('https://rewards.microsoft.com/')
     try:
-        for i in range(27):
+        for i in range(15):
             i+=1
             try:
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
@@ -165,7 +155,7 @@ def completeMore(driver):
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
-                            break
+                            continue
                         except:
                             pass
                         try:
@@ -173,6 +163,7 @@ def completeMore(driver):
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
+                            continue
                         except:
                             pass
                         try:
@@ -180,7 +171,7 @@ def completeMore(driver):
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
-                            break
+                            continue
                         except:
                             driver.close()
                             driver._switch_to.window(p)
@@ -198,6 +189,7 @@ def completeMore(driver):
     except Exception as e:
         print(traceback.format_exc())
         pass
+    return
 
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -228,6 +220,8 @@ def dailySet(driver):
             if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
                 p = driver.current_window_handle
                 driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+                chwd = driver.window_handles
+                driver._switch_to.window(chwd[1])
                 completeSet(driver)
                 driver.close()
                 driver._switch_to.window(p)
@@ -242,6 +236,8 @@ def dailySet(driver):
             if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
                 p = driver.current_window_handle
                 driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+                chwd = driver.window_handles
+                driver._switch_to.window(chwd[1])
                 completePoll(driver)
                 driver.close()
                 driver._switch_to.window(p)
@@ -255,6 +251,8 @@ def dailySet(driver):
             if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium" or driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") =="mee-icon mee-icon-HourGlass"):
                 p = driver.current_window_handle
                 driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+                chwd = driver.window_handles
+                driver._switch_to.window(chwd[1])
                 completeQuiz(driver)
                 driver.close()
                 driver._switch_to.window(p)
@@ -277,6 +275,10 @@ def main():
     # LOGIN EXAMPLE:
     # "EMAIL:PASSWORD,EMAIL:PASSWORD"
     accounts = os.environ["LOGIN"].split(",")
+
+    if(len(accounts) > 5):
+        raise Exception("Too many accounts. Bing limits 5 accounts per ip address. Going above that amount is likely to resort in a ban. Adjust LOGIN and restart the program.")
+
     delay = 6
 
     # Loop through the array of accounts, splitting each string into an username and a password, then doing edge and mobile searches
@@ -333,6 +335,7 @@ def main():
         ranSets = False
 
         ranSets = dailySet(driver)
+        completeMore(driver)
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets):
             alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${int(points)/1300} \n')
