@@ -33,6 +33,38 @@ def login(EMAIL, PASSWORD, driver):
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
+def completeSet(driver):
+    time.sleep(10)
+    try:
+        time.sleep(5)
+        driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
+        time.sleep(8)
+        driver.refresh()
+    except:
+        driver.refresh()
+        pass
+    driver.close()
+    print('\n\tExplore completed!')
+    return
+
+
+def completePoll(driver):
+    try:
+        driver.refresh()
+        try:
+            time.sleep(5)
+            driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
+        except:
+            driver.refresh()
+            pass
+        time.sleep(5)
+        driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
+        time.sleep(8)
+        print('\n\tPoll completed!')
+    except:
+        pass
+    time.sleep(3)
+    return
 
 def completeQuiz(driver):
     time.sleep(7)
@@ -90,44 +122,6 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
-
-
-def completeSet(driver):
-    time.sleep(10)
-    try:
-        time.sleep(5)
-        driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        time.sleep(8)
-        driver.refresh()
-    except:
-        driver.refresh()
-        pass
-    driver.close()
-    print('\n\tExplore completed!')
-    return
-
-
-def completePoll(driver):
-    try:
-        driver.refresh()
-        try:
-            time.sleep(5)
-            driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        except:
-            driver.refresh()
-            pass
-        time.sleep(5)
-        driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
-        time.sleep(8)
-        print('\n\tPoll completed!')
-    except:
-        pass
-    time.sleep(3)
-    return
-
-
-
-
 
 def completeMore(driver):
     driver.get('https://rewards.microsoft.com/')
@@ -262,8 +256,8 @@ def dailySet(driver):
             driver.get('https://rewards.microsoft.com/')
             print(e)
             pass
-        return ranSets
 
+        return ranSets
 
 
 def main():
@@ -378,7 +372,7 @@ def main():
 
                     # add delay to prevent ban
                     time.sleep(delay)
-                    print(f'Doing {x} search out of {Number_PC_Search} this is {int(x/Number_PC_Search*100)} percent done.')
+                    print(f'{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -431,7 +425,7 @@ def main():
                         pass
                     time.sleep(delay)
 
-                    print(f'Doing {x} search out of {Number_Mobile_Search} this is {int(x/Number_Mobile_Search*100)} percent done.')
+                    print(f'{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
 
                 print("Account [" + EMAIL + "] has completed mobile searches]")
                 driver.quit()
