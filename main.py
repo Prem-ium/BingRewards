@@ -275,7 +275,7 @@ def main():
             pass
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets):
-            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t{EMAIL}\nPoints:\t{points}\nCash Value:\t${points/1300}\n')
+            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points: \t {points} \nCash Value: \t ${int(points)/1300} \n')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get('https://www.bing.com/')
@@ -379,7 +379,7 @@ def main():
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
 
-            alerts.notify(title=f'Bing Rewards Automation Complete', body=f'Email:\t{EMAIL}\nPoints:\t{points}\nCash Value:\t${points/1300}\n')
+            alerts.notify(title=f'Bing Rewards Automation Complete', body=f'Email:\t {EMAIL} \nPoints:\t {points} \nCash Value:\t ${int(points)/1300} \n')
             driver.quit()
         else:
             driver.quit()
@@ -399,11 +399,10 @@ if __name__ == "__main__":
     while True:
         try:
             main()
-            print('Finished Bing Automation without any issues! Sleeping for a bit...')
             time.sleep(21600)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
             alerts.notify(title=f'Bing Rewards Failed!',
-                          body=f'EXCEPTION:{e}\n\nTraceback:{traceback.format_exc()}\n\nAttempting to restart...')
+                          body=f'EXCEPTION: {e} \n\n Traceback: {traceback.format_exc()} \n\nAttempting to restart...')
             time.sleep(20)
             continue
