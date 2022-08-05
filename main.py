@@ -13,7 +13,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from keep_alive import keep_alive
 
 # LOGIN EXAMPLE:
 # "EMAIL:PASSWORD,EMAIL:PASSWORD"
@@ -457,11 +456,6 @@ def main():
     if (len(ACCOUNTS) > 1):
         alerts.notify(title=f'Bing Rewards Automation Complete', 
                             body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${report/1300} \n')
-
-    try:
-        keep_alive()
-    except:
-        pass
 
     report = 0
     return
