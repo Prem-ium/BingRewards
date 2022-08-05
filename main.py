@@ -1,9 +1,9 @@
 import os
-#os.system("pip install apprise")
-import apprise
 import time
 import random
 import traceback
+#os.system("pip install apprise")
+import apprise
 #os.system("pip install RandomWords")
 from random_words import RandomWords
 
@@ -13,6 +13,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
+from keep_alive import keep_alive
+
+# LOGIN EXAMPLE:
+# "EMAIL:PASSWORD,EMAIL:PASSWORD"
+ACCOUNTS = os.environ["LOGIN"].split(",")
+
+if (len(ACCOUNTS) > 5):
+    raise Exception("Too many ACCOUNTS. Bing limits 5 ACCOUNTS per ip address. Going above that amount is likely to resort in a ban. Adjust LOGIN and restart the program.")
 
 # Optional
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
@@ -20,9 +28,17 @@ if APPRISE_ALERTS:
     APPRISE_ALERTS = APPRISE_ALERTS.split(",")
 
 points = -1
+TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
+         "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
+        "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
 
-TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ", "what is the example of ", "what is the pronunciation of ", "what is the synonym of ", "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
 
+def apprise_init():
+    alerts = apprise.Apprise()
+    # Add all services from .env
+    for service in APPRISE_ALERTS:
+        alerts.add(service)
+    return alerts
 
 def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
@@ -123,7 +139,9 @@ def completeQuiz(driver):
             print(e)
             pass
 
+
 def completeMore(driver):
+    ran = False
     driver.get('https://rewards.microsoft.com/')
     try:
         for i in range(15):
@@ -149,6 +167,7 @@ def completeMore(driver):
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
+                            ran = True
                             continue
                         except:
                             pass
@@ -157,6 +176,7 @@ def completeMore(driver):
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
+                            ran = True
                             continue
                         except:
                             pass
@@ -165,11 +185,13 @@ def completeMore(driver):
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
+                            ran = True
                             continue
                         except:
                             driver.close()
                             driver._switch_to.window(p)
                             driver.refresh()
+                            ran = True
                             pass
                     except:
                         print(traceback.format_exc())
@@ -183,7 +205,7 @@ def completeMore(driver):
     except Exception as e:
         print(traceback.format_exc())
         pass
-    return
+    return ran
 
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -262,22 +284,12 @@ def dailySet(driver):
 
 def main():
     points = -1
+    report = 0
     rw = "Random"
-    # Loop through all accounts doing edge and mobile searches
     rw = RandomWords()
-
-    # LOGIN EXAMPLE:
-    # "EMAIL:PASSWORD,EMAIL:PASSWORD"
-    accounts = os.environ["LOGIN"].split(",")
-
-    if(len(accounts) > 5):
-        raise Exception("Too many accounts. Bing limits 5 accounts per ip address. Going above that amount is likely to resort in a ban. Adjust LOGIN and restart the program.")
-
     delay = 6
-
-    # Loop through the array of accounts, splitting each string into an username and a password, then doing edge and mobile searches
-    for x in accounts:
-        import time
+    # Loop through the array of ACCOUNTS, splitting each string into an username and a password, then doing edge and mobile searches
+    for x in ACCOUNTS:
 
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
@@ -304,7 +316,7 @@ def main():
             driver.find_element(By.XPATH, value='//*[@id="rx-user-status-action"]').click()
             time.sleep(7)
             PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
-            if(int(PC[0]) < int(PC[1])):
+            if (int(PC[0]) < int(PC[1])):
                 Number_PC_Search = int((int(PC[1]) - int(PC[0])) / 5)
                 print(f'\tPC Searches Left:\t{Number_PC_Search}')
             else:
@@ -313,8 +325,7 @@ def main():
             if (int(PC[1]) > 50):
                 MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
                 if (int(MOBILE[0]) < int(MOBILE[1])):
-                    Number_Mobile_Search = int(
-                        (int(MOBILE[1]) - int(MOBILE[0])) / 5)
+                    Number_Mobile_Search = int((int(MOBILE[1]) - int(MOBILE[0])) / 5)
                     print(f'\tMobile Searches Left:\t{Number_Mobile_Search}')
                 else:
                     Number_Mobile_Search = 0
@@ -326,12 +337,11 @@ def main():
             pass
         driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
         #driver.get('https://rewards.microsoft.com/')
-        ranSets = False
+       # ranSets = False
 
-        ranSets = dailySet(driver)
-        completeMore(driver)
+        #ranSets = dailySet(driver) or completeMore(driver)
         # Starts Edge Search Loop
-        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets):
+        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or dailySet(driver) or completeMore(driver)):
             alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${int(points)/1300} \n')
             print('\n\n')
             if (Number_PC_Search > 0):
@@ -398,12 +408,13 @@ def main():
                 try:
                     driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
                     driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
-                except Exception as e:
+                except Exception:
                     pass
 
                 login(EMAIL, PASSWORD, driver)
                 print(f"Account {EMAIL} logged in successfully! Auto search initiated.")
                 driver.get('https://www.bing.com/')
+                
                 # Main search loop
                 for x in range(1, Number_Mobile_Search + 1):
                     value = random.choice(TERMS) + rw.random_word()
@@ -436,32 +447,36 @@ def main():
             driver = webdriver.Chrome(options=chrome_options)
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
-
-            alerts.notify(title=f'Bing Rewards Automation Complete', body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${int(points)/1300} \n')
+            report += int(points)
+            alerts.notify(title=f'Bing Rewards Automation Complete', 
+                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${int(points)/1300} \n')
             driver.quit()
         else:
             print('\n')
             driver.quit()
+    if (len(ACCOUNTS) > 1):
+        alerts.notify(title=f'Bing Rewards Automation Complete', 
+                            body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${report/1300} \n')
 
+    try:
+        keep_alive()
+    except:
+        pass
 
-def apprise_init():
-    alerts = apprise.Apprise()
-    # Add all services from .env
-    for service in APPRISE_ALERTS:
-        alerts.add(service)
-    return alerts
+    report = 0
+    return
 
-
-alerts = apprise_init()
 
 if __name__ == "__main__":
+    alerts = apprise_init()
     while True:
         try:
             main()
+            print('Bing Automation complete. Sleeping for some time before resuming checks.')
             time.sleep(21600)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
             alerts.notify(title=f'Bing Rewards Failed!',
-                          body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \n\nAttempting to restart...')
+                          body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...')
             time.sleep(20)
             continue
