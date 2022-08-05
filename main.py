@@ -26,17 +26,15 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 
 def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
-    driver.find_element(
-        By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
+    driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
     time.sleep(2)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
-    driver.find_element(
-        By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
+    driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     time.sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 def exploreSet(driver):
-    print('Exploring Set starting...')
+    print('\n\tDaily Explore starting...')
     p = driver.current_window_handle
     driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
     time.sleep(2)
@@ -51,20 +49,21 @@ def exploreSet(driver):
         driver.refresh()
         pass
     driver.close()
-    driver.refresh()
     driver._switch_to.window(p)
-    print('Exploring Set completed')
+    driver.refresh()
+    print('\n\tDaily Explore completed!')
     return
 
 
 def dailyPoll(driver):
-    print('Daily Poill starting...')
+    print('\n\tDaily Poll starting...')
     driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
     time.sleep(2)
     p = driver.current_window_handle
     try:
         chwd = driver.window_handles
         driver._switch_to.window(chwd[1])
+        driver.refresh()
         try:
             time.sleep(5)
             driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
@@ -74,14 +73,13 @@ def dailyPoll(driver):
         time.sleep(5)
         driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
         time.sleep(8)
-        print('Daily Poll completed')
+        print('\n\tDaily Poll completed!')
         driver.close()
         driver._switch_to.window(p)
         driver.refresh()
     except Exception as e:
         driver._switch_to.window(p)
         driver.refresh()
-        print(f'Daily Poll error\t{e}...')
         pass
     time.sleep(5)
     return
@@ -89,7 +87,7 @@ def dailyPoll(driver):
 # Currently does not work with correct answers
 def dailyQuiz(driver):
     p = driver.current_window_handle
-    print('Daily Quiz starting...')
+    print('\n\tDaily Quiz Starting...')
     driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
     time.sleep(4)
     chwd = driver.window_handles
@@ -112,9 +110,10 @@ def dailyQuiz(driver):
             time.sleep(8)
             driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
             time.sleep(5)
-        print('Daily Quiz completed')
+            print('\n\tDaily Quiz completed!')
         driver.close()
         driver._switch_to.window(p)
+        driver.refresh()
         return
     except Exception as e:
         pass
@@ -140,9 +139,10 @@ def dailyQuiz(driver):
                                 option.click()
                     except Exception:
                         continue
-                print('Daily Quiz completed')
+                print('\n\tDaily Quiz completed!')
                 driver.close()
                 driver._switch_to.window(p)
+                driver.refresh()
                 return
 
             elif (driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]')):
@@ -151,9 +151,10 @@ def dailyQuiz(driver):
                 for i in range(int(numberOfQuestions)):
                     driver.find_element(By.CLASS_NAME, value='btOptionCard').click()
                     time.sleep(13)
-                print('Daily Quiz completed')
+                print('\n\tDaily Quiz completed!')
                 driver.close()
                 driver._switch_to.window(p)
+                driver.refresh()
                 return
         except Exception as e:
             print(e)
@@ -200,6 +201,8 @@ def main():
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        # EXPERIMENTAL
+        # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         driver = webdriver.Chrome(options=chrome_options)
         driver.implicitly_wait(4)
 
@@ -272,14 +275,15 @@ def main():
             pass
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets):
-            alerts.notify(title=f'Bing Rewards {EMAIL} Automation Starting...', body=f'Points: {points}')
+            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t{EMAIL}\nPoints:\t{points}\nCash Value:\t${points/1300}\n')
             if (Number_PC_Search > 0):
-                driver.get(os.environ['URL'])
+                rw = RandomWords()
+                driver.get('https://www.bing.com/')
                 try:
                     login(EMAIL, PASSWORD, driver)
                 except Exception as e:
                     driver.get('https://www.bing.com/')
-                    print(e)
+                    #print(e)
                     pass
                 # First test search
                 time.sleep(delay)
@@ -314,6 +318,7 @@ def main():
             driver.quit()
 
             if (Number_Mobile_Search > 0):
+                rw = RandomWords()
                 # Opens Mobile Driver
                 mobile_emulation = {"deviceName": "Nexus 5"}
                 chrome_options = webdriver.ChromeOptions()
@@ -323,6 +328,8 @@ def main():
                 chrome_options.add_argument('--disable-dev-shm-usage')
                 chrome_options.add_experimental_option(
                     "mobileEmulation", mobile_emulation)
+                # EXPERIMENTAL
+                # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
                 driver = webdriver.Chrome(options=chrome_options)
                 driver.implicitly_wait(4)
@@ -331,10 +338,8 @@ def main():
                 driver.maximize_window()
 
                 try:
-                    driver.find_element(
-                        By.XPATH, value='//*[@id="mHamburger"]').click()
-                    driver.find_element(
-                        By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
+                    driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
+                    driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
                 except Exception as e:
                     pass
 
@@ -374,7 +379,7 @@ def main():
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
 
-            alerts.notify(title=f'Bing Rewards {EMAIL} Automation Successful', body=f'Points: {points}')
+            alerts.notify(title=f'Bing Rewards Automation Complete', body=f'Email:\t{EMAIL}\nPoints:\t{points}\nCash Value:\t${points/1300}\n')
             driver.quit()
         else:
             driver.quit()
@@ -396,8 +401,8 @@ if __name__ == "__main__":
             main()
             time.sleep(21600)
         except Exception as e:
-            print(f"Error.\n{e}\n\n{traceback.format_exc()}\nRestarting...")
-            alerts.notify(title=f'Bing Rewards',
-                          body=f'Bing Automation Failed!\n{e}\nAttempting to restart...')
+            print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
+            alerts.notify(title=f'Bing Rewards Failed!',
+                          body=f'EXCEPTION:{e}\n\nTraceback:{traceback.format_exc()}\n\nAttempting to restart...')
             time.sleep(20)
             continue
