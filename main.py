@@ -55,11 +55,10 @@ def completeSet(driver):
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         time.sleep(8)
         driver.refresh()
+        print('\tExplore completed!')
     except:
         driver.refresh()
         pass
-    driver.close()
-    print('\n\tExplore completed!')
     return
 
 
@@ -75,7 +74,7 @@ def completePoll(driver):
         time.sleep(5)
         driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
         time.sleep(8)
-        print('\n\tPoll completed!')
+        print('\tPoll completed!')
     except:
         pass
     time.sleep(3)
@@ -99,7 +98,7 @@ def completeQuiz(driver):
             time.sleep(8)
             driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
             time.sleep(5)
-        print('\n\tQuiz completed!')
+        print('\tQuiz completed!')
         return
     except Exception as e:
         pass
@@ -124,7 +123,7 @@ def completeQuiz(driver):
                                 option.click()
                     except Exception:
                         continue
-                print('\n\tQuiz completed!')
+                print('\tQuiz completed!')
                 return
 
             elif (driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]')):
@@ -132,7 +131,7 @@ def completeQuiz(driver):
                 for i in range(int(numberOfQuestions)):
                     driver.find_element(By.CLASS_NAME, value='btOptionCard').click()
                     time.sleep(13)
-                print('\n\tQuiz completed!')
+                print('\tQuiz completed!')
                 return
         except Exception as e:
             print(e)
@@ -159,46 +158,49 @@ def completeMore(driver):
                     assign.click()
 
                     chwd = driver.window_handles
-                    driver._switch_to.window(chwd[1])
-                    try:
+                    if (chwd[1]):
+                        driver._switch_to.window(chwd[1])
                         try:
-                            completeQuiz(driver)
-                            driver.close()
-                            driver._switch_to.window(p)
-                            driver.refresh()
-                            ran = True
-                            continue
+                            try:
+                                completeQuiz(driver)
+                                driver.close()
+                                driver._switch_to.window(p)
+                                driver.refresh()
+                                ran = True
+                                continue
+                            except:
+                                pass
+                            try:
+                                completeSet(driver)
+                                driver.close()
+                                driver._switch_to.window(p)
+                                driver.refresh()
+                                ran = True
+                                continue
+                            except:
+                                pass
+                            try:
+                                completePoll(driver)
+                                driver.close()
+                                driver._switch_to.window(p)
+                                driver.refresh()
+                                ran = True
+                                continue
+                            except:
+                                driver.close()
+                                driver._switch_to.window(p)
+                                driver.refresh()
+                                ran = True
+                                pass
                         except:
+                            print(traceback.format_exc())
                             pass
-                        try:
-                            completeSet(driver)
-                            driver.close()
-                            driver._switch_to.window(p)
+                        finally:
+                            time.sleep(5)
                             driver.refresh()
-                            ran = True
-                            continue
-                        except:
-                            pass
-                        try:
-                            completePoll(driver)
-                            driver.close()
-                            driver._switch_to.window(p)
-                            driver.refresh()
-                            ran = True
-                            continue
-                        except:
-                            driver.close()
-                            driver._switch_to.window(p)
-                            driver.refresh()
-                            ran = True
-                            pass
-                    except:
-                        print(traceback.format_exc())
-                        pass
-                    finally:
-                        time.sleep(5)
-                        driver.refresh()
-                        time.sleep(5)
+                            time.sleep(5)
+                    else:
+                        driver.get('https://rewards.microsoft.com/')
             except:
                 continue
     except Exception as e:
@@ -336,11 +338,13 @@ def main():
             pass
         driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
         #driver.get('https://rewards.microsoft.com/')
-       # ranSets = False
+        ranSets = False 
+        ranMore = False
 
-        #ranSets = dailySet(driver) or completeMore(driver)
+        ranSets = dailySet(driver)
+        ranMore = completeMore(driver)
         # Starts Edge Search Loop
-        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or dailySet(driver) or completeMore(driver)):
+        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
             alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${int(points)/1300} \n')
             print('\n\n')
             if (Number_PC_Search > 0):
@@ -453,9 +457,9 @@ def main():
         else:
             print('\n')
             driver.quit()
-    if (len(ACCOUNTS) > 1):
-        alerts.notify(title=f'Bing Rewards Automation Complete', 
-                            body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${report/1300} \n')
+
+    alerts.notify(title=f'Bing Rewards Automation Complete', 
+                        body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${report/1300} \n')
 
     report = 0
     return
@@ -472,5 +476,5 @@ if __name__ == "__main__":
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
             alerts.notify(title=f'Bing Rewards Failed!',
                           body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...')
-            time.sleep(20)
+            time.sleep(600)
             continue
