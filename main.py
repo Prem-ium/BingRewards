@@ -15,6 +15,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from dotenv import load_dotenv
 
+# Load ENV
 load_dotenv()
 
 # LOGIN EXAMPLE:
@@ -145,7 +146,8 @@ def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
     try:
-        for i in range(15):
+        count = len(driver.find_elements(By.CLASS_NAME, 'ds-card-sec')) - 6
+        for i in range(count):
             i+=1
             try:
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
@@ -348,7 +350,7 @@ def main():
         ranMore = completeMore(driver)
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
-            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${int(points.replace(",",""))/1300} \n')
+            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${round(int(points.replace(",",""))/1300, 2)} \n')
             print('\n\n')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
@@ -455,14 +457,14 @@ def main():
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
             alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${int(points.replace(",",""))/1300} \n')
+                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(float(points.replace(",",""))/1300), 2} \n')
             driver.quit()
         else:
             print('\n')
             driver.quit()
 
     alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${report/1300} \n')
+                        body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)} \n')
     
     report = 0
     return
