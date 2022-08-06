@@ -345,7 +345,7 @@ def main():
         ranMore = completeMore(driver)
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
-            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${int(points)/1300} \n')
+            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${int(points.replace(",",""))/1300} \n')
             print('\n\n')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
@@ -450,9 +450,9 @@ def main():
             driver = webdriver.Chrome(options=chrome_options)
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
-            report += int(points)
+            report += int(points.replace(",",""))
             alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${int(points)/1300} \n')
+                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${int(points.replace(",",""))/1300} \n')
             driver.quit()
         else:
             print('\n')
@@ -460,7 +460,7 @@ def main():
 
     alerts.notify(title=f'Bing Rewards Automation Complete', 
                         body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${report/1300} \n')
-
+    
     report = 0
     return
 
