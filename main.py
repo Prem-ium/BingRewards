@@ -2,9 +2,9 @@ import os
 import time
 import random
 import traceback
-#os.system("pip install apprise")
+os.system("pip install apprise")
 import apprise
-#os.system("pip install RandomWords")
+os.system("pip install RandomWords")
 from random_words import RandomWords
 
 from selenium import webdriver
@@ -14,7 +14,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from dotenv import load_dotenv
-
 # Load ENV
 load_dotenv()
 
@@ -146,8 +145,7 @@ def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
     try:
-        count = len(driver.find_elements(By.CLASS_NAME, 'ds-card-sec')) - 6
-        for i in range(count):
+        for i in range(15):
             i+=1
             try:
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
@@ -457,7 +455,7 @@ def main():
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
             alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(float(points.replace(",",""))/1300), 2} \n')
+                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(int(points.replace(",",""))/1300), 2} \n')
             driver.quit()
         else:
             print('\n')
@@ -465,7 +463,6 @@ def main():
 
     alerts.notify(title=f'Bing Rewards Automation Complete', 
                         body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)} \n')
-    
     report = 0
     return
 
