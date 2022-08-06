@@ -1,3 +1,4 @@
 apprise==0.9.9
+python-dotenv==0.20.0
 RandomWords==0.3.0
 selenium==4.3.0
