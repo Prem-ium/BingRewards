@@ -8,6 +8,7 @@ A selenium based python project which auto completes Bing Reward's daily PC and 
    pip3 install RandomWords
    pip3 install Selenium
    pip3 install apprise
+   pip3 install python-dotenv
    ```
 Alternatively, you can clone this repository and install using requirements.txt
 ```sh
