@@ -456,7 +456,7 @@ def main():
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
             alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((float(points) / 1300), 2)} \n')
+                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((int(points) / 1300), 2)} \n')
             driver.quit()
         else:
             print('\n')
