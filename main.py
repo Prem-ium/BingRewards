@@ -357,16 +357,10 @@ def main():
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(int(points.replace(",",""))/1300, 2)}\n\n ')
-            #print('\n\n')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get('https://www.bing.com/')
-                try:
-                    login(EMAIL, PASSWORD, driver)
-                except Exception as e:
-                    driver.get('https://www.bing.com/')
-                    #print(e)
-                    pass
+
                 # First test search
                 time.sleep(delay)
                 first = driver.find_element(By.ID, value="sb_form_q")
@@ -475,7 +469,8 @@ def main():
 
 
 if __name__ == "__main__":
-    alerts = apprise_init()
+    if APPRISE_ALERTS:
+        alerts = apprise_init()
     while True:
         try:
             main()
