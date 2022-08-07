@@ -54,6 +54,6 @@ Let the bot log in, this could take a minute. Make sure the bot logs in correctl
 - Apprise Alerts
 
 # To-Do:
-- Fix incorrect points being recorded/assigned (retrieving points too early, before the dashboard JS loads in full amount)
+- Remove Code Clutter (Fix getDriver() method, improve code readability, etc.)
 - Speed up 'more activities' execution
 - Selecting correct answers only on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
