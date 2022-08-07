@@ -54,6 +54,5 @@ Let the bot log in, this could take a minute. Make sure the bot logs in correctl
 - Apprise Alerts
 
 # To-Do:
-- Remove Code Clutter (Fix getDriver() method, improve code readability, etc.)
 - Speed up 'more activities' execution
 - Selecting correct answers only on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
