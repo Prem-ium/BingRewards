@@ -38,6 +38,13 @@ if APPRISE_ALERTS:
     APPRISE_ALERTS = APPRISE_ALERTS.split(",")
 
 points = -1
+
+HANDLE_DRIVER = os.environ.get("HANDLE DRIVER", "False")
+
+if (HANDLE_DRIVER == "True"):
+    HANDLE_DRIVER = True
+else:
+    HANDLE_DRIVER = False
 TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
          "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
@@ -303,15 +310,21 @@ def main():
     delay = 6
     # Loop through the array of ACCOUNTS, splitting each string into an username and a password, then doing edge and mobile searches
     for x in ACCOUNTS:
-
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        # EXPERIMENTAL
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-            options=chrome_options)
+        if not HANDLE_DRIVER:
+            chrome_options = Options()
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument('--disable-dev-shm-usage')
+            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+            driver = webdriver.Chrome(options=chrome_options)
+        else:
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument('--disable-dev-shm-usage')
+            # EXPERIMENTAL
+            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                options=chrome_options)
         driver.implicitly_wait(4)
 
         # Grab email
@@ -399,6 +412,22 @@ def main():
 
             if (Number_Mobile_Search > 0):
                 rw = RandomWords()
+
+                if not HANDLE_DRIVER:
+                    chrome_options = Options()
+                    chrome_options.add_argument('--no-sandbox')
+                    chrome_options.add_argument('--disable-dev-shm-usage')
+                    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+                    driver = webdriver.Chrome(options=chrome_options)
+                else:
+                    chrome_options = webdriver.ChromeOptions()
+                    chrome_options.add_argument('--no-sandbox')
+                    chrome_options.add_argument('--disable-dev-shm-usage')
+                    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+                    driver = webdriver.Chrome(
+                        service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                        options=chrome_options)
+
                 # Opens Mobile Driver
                 mobile_emulation = {"deviceName": "Nexus 5"}
                 chrome_options = webdriver.ChromeOptions()
