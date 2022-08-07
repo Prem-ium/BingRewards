@@ -19,12 +19,13 @@ from dotenv import load_dotenv
 
 # Load ENV
 load_dotenv()
+
 if not os.environ["LOGIN"]:
     raise Exception("LOGIN not set. Please enter your login information in .env variable 'LOGIN' in the following format: 'EMAIL:PASSWORD,EMAIL2:PASSWORD2,EMAIL3:PASSWORD3'")
 else:
     # LOGIN EXAMPLE:
     # "EMAIL:PASSWORD,EMAIL:PASSWORD"
-    ACCOUNTS = os.environ["LOGIN"].split(",")
+    ACCOUNTS = os.environ["LOGIN"].replace(" ", "").split(",")
 
 if (len(ACCOUNTS) > 5):
     raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
@@ -37,18 +38,16 @@ APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
     APPRISE_ALERTS = APPRISE_ALERTS.split(",")
 
-points = -1
-
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
 
 if (HANDLE_DRIVER == "True"):
     HANDLE_DRIVER = True
 else:
     HANDLE_DRIVER = False
+
 TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
          "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
-
 
 def apprise_init():
     if APPRISE_ALERTS:
@@ -105,13 +104,12 @@ def completeQuiz(driver):
         time.sleep(5)
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         time.sleep(3)
-        driver.refresh()
     except:
-        driver.refresh()
         pass
+    driver.refresh()
     try:
-        numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1]
-        numberOfQuestions = numberOfQuestions[:-1]
+        numberOfQuestions = (driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1])[:-1]
+        # numberOfQuestions = numberOfQuestions[:-1]
         for i in range(int(numberOfQuestions)):
             driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
             time.sleep(8)
@@ -230,8 +228,7 @@ def completeMore(driver):
 
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
-    driver.implicitly_wait(3)
-    #driver.get('https://rewards.microsoft.com/')
+    driver.implicitly_wait(4)
     driver.maximize_window()
     try:
         #driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
@@ -242,12 +239,12 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     try:
-        time.sleep(10)
+        time.sleep(13)
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
     except Exception:
         pass
-    return points
+    return int(points.replace(",", ""))
 
 
 def dailySet(driver):
@@ -300,42 +297,66 @@ def dailySet(driver):
             pass
 
         return ranSets
+def getPCDriver():
+    if not HANDLE_DRIVER:
+        chrome_options = Options()
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+        chrome_options = webdriver.ChromeOptions()
+
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
+    if not HANDLE_DRIVER:
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+            options=chrome_options)
+
+    return driver
+def getMobileDriver():
+    mobile_emulation = {"deviceName": "Nexus 5"}
+    if not HANDLE_DRIVER:
+        chrome_options = Options()
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+        chrome_options = webdriver.ChromeOptions()
+
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_experimental_option(
+        "mobileEmulation", mobile_emulation)
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
+    if not HANDLE_DRIVER:
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+            options=chrome_options)
+
+    return driver
 
 
 def main():
-    points = -1
     report = 0
-    rw = "Random"
     rw = RandomWords()
     delay = 6
-    # Loop through the array of ACCOUNTS, splitting each string into an username and a password, then doing edge and mobile searches
+
     for x in ACCOUNTS:
-        if not HANDLE_DRIVER:
-            chrome_options = Options()
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--disable-dev-shm-usage')
-            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-            driver = webdriver.Chrome(options=chrome_options)
-        else:
-            chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--disable-dev-shm-usage')
-            # EXPERIMENTAL
-            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-            driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-                options=chrome_options)
-        driver.implicitly_wait(4)
+        driver = getPCDriver()
 
         # Grab email
         colonIndex = x.index(":")+1
         EMAIL = x[0:colonIndex-1]
-        # Grab password
-        lastIndex = len(x)
-        PASSWORD = x[colonIndex:lastIndex]
+        PASSWORD = x[colonIndex:len(x)]
+
         # Set default search amount
         Number_Mobile_Search = 20
         Number_PC_Search = 34
+
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
 
@@ -343,13 +364,16 @@ def main():
             time.sleep(3)
             driver.find_element(By.XPATH, value='//*[@id="rx-user-status-action"]').click()
             time.sleep(7)
+
             PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
+            
             if (int(PC[0]) < int(PC[1])):
                 Number_PC_Search = int((int(PC[1]) - int(PC[0])) / 5)
                 print(f'\tPC Searches Left:\t{Number_PC_Search}')
             else:
                 Number_PC_Search = 0
                 print(f'\tPC Searches Completed:\t{PC[0]}/{PC[1]}')
+
             if (int(PC[1]) > 50):
                 MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
                 if (int(MOBILE[0]) < int(MOBILE[1])):
@@ -358,22 +382,26 @@ def main():
                 else:
                     Number_Mobile_Search = 0
                     print(f'\tMobile Searches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
+
             else:
                 Number_Mobile_Search = 0
+            
+            driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
         except Exception as e:
+            driver.get('https://rewards.microsoft.com/')
             print(e)
             pass
-        driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
-        #driver.get('https://rewards.microsoft.com/')
-        ranSets = False 
-        ranMore = False
+        ranDailySets = False 
+        ranMoreActivities = False
 
-        ranSets = dailySet(driver)
-        ranMore = completeMore(driver)
+        ranDailySets = dailySet(driver)
+        ranMoreActivities = completeMore(driver)
+
         # Starts Edge Search Loop
-        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
+        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(int(points.replace(",",""))/1300, 2)}\n\n ')
+                alerts.notify(title=f'Bing Rewards Automation Starting', 
+                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n ')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get('https://www.bing.com/')
@@ -412,32 +440,12 @@ def main():
 
             if (Number_Mobile_Search > 0):
                 rw = RandomWords()
-                mobile_emulation = {"deviceName": "Nexus 5"}
-                if not HANDLE_DRIVER:
-                    chrome_options = Options()
-                    chrome_options.add_argument('--no-sandbox')
-                    chrome_options.add_argument('--disable-dev-shm-usage')
-                    chrome_options.add_experimental_option(
-                        "mobileEmulation", mobile_emulation)
-                    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-                    driver = webdriver.Chrome(options=chrome_options)
-                else:
-                    chrome_options = webdriver.ChromeOptions()
-                    chrome_options.add_argument('--no-sandbox')
-                    chrome_options.add_argument('--disable-dev-shm-usage')
-                    chrome_options.add_experimental_option(
-                        "mobileEmulation", mobile_emulation)
-                    # EXPERIMENTAL
-                    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
-                    driver = webdriver.Chrome(
-                        service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-                        options=chrome_options)
-
-
+                driver = getMobileDriver()
                 driver.implicitly_wait(4)
                 driver.get(os.environ['URL'])
-
+                # TO TRY:
+                # driver.get('https://login.live.com/')
                 driver.maximize_window()
 
                 try:
@@ -476,28 +484,14 @@ def main():
                 print("\tAccount [" + EMAIL + "] has completed mobile searches]")
                 driver.quit()
 
-            if not HANDLE_DRIVER:
-                chrome_options = Options()
-                chrome_options.add_argument('--no-sandbox')
-                chrome_options.add_argument('--disable-dev-shm-usage')
-                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-                driver = webdriver.Chrome(options=chrome_options)
-            else:
-                chrome_options = webdriver.ChromeOptions()
-                chrome_options.add_argument('--no-sandbox')
-                chrome_options.add_argument('--disable-dev-shm-usage')
-                # EXPERIMENTAL
-                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-                driver = webdriver.Chrome(
-                    service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-                    options=chrome_options)
+            driver = getPCDriver()
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
-            report += int(points.replace(",",""))
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((int(points.replace(",", "")) / 1300), 2)}\n\n ')
+                    body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
         driver.quit()
+        record += points
         print(f'\n\n')
     if APPRISE_ALERTS:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
@@ -505,10 +499,10 @@ def main():
     report = 0
     return
 
-
 if __name__ == "__main__":
     if APPRISE_ALERTS:
         alerts = apprise_init()
+
     while True:
         try:
             main()
