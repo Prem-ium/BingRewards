@@ -349,8 +349,8 @@ def main():
         ranMore = completeMore(driver)
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
-            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email: \t {EMAIL} \n Points:\t\t {points} \nCash Value: \t\t${round(int(points.replace(",",""))/1300, 2)} \n')
-            print('\n\n')
+            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(int(points.replace(",",""))/1300, 2)}\n\n ')
+            #print('\n\n')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get('https://www.bing.com/')
@@ -419,7 +419,7 @@ def main():
                     pass
 
                 login(EMAIL, PASSWORD, driver)
-                print(f"Account {EMAIL} logged in successfully! Auto search initiated.")
+                print(f"\tAccount {EMAIL} logged in successfully! Auto search initiated.")
                 driver.get('https://www.bing.com/')
                 
                 # Main search loop
@@ -443,9 +443,9 @@ def main():
                         pass
                     time.sleep(delay)
 
-                    print(f'{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
+                    print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
 
-                print("Account [" + EMAIL + "] has completed mobile searches]")
+                print("\tAccount [" + EMAIL + "] has completed mobile searches]")
                 driver.quit()
 
             chrome_options = Options()
@@ -456,14 +456,12 @@ def main():
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
             alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Email:\t {EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((int(points) / 1300), 2)} \n')
-            driver.quit()
-        else:
-            print('\n')
-            driver.quit()
+                        body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((int(points.replace(",", "")) / 1300), 2)}\n\n ')
+        driver.quit()
+        print(f'\n\n')
 
     alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)} \n')
+                        body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)}\n\n ')
     report = 0
     return
 
@@ -478,6 +476,6 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
             alerts.notify(title=f'Bing Rewards Failed!',
-                          body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...')
+                          body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
             time.sleep(600)
             continue
