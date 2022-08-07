@@ -17,13 +17,18 @@ from dotenv import load_dotenv
 
 # Load ENV
 load_dotenv()
-
-# LOGIN EXAMPLE:
-# "EMAIL:PASSWORD,EMAIL:PASSWORD"
-ACCOUNTS = os.environ["LOGIN"].split(",")
+if not os.environ["LOGIN"]:
+    raise Exception("LOGIN not set. Please enter your login information in .env variable 'LOGIN' in the following format: 'EMAIL:PASSWORD,EMAIL2:PASSWORD2,EMAIL3:PASSWORD3'")
+else:
+    # LOGIN EXAMPLE:
+    # "EMAIL:PASSWORD,EMAIL:PASSWORD"
+    ACCOUNTS = os.environ["LOGIN"].split(",")
 
 if (len(ACCOUNTS) > 5):
-    raise Exception("Too many ACCOUNTS. Bing limits 5 ACCOUNTS per ip address. Going above that amount is likely to resort in a ban. Adjust LOGIN and restart the program.")
+    raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
+
+if not os.environ["URL"]:
+    raise Exception("URL not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
 
 # Optional
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
@@ -37,11 +42,12 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 
 
 def apprise_init():
-    alerts = apprise.Apprise()
-    # Add all services from .env
-    for service in APPRISE_ALERTS:
-        alerts.add(service)
-    return alerts
+    if APPRISE_ALERTS:
+        alerts = apprise.Apprise()
+        # Add all services from .env
+        for service in APPRISE_ALERTS:
+            alerts.add(service)
+        return alerts
 
 def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
@@ -349,7 +355,8 @@ def main():
         ranMore = completeMore(driver)
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranSets or ranMore):
-            alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(int(points.replace(",",""))/1300, 2)}\n\n ')
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'Bing Rewards Automation Starting', body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(int(points.replace(",",""))/1300, 2)}\n\n ')
             #print('\n\n')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
@@ -455,13 +462,14 @@ def main():
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
-            alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((int(points.replace(",", "")) / 1300), 2)}\n\n ')
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'Bing Rewards Automation Complete', 
+                    body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round((int(points.replace(",", "")) / 1300), 2)}\n\n ')
         driver.quit()
         print(f'\n\n')
-
-    alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)}\n\n ')
+    if APPRISE_ALERTS:
+        alerts.notify(title=f'Bing Rewards Automation Complete', 
+                    body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)}\n\n ')
     report = 0
     return
 
@@ -475,7 +483,10 @@ if __name__ == "__main__":
             time.sleep(21600)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
-            alerts.notify(title=f'Bing Rewards Failed!',
-                          body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
+
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'Bing Rewards Failed!',
+                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
+
             time.sleep(600)
             continue
