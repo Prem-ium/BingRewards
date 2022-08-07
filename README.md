@@ -43,6 +43,6 @@ To run this project, you will need to add the following environment variables to
 - Apprise Alerts
 
 # To-Do:
-- Fix incorrect Points being assigned
+- Fix incorrect points being recorded/assigned (retrieving points too early, before the dashboard JS loads in full amount)
 - Speed up 'more activities' execution
 - Selecting correct answers only on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
