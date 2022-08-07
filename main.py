@@ -298,7 +298,6 @@ def dailySet(driver):
 
         return ranSets
 
-# Not Working currently...
 def getDriver(isMobile = False):
     if not HANDLE_DRIVER:
         chrome_options = Options()
