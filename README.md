@@ -43,4 +43,6 @@ To run this project, you will need to add the following environment variables to
 - Apprise Alerts
 
 # To-Do:
+- Fix incorrect Points being assigned
+- Speed up 'more activities' execution
 - Selecting correct answers only on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
