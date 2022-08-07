@@ -10,7 +10,7 @@ To run this project, you will need to add the following environment variables to
 `URL` = 'Sign in link obtained through https://bing.com/'
 
 Optional:
-
+`HANDLE_DRIVER` = True or False. Depending on if you wish for driver to be downloaded for you.
 `APPRISE_ALERTS` = see .env example for more details
 ## Installation
 
