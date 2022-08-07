@@ -482,10 +482,21 @@ def main():
                 print("\tAccount [" + EMAIL + "] has completed mobile searches]")
                 driver.quit()
 
-            chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--disable-dev-shm-usage')
-            driver = webdriver.Chrome(ChromeDriverManager(cache_valid_range=30).install(), options=chrome_options)
+            if not HANDLE_DRIVER:
+                chrome_options = Options()
+                chrome_options.add_argument('--no-sandbox')
+                chrome_options.add_argument('--disable-dev-shm-usage')
+                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+                driver = webdriver.Chrome(options=chrome_options)
+            else:
+                chrome_options = webdriver.ChromeOptions()
+                chrome_options.add_argument('--no-sandbox')
+                chrome_options.add_argument('--disable-dev-shm-usage')
+                # EXPERIMENTAL
+                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+                driver = webdriver.Chrome(
+                    service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                    options=chrome_options)
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
