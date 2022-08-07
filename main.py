@@ -39,7 +39,7 @@ if APPRISE_ALERTS:
 
 points = -1
 
-HANDLE_DRIVER = os.environ.get("HANDLE DRIVER", "False")
+HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
 
 if (HANDLE_DRIVER == "True"):
     HANDLE_DRIVER = True
