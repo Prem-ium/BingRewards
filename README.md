@@ -31,6 +31,14 @@ Alternatively, you can clone this repository and install using requirements.txt
 ```sh
    python main.py
 ```
+
+### Docker Container
+View on [Docker Hub](https://hub.docker.com/repository/docker/nelsondane/bing-rewards)
+1. Download and install Docker on your system
+2. Run: `docker run -it --env-file ./.env --restart unless-stopped --name bing-rewards nelsondane/bing-rewards:latest`. This creates a new container called bing-rewards. Make sure you have the correct path to your `.env` file you created.
+
+Let the bot log in, this could take a minute. Make sure the bot logs in correctly: wait until it prints your email and points DO NOT PRESS CTRL-C. This will kill the container. To exit the logs view, press CTRL-p then CTRL-q. This will exit the logs view but let the bot keep running.
+
 ## Demo
 
 {coming soon}

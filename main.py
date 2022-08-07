@@ -13,6 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from dotenv import load_dotenv
 
 # Load ENV
@@ -302,12 +304,14 @@ def main():
     # Loop through the array of ACCOUNTS, splitting each string into an username and a password, then doing edge and mobile searches
     for x in ACCOUNTS:
 
-        chrome_options = Options()
+        chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         # EXPERIMENTAL
-        # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        driver = webdriver.Chrome(options=chrome_options)
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+            options=chrome_options)
         driver.implicitly_wait(4)
 
         # Grab email
@@ -398,16 +402,16 @@ def main():
                 # Opens Mobile Driver
                 mobile_emulation = {"deviceName": "Nexus 5"}
                 chrome_options = webdriver.ChromeOptions()
-
-                chrome_options = Options()
                 chrome_options.add_argument('--no-sandbox')
                 chrome_options.add_argument('--disable-dev-shm-usage')
                 chrome_options.add_experimental_option(
                     "mobileEmulation", mobile_emulation)
                 # EXPERIMENTAL
-                # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
-                driver = webdriver.Chrome(options=chrome_options)
+                driver = webdriver.Chrome(
+                    service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                    options=chrome_options)
                 driver.implicitly_wait(4)
                 driver.get(os.environ['URL'])
 
@@ -449,10 +453,10 @@ def main():
                 print("\tAccount [" + EMAIL + "] has completed mobile searches]")
                 driver.quit()
 
-            chrome_options = Options()
+            chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
-            driver = webdriver.Chrome(options=chrome_options)
+            driver = webdriver.Chrome(ChromeDriverManager(cache_valid_range=30).install(), options=chrome_options)
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
             report += int(points.replace(",",""))
