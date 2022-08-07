@@ -5,7 +5,7 @@ A selenium based python project which auto completes Bing Reward's daily PC and 
 
 To run this project, you will need to add the following environment variables to your .env file. 
 
-`LOGIN` = 'EMAIL:PASSWORD,EMAIL2:PASSWORD2'
+`LOGIN` = A string of Bing Rewards login information. Email and Password are seperated using a colon and accounts are seperated using commas. Check .env.example file for an example.
 
 `URL` = 'Sign in link obtained through https://bing.com/'
 
