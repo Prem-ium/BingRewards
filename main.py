@@ -412,35 +412,29 @@ def main():
 
             if (Number_Mobile_Search > 0):
                 rw = RandomWords()
-
+                mobile_emulation = {"deviceName": "Nexus 5"}
                 if not HANDLE_DRIVER:
                     chrome_options = Options()
                     chrome_options.add_argument('--no-sandbox')
                     chrome_options.add_argument('--disable-dev-shm-usage')
+                    chrome_options.add_experimental_option(
+                        "mobileEmulation", mobile_emulation)
                     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
                     driver = webdriver.Chrome(options=chrome_options)
                 else:
                     chrome_options = webdriver.ChromeOptions()
                     chrome_options.add_argument('--no-sandbox')
                     chrome_options.add_argument('--disable-dev-shm-usage')
+                    chrome_options.add_experimental_option(
+                        "mobileEmulation", mobile_emulation)
+                    # EXPERIMENTAL
                     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
                     driver = webdriver.Chrome(
                         service=Service(ChromeDriverManager(cache_valid_range=30).install()),
                         options=chrome_options)
 
-                # Opens Mobile Driver
-                mobile_emulation = {"deviceName": "Nexus 5"}
-                chrome_options = webdriver.ChromeOptions()
-                chrome_options.add_argument('--no-sandbox')
-                chrome_options.add_argument('--disable-dev-shm-usage')
-                chrome_options.add_experimental_option(
-                    "mobileEmulation", mobile_emulation)
-                # EXPERIMENTAL
-                chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
-                driver = webdriver.Chrome(
-                    service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-                    options=chrome_options)
                 driver.implicitly_wait(4)
                 driver.get(os.environ['URL'])
 
