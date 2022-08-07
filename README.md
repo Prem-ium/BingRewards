@@ -11,7 +11,7 @@ To run this project, you will need to add the following environment variables to
 
 Optional:
 
-`HANDLE_DRIVER` = True or False. Depending on if you wish for driver to be downloaded for you.
+`HANDLE_DRIVER` = Boolean (True/False) variable based on whether a user wants webdriver to be installed for them. Defaultly set to False.
 
 `APPRISE_ALERTS` = see .env example for more details
 ## Installation
