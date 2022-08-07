@@ -1,6 +1,17 @@
 # Bing Rewards Automation
 A selenium based python project which auto completes Bing Reward's daily PC and mobile bing searches across multiple accounts. 
 
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file. 
+
+`LOGIN` = 'EMAIL:PASSWORD,EMAIL2:PASSWORD2'
+
+`URL` = 'Sign in link obtained through https://bing.com/'
+
+Optional:
+
+`APPRISE_ALERTS` = see .env example for more details
 ## Installation
 
 ### - Install the following dependencies using pip3:
@@ -20,16 +31,6 @@ Alternatively, you can clone this repository and install using requirements.txt
 ```sh
    python main.py
 ```
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file. 
-
-`LOGIN` = 'EMAIL:PASSWORD,EMAIL2:PASSWORD2'
-
-`URL` = 'Sign in link obtained through https://bing.com/'
-
-'APPRISE_ALERTS' = see .env example for more details
-
 ## Demo
 
 {coming soon}
