@@ -326,7 +326,7 @@ def main():
     report = 0
     rw = RandomWords()
     delay = 6
-
+    ranRewards = False
     for x in ACCOUNTS:
         driver = getDriver()
 
@@ -381,6 +381,7 @@ def main():
 
         # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranDailySets or ranMoreActivities):
+            ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n ')
@@ -464,6 +465,7 @@ def main():
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
 
                 print("\tAccount [" + EMAIL + "] has completed mobile searches]")
+
                 driver.quit()
 
             driver = getDriver()
@@ -472,10 +474,11 @@ def main():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Complete', 
                     body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
+                
         driver.quit()
         report += points
         print(f'\n\n')
-    if APPRISE_ALERTS:
+    if APPRISE_ALERTS and ranRewards:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
                     body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)}\n\n ')
     report = 0
