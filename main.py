@@ -2,9 +2,9 @@ import os
 import time
 import random
 import traceback
-#os.system("pip install apprise")
+os.system("pip install apprise")
 import apprise
-#os.system("pip install RandomWords")
+os.system("pip install RandomWords")
 from random_words import RandomWords
 
 from selenium import webdriver
@@ -159,7 +159,9 @@ def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
     try:
-        for i in range(15):
+        count = len(driver.find_elements(By.CLASS_NAME, 'ds-card-sec')) - 6
+        #for i in range(15):
+        for i in range(count):
             i+=1
             try:
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
@@ -242,9 +244,10 @@ def getPoints(EMAIL, PASSWORD, driver):
         time.sleep(13)
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
+        points = points.replace(',', '')
     except Exception:
         pass
-    return int(points.replace(",", ""))
+    return int(points)
 
 
 def dailySet(driver):
@@ -418,7 +421,7 @@ def main():
 
                     # add delay to prevent ban
                     time.sleep(delay)
-                    print(f'{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
+                    print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -438,7 +441,7 @@ def main():
                     pass
 
                 login(EMAIL, PASSWORD, driver)
-                print(f"\tAccount {EMAIL} logged in successfully! Auto search initiated.")
+                print(f"\n\tAccount {EMAIL} logged in successfully! Auto search initiated.\n")
                 driver.get('https://www.bing.com/')
                 
                 # Main search loop
@@ -464,7 +467,7 @@ def main():
 
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
 
-                print("\tAccount [" + EMAIL + "] has completed mobile searches]")
+                print("\n\tAccount [" + EMAIL + "] has completed mobile searches]\n")
 
                 driver.quit()
 
@@ -473,7 +476,7 @@ def main():
             points = getPoints(EMAIL, PASSWORD, driver)
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
+                    body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
                 
         driver.quit()
         report += points
