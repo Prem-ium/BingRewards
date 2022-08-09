@@ -301,7 +301,6 @@ def getDriver(isMobile = False):
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
     driver.implicitly_wait(4)
-    driver.maximize_window()
     try:
         driver.get('https://rewards.bing.com/Signin?idru=%2F')
         login(EMAIL, PASSWORD, driver)
@@ -310,7 +309,8 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        time.sleep(20)
+        time.sleep(10)
+        driver.maximize_window()
     # Error arrises on return statement, therefore it is necessary to have reductant code
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
@@ -417,6 +417,7 @@ def main():
 
                 # Main search loop
                 for x in range(1, Number_PC_Search+1):
+                    time.sleep(delay)
                     # Create string to send
                     value = random.choice(TERMS) + rw.random_word()
 
