@@ -302,7 +302,7 @@ def getPoints(EMAIL, PASSWORD, driver):
     points = -1
     driver.implicitly_wait(4)
     try:
-        driver.get('https://rewards.bing.com/Signin?idru=%2F')
+        driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
         login(EMAIL, PASSWORD, driver)
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
@@ -466,14 +466,20 @@ def main():
                 # Main search loop
                 for x in range(1, Number_Mobile_Search + 1):
                     value = random.choice(TERMS) + rw.random_word()
+                    try:
+                        # Clear search bar
+                        ping = driver.find_element(By.ID, value="sb_form_q")
+                        ping.clear()
 
-                    # Clear search bar
-                    ping = driver.find_element(By.ID, value="sb_form_q")
-                    ping.clear()
+                        # Send random keyword
+                        ping.send_keys(value)
+                    except:
+                        driver.get('https://www.bing.com/')
 
-                    # Send random keyword
-                    ping.send_keys(value)
-
+                        time.sleep(10)
+                        # Clear search bar
+                        ping = driver.find_element(By.ID, value="sb_form_q").send_keys(value)
+                        pass
                     try:
                         # add delay to prevent ban
                         time.sleep(4)
