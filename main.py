@@ -242,12 +242,21 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
     try:
         time.sleep(13)
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
-        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
-        points = points.replace(',', '')
+        #points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
+        #points = points.replace(',', '')
     except Exception:
         pass
-    return int(points)
+    time.sleep(20)
+    try:
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
+        points = points.replace(',', '')
+        return int(points)
+    except:
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text
+        points = points.replace(',', '')
+        pass
+        return int(points)
+    
 
 
 def dailySet(driver):
@@ -344,10 +353,11 @@ def main():
 
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
-
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
+        driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
             time.sleep(3)
-            driver.find_element(By.XPATH, value='//*[@id="rx-user-status-action"]').click()
+            #driver.find_element(By.XPATH, value='//*[@id="rx-user-status-action"]').click()
             time.sleep(7)
 
             PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
@@ -474,6 +484,7 @@ def main():
             driver = getDriver()
             driver.implicitly_wait(3)
             points = getPoints(EMAIL, PASSWORD, driver)
+            print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Complete', 
                     body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
