@@ -303,8 +303,7 @@ def getPoints(EMAIL, PASSWORD, driver):
     driver.implicitly_wait(4)
     driver.maximize_window()
     try:
-        #driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
-        driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
+        driver.get('https://rewards.bing.com/Signin?idru=%2F')
         login(EMAIL, PASSWORD, driver)
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
@@ -387,19 +386,35 @@ def main():
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n ')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
-                driver.get('https://www.bing.com/')
+                driver.get(os.environ['URL'])
+                # TO TRY:
+                # driver.get('https://login.live.com/')
+                driver.maximize_window()
+                try:
+                    login(EMAIL, PASSWORD, driver)
+                except:
+                    pass
+                try:
+                    driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
+                    driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
+                except Exception:
+                    pass
+                finally:
+                    driver.get('https://www.bing.com/')
+
                 try:
                     driver.find_element(By.ID, 'id_l').click()
-                    time.sleep(1)
+                    time.sleep(2)
                     driver.refresh()
                 except:
-                    driver.get('https://www.bing.com/')
                     pass
+
                 # First test search
                 time.sleep(delay)
                 first = driver.find_element(By.ID, value="sb_form_q")
                 first.send_keys("test")
                 first.send_keys(Keys.RETURN)
+
                 # Main search loop
                 for x in range(1, Number_PC_Search+1):
                     # Create string to send
