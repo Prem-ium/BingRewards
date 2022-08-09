@@ -54,5 +54,4 @@ Let the bot log in, this could take a minute. Make sure the bot logs in correctl
 - Apprise Alerts
 
 # To-Do:
-- Speed up 'more activities' execution
-- Selecting correct answers only on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
+- Selecting only correct answers on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
