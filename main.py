@@ -2,9 +2,9 @@ import os
 import time
 import random
 import traceback
-#os.system("pip install apprise")
+os.system("pip install apprise")
 import apprise
-#os.system("pip install RandomWords")
+os.system("pip install RandomWords")
 from random_words import RandomWords
 
 from selenium import webdriver
@@ -371,6 +371,8 @@ def main():
             driver.get('https://rewards.microsoft.com/')
             print(e)
             pass
+        finally:
+            print()
 
         ranDailySets = False 
         ranMoreActivities = False
