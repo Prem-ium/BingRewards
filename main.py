@@ -388,7 +388,13 @@ def main():
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get('https://www.bing.com/')
-
+                try:
+                    driver.find_element(By.ID, 'id_l').click()
+                    time.sleep(1)
+                    driver.refresh()
+                except:
+                    driver.get('https://www.bing.com/')
+                    pass
                 # First test search
                 time.sleep(delay)
                 first = driver.find_element(By.ID, value="sb_form_q")
@@ -493,7 +499,7 @@ if __name__ == "__main__":
         try:
             main()
             print('Bing Automation complete. Sleeping for some time before resuming checks.')
-            time.sleep(21600)
+            time.sleep(14400)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
 
