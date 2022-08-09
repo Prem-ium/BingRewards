@@ -68,9 +68,8 @@ def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 def completeSet(driver):
-    time.sleep(10)
+    time.sleep(15)
     try:
-        time.sleep(5)
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         time.sleep(8)
         driver.refresh()
@@ -99,11 +98,10 @@ def completePoll(driver):
     return
 
 def completeQuiz(driver):
-    time.sleep(7)
+    time.sleep(10)
     try:
-        time.sleep(5)
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        time.sleep(3)
+        time.sleep(4)
     except:
         pass
     driver.refresh()
@@ -347,10 +345,7 @@ def main():
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
-            time.sleep(3)
-            #driver.find_element(By.XPATH, value='//*[@id="rx-user-status-action"]').click()
-            time.sleep(7)
-
+            time.sleep(10)
             PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
             
             if (int(PC[0]) < int(PC[1])):
@@ -368,7 +363,6 @@ def main():
                 else:
                     Number_Mobile_Search = 0
                     print(f'\tMobile Searches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
-
             else:
                 Number_Mobile_Search = 0
             
@@ -377,13 +371,13 @@ def main():
             driver.get('https://rewards.microsoft.com/')
             print(e)
             pass
+
         ranDailySets = False 
         ranMoreActivities = False
 
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
-        # Starts Edge Search Loop
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranDailySets or ranMoreActivities):
             ranRewards = True
             if APPRISE_ALERTS:
