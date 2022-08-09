@@ -16,7 +16,6 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from dotenv import load_dotenv
-from keep_alive import keep_alive
 
 # Load ENV
 load_dotenv()
