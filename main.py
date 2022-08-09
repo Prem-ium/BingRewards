@@ -16,6 +16,7 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from dotenv import load_dotenv
+from keep_alive import keep_alive
 
 # Load ENV
 load_dotenv()
@@ -33,7 +34,11 @@ if (len(ACCOUNTS) > 5):
 if not os.environ["URL"]:
     raise Exception("URL not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
 
-# Optional
+TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
+         "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
+        "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
+
+# Optional Variables
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
     APPRISE_ALERTS = APPRISE_ALERTS.split(",")
@@ -45,10 +50,7 @@ if (HANDLE_DRIVER == "True"):
 else:
     HANDLE_DRIVER = False
 
-TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
-         "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
-        "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
-
+# Methods
 def apprise_init():
     if APPRISE_ALERTS:
         alerts = apprise.Apprise()
@@ -78,7 +80,6 @@ def completeSet(driver):
         driver.refresh()
         pass
     return
-
 
 def completePoll(driver):
     try:
@@ -154,7 +155,6 @@ def completeQuiz(driver):
             print(e)
             pass
 
-
 def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
@@ -226,38 +226,6 @@ def completeMore(driver):
         print(traceback.format_exc())
         pass
     return ran
-
-
-def getPoints(EMAIL, PASSWORD, driver):
-    points = -1
-    driver.implicitly_wait(4)
-    driver.maximize_window()
-    try:
-        #driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
-        driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
-        login(EMAIL, PASSWORD, driver)
-    except Exception as e:
-        driver.get('https://rewards.microsoft.com/')
-        print(e)
-        pass
-    try:
-        time.sleep(13)
-        #points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
-        #points = points.replace(',', '')
-    except Exception:
-        pass
-    time.sleep(20)
-    try:
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
-        points = points.replace(',', '')
-        return int(points)
-    except:
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text
-        points = points.replace(',', '')
-        pass
-        return int(points)
-    
-
 
 def dailySet(driver):
         ranSets = False
@@ -333,6 +301,30 @@ def getDriver(isMobile = False):
 
     return driver
 
+def getPoints(EMAIL, PASSWORD, driver):
+    points = -1
+    driver.implicitly_wait(4)
+    driver.maximize_window()
+    try:
+        #driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
+        driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
+        login(EMAIL, PASSWORD, driver)
+    except Exception as e:
+        driver.get('https://rewards.microsoft.com/')
+        print(e)
+        pass
+    finally:
+        time.sleep(20)
+    # Error arrises on return statement, therefore it is necessary to have reductant code
+    try:
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
+        points = points.replace(',', '')
+        return int(points)
+    except:
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text
+        points = points.replace(',', '')
+        pass
+        return int(points)
 
 def main():
     report = 0
