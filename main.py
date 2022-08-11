@@ -16,6 +16,7 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from dotenv import load_dotenv
+from time import sleep
 
 # Load ENV
 load_dotenv()
@@ -62,17 +63,17 @@ def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
-    time.sleep(2)
+    sleep(2)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
-    time.sleep(3)
+    sleep(3)
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 def completeSet(driver):
-    time.sleep(15)
+    sleep(random.uniform(10, 15))
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        time.sleep(8)
+        sleep(8)
         driver.refresh()
         print('\tExplore completed!')
     except:
@@ -84,25 +85,25 @@ def completePoll(driver):
     try:
         driver.refresh()
         try:
-            time.sleep(5)
+            sleep(5)
             driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         except:
             driver.refresh()
             pass
-        time.sleep(5)
+        sleep(random.uniform(2, 7))
         driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
-        time.sleep(8)
+        sleep(8)
         print('\tPoll completed!')
     except:
         pass
-    time.sleep(3)
+    sleep(3)
     return
 
 def completeQuiz(driver):
-    time.sleep(10)
+    sleep(random.uniform(7, 14))
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        time.sleep(4)
+        sleep(4)
     except:
         pass
     driver.refresh()
@@ -111,9 +112,9 @@ def completeQuiz(driver):
         # numberOfQuestions = numberOfQuestions[:-1]
         for i in range(int(numberOfQuestions)):
             driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
-            time.sleep(8)
+            sleep(8)
             driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
-            time.sleep(5)
+            sleep(5)
         print('\tQuiz completed!')
         return
     except Exception as e:
@@ -125,7 +126,7 @@ def completeQuiz(driver):
         except:
             pass
         try:
-            time.sleep(3)
+            sleep(3)
             if (driver.find_elements(By.XPATH, value='//*[@id="rqHeaderCredits"]')):
                 section = len(driver.find_element(By.XPATH, value='//*[@id="rqHeaderCredits"]').find_elements(By.XPATH, value='*'))
                 for i in range(section):
@@ -133,7 +134,7 @@ def completeQuiz(driver):
                     choices = int(choices[-1]) - int(choices[0])
                     try:
                         for i in range(choices * 2):
-                            time.sleep(5)
+                            sleep(5)
                             option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{i}"]')
                             if (option.get_attribute('iscorrectoption') == 'True'):
                                 option.click()
@@ -146,7 +147,7 @@ def completeQuiz(driver):
                 numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]').text.strip().split("of ")[1]
                 for i in range(int(numberOfQuestions)):
                     driver.find_element(By.CLASS_NAME, value='btOptionCard').click()
-                    time.sleep(13)
+                    sleep(13)
                 print('\tQuiz completed!')
                 return
         except Exception as e:
@@ -213,9 +214,9 @@ def completeMore(driver):
                             print(traceback.format_exc())
                             pass
                         finally:
-                            time.sleep(5)
+                            sleep(5)
                             driver.refresh()
-                            time.sleep(5)
+                            sleep(5)
                     else:
                         driver.get('https://rewards.microsoft.com/')
             except:
@@ -310,7 +311,7 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        time.sleep(10)
+        sleep(random.uniform(7, 12))
     # Error arrises on return statement, therefore it is necessary to have reductant code
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
@@ -327,7 +328,6 @@ def main():
     totalDifference = 0
     differenceReport = 0
     rw = RandomWords()
-    delay = 6
     ranRewards = False
     for x in ACCOUNTS:
         driver = getDriver()
@@ -346,7 +346,7 @@ def main():
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
-            time.sleep(10)
+            sleep(10)
             PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
             
             if (int(PC[0]) < int(PC[1])):
@@ -406,20 +406,20 @@ def main():
 
                 try:
                     driver.find_element(By.ID, 'id_l').click()
-                    time.sleep(2)
+                    sleep(2)
                     driver.refresh()
                 except:
                     pass
 
                 # First test search
-                time.sleep(delay)
+                sleep(random.uniform(1, 6))
                 first = driver.find_element(By.ID, value="sb_form_q")
                 first.send_keys("test")
                 first.send_keys(Keys.RETURN)
 
                 # Main search loop
                 for x in range(1, Number_PC_Search+1):
-                    time.sleep(delay)
+                    sleep(random.uniform(1, 6))
                     # Create string to send
                     value = random.choice(TERMS) + rw.random_word()
 
@@ -431,7 +431,7 @@ def main():
                     ping.send_keys(value)
 
                     # add delay to prevent ban
-                    time.sleep(4)
+                    sleep(4)
                     try:
                         go = driver.find_element(By.ID, value="sb_form_go")
                         go.click()
@@ -441,7 +441,7 @@ def main():
                         pass
 
                     # add delay to prevent ban
-                    time.sleep(delay)
+                    sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
             driver.quit()
 
@@ -477,21 +477,17 @@ def main():
                         ping.send_keys(value)
                     except:
                         driver.get('https://www.bing.com/')
-
-                        time.sleep(10)
+                        sleep(7)
                         # Clear search bar
                         ping = driver.find_element(By.ID, value="sb_form_q").send_keys(value)
                         pass
                     try:
-                        # add delay to prevent ban
-                        time.sleep(4)
                         go = driver.find_element(By.ID, value="sb_form_go")
                         go.click()
                     except Exception:
                         ping.send_keys(Keys.ENTER)
                         pass
-                    time.sleep(delay)
-
+                    sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
 
                 print("\n\tAccount [" + EMAIL + "] has completed mobile searches]\n")
@@ -526,7 +522,7 @@ if __name__ == "__main__":
         try:
             main()
             print('Bing Automation complete. Sleeping for some time before resuming checks.')
-            time.sleep(14400)
+            sleep(14400)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
 
@@ -534,5 +530,5 @@ if __name__ == "__main__":
                 alerts.notify(title=f'Bing Rewards Failed!',
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
 
-            time.sleep(600)
+            sleep(600)
             continue
