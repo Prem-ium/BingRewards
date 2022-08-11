@@ -510,7 +510,7 @@ def main():
                 
         driver.quit()
         totalPointsReport += points
-        totalDifferenceReport += differenceReport
+        totalDifference += differenceReport
         print(f'\n\n')
     if APPRISE_ALERTS and ranRewards:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
