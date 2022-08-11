@@ -59,6 +59,7 @@ def apprise_init():
         return alerts
 
 def login(EMAIL, PASSWORD, driver):
+    driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
     time.sleep(2)
@@ -310,7 +311,6 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
     finally:
         time.sleep(10)
-        driver.maximize_window()
     # Error arrises on return statement, therefore it is necessary to have reductant code
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
@@ -323,7 +323,9 @@ def getPoints(EMAIL, PASSWORD, driver):
         return int(points)
 
 def main():
-    report = 0
+    totalPointsReport = 0
+    totalDifference = 0
+    differenceReport = 0
     rw = RandomWords()
     delay = 6
     ranRewards = False
@@ -483,7 +485,7 @@ def main():
                     try:
                         # add delay to prevent ban
                         time.sleep(4)
-                        go = driver.find_element_by_id("sb_form_go")
+                        go = driver.find_element(By.ID, value="sb_form_go")
                         go.click()
                     except Exception:
                         ping.send_keys(Keys.ENTER)
@@ -498,19 +500,22 @@ def main():
 
             driver = getDriver()
             driver.implicitly_wait(3)
+            differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
+            differenceReport = points - differenceReport
             print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
             if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
+                alerts.notify(title=f'Bing Rewards Automation Completed!', 
+                    body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
                 
         driver.quit()
-        report += points
+        totalPointsReport += points
+        totalDifferenceReport += differenceReport
         print(f'\n\n')
     if APPRISE_ALERTS and ranRewards:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Total Points(across all accounts):\t\t{report}\nCash Value of Total:\t\t${round(report/1300, 2)}\n\n ')
-    report = 0
+                    body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t{round(totalDifference/1300, 2)}\n\n')
+    #totalPointsReport = 0
     return
 
 if __name__ == "__main__":
