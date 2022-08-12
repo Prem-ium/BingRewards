@@ -502,7 +502,7 @@ def main():
             print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Completed!', 
-                    body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n ')
+                    body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n...')
                 
         driver.quit()
         totalPointsReport += points
@@ -510,7 +510,7 @@ def main():
         print(f'\n\n')
     if APPRISE_ALERTS and ranRewards:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t{round(totalDifference/1300, 2)}\n\n')
+                    body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t{round(totalDifference/1300, 2)}\n\n...')
     #totalPointsReport = 0
     return
 
