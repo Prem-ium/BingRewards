@@ -174,7 +174,10 @@ def completeMore(driver):
                     assign = driver.find_element(By.XPATH, value=f'//*[@id="more-activities"]/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a')
                     p = driver.current_window_handle
                     assign.click()
-
+                    try:
+                        driver.find_element(By.XPATH, value='//*[@id="legalTextBox"]/div/div/div[3]/a').click()
+                    except:
+                        pass
                     chwd = driver.window_handles
                     if (chwd[1]):
                         driver._switch_to.window(chwd[1])
