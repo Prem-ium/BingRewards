@@ -3,3 +3,4 @@ python-dotenv==0.20.0
 RandomWords==0.3.0
 selenium==4.3.0
 webdriver-manager==3.7.0
+requests==2.27.1
