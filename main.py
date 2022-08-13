@@ -46,7 +46,7 @@ if APPRISE_ALERTS:
 
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
 
-if (HANDLE_DRIVER == "True"):
+if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
 else:
     HANDLE_DRIVER = False
@@ -90,7 +90,7 @@ def get_current_ip(type, proxies):
                     title=f"Failed to connect to icanhazip.com over {type}",
                     body=f"Is there a problem with your network?"
                 )
-            # Wait some time (to prevent Docker containers from constantly restarting), but only in Docker mode
+            # Wait some time (to prevent Docker containers from constantly restarting)
             sleep(300)
             raise Exception(
                 f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?"
@@ -112,7 +112,7 @@ def get_current_ip(type, proxies):
                 title=f"An exception occurred while trying to get your current IP address",
                 body=f"{e}"
             )
-        # Wait some time (to prevent Docker containers from constantly restarting), but only in Docker mode
+        # Wait some time (to prevent Docker containers from constantly restarting)
         sleep(60)
         raise Exception
 
@@ -345,7 +345,7 @@ def getDriver(isMobile = False):
 
     if proxy:
         chrome_options.add_argument(f'--proxy-server={proxy}')
-        print(f"Set Edge proxy to {proxy}")
+        print(f"Set Chrome proxy to {proxy}")
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     if (isMobile):   
@@ -577,6 +577,7 @@ def main():
     #totalPointsReport = 0
     return
 
+# Main function
 if __name__ == "__main__":
     # Initialize apprise alerts
     if APPRISE_ALERTS:
@@ -589,7 +590,6 @@ if __name__ == "__main__":
     current_ipv6 = get_current_ip("v6", proxies)
     if current_ipv6:
         print(f"Current IPv6 Address: {current_ipv6}")
-
     # If declared in .env, check the IPv4 address
     if wanted_ipv4:
         # Raise exception if they don't match, otherwise print success and continue
@@ -607,23 +607,24 @@ if __name__ == "__main__":
             )
         else:
             print("IPv4 addresses match!")
-        # If declared in .env, check the IPv6 address
-        if wanted_ipv6 and current_ipv6:
-            # Raise exception if they don't match, otherwise print success and continue
-            if wanted_ipv6 != current_ipv6:
-                # Send message to console and apprise if configured
-                print(
-                    f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}",
-                    "error",
-                )
-                if APPRISE_ALERTS:
-                    alerts.notify(title=f'IPv6 Address Mismatch', 
-                        body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
-                raise Exception(
-                    f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}"
-                )
-            else:
-                print("IPv6 addresses match!")
+    # If declared in .env, check the IPv6 address
+    if wanted_ipv6 and current_ipv6:
+        # Raise exception if they don't match, otherwise print success and continue
+        if wanted_ipv6 != current_ipv6:
+            # Send message to console and apprise if configured
+            print(
+                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}",
+                "error",
+            )
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'IPv6 Address Mismatch', 
+                    body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
+            raise Exception(
+                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}"
+            )
+        else:
+            print("IPv6 addresses match!")
+
     # If IP checks pass, then start main loop
     while True:
         try:
