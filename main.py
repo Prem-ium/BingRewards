@@ -6,6 +6,7 @@ import traceback
 import apprise
 #os.system("pip install RandomWords")
 from random_words import RandomWords
+import requests
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -50,6 +51,17 @@ if (HANDLE_DRIVER == "True"):
 else:
     HANDLE_DRIVER = False
 
+# Get IPs if it's set in .env
+wanted_ipv4 = os.environ.get("WANTED_IPV4")
+wanted_ipv6 = os.environ.get("WANTED_IPV6")
+
+# Get proxy settings from .env
+# Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
+proxy = os.environ.get("PROXY", "")
+
+# Populate proxy dictionary for requests
+proxies = {"http": f"{proxy}", "https": f"{proxy}"}
+
 # Methods
 def apprise_init():
     if APPRISE_ALERTS:
@@ -58,6 +70,51 @@ def apprise_init():
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
+
+def get_current_ip(type, proxies):
+    # try with icanhazip.com
+    try:
+        current_ip = (
+            (requests.get(f"https://ip{type}.icanhazip.com", proxies=proxies)).text
+        ).strip("\n")
+        return current_ip
+    except requests.ConnectionError:
+        print(f"Unable to get IP{type} address")
+        if type == "v4":
+            # Send message to console and apprise alert if configured
+            print(
+                f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?"
+            )
+            if APPRISE_ALERTS:
+                alerts.notify(
+                    title=f"Failed to connect to icanhazip.com over {type}",
+                    body=f"Is there a problem with your network?"
+                )
+            # Wait some time (to prevent Docker containers from constantly restarting), but only in Docker mode
+            sleep(300)
+            raise Exception(
+                f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?"
+            )
+        if type == "v6":
+            # We can just fail softly if this error occurs with v6
+            # Note that a ConnectionError is raised if a v4-only host tries to connect to a v6 site
+            # We can make this fail hard once v6 is actually widely available....
+            return None
+    except Exception as e:
+        # Catch all other errors
+        # Send message to console and apprise alert if configured
+        print(
+            f"An exception occurred while trying to get your current IP address: {e}",
+            "error",
+        )
+        if APPRISE_ALERTS:
+            alerts.notify(
+                title=f"An exception occurred while trying to get your current IP address",
+                body=f"{e}"
+            )
+        # Wait some time (to prevent Docker containers from constantly restarting), but only in Docker mode
+        sleep(60)
+        raise Exception
 
 def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
@@ -286,6 +343,9 @@ def getDriver(isMobile = False):
     else:
         chrome_options = webdriver.ChromeOptions()
 
+    if proxy:
+        chrome_options.add_argument(f'--proxy-server={proxy}')
+        print(f"Set Edge proxy to {proxy}")
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     if (isMobile):   
@@ -518,9 +578,53 @@ def main():
     return
 
 if __name__ == "__main__":
+    # Initialize apprise alerts
     if APPRISE_ALERTS:
         alerts = apprise_init()
 
+    # Compares desired IP address with actual external IP address
+    # Print current IPv4 and check IPv6
+    current_ipv4 = get_current_ip("v4", proxies)
+    print(f"Current IPv4 Address: {current_ipv4}")
+    current_ipv6 = get_current_ip("v6", proxies)
+    if current_ipv6:
+        print(f"Current IPv6 Address: {current_ipv6}")
+
+    # If declared in .env, check the IPv4 address
+    if wanted_ipv4:
+        # Raise exception if they don't match, otherwise print success and continue
+        if wanted_ipv4 != current_ipv4:
+            # Send message to console and apprise if configured
+            print(
+                f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}",
+                "error",
+            )
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'IPv4 Address Mismatch', 
+                    body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
+            raise Exception(
+                f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}"
+            )
+        else:
+            print("IPv4 addresses match!")
+        # If declared in .env, check the IPv6 address
+        if wanted_ipv6 and current_ipv6:
+            # Raise exception if they don't match, otherwise print success and continue
+            if wanted_ipv6 != current_ipv6:
+                # Send message to console and apprise if configured
+                print(
+                    f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}",
+                    "error",
+                )
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'IPv6 Address Mismatch', 
+                        body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
+                raise Exception(
+                    f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}"
+                )
+            else:
+                print("IPv6 addresses match!")
+    # If IP checks pass, then start main loop
     while True:
         try:
             main()
