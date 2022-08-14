@@ -384,14 +384,19 @@ def getDriver(isMobile = False):
     if proxy:
         chrome_options.add_argument(f'--proxy-server={proxy}')
         print(f"Set Chrome proxy to {proxy}")
+        
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
+    
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
         chrome_options.add_experimental_option(
             "mobileEmulation", mobile_emulation)
+        
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-
+    chrome_options.add_argument('--disable-infobars')
+    chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
+    
     if not HANDLE_DRIVER:
         driver = webdriver.Chrome(options=chrome_options)
     else:
