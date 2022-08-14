@@ -479,7 +479,7 @@ def runRewards():
             driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
         except Exception as e:
             driver.get('https://rewards.microsoft.com/')
-            print(e)
+            print(traceback.format_exc())
             pass
         finally:
             print()
