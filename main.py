@@ -388,18 +388,16 @@ def getDriver(isMobile = False):
 
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
         chrome_options.add_experimental_option(
             "mobileEmulation", mobile_emulation)
     
-    chrome_options.add_argument('--disable-infobars')
-    chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
-    prefs = {"credentials_enable_service": False,
-            "profile.password_manager_enabled": False}
-    chrome_options.add_experimental_option("prefs", prefs)
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    #chrome_options.add_argument('--disable-infobars')
+    #chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
+    #prefs = {"credentials_enable_service": False,"profile.password_manager_enabled": False}
+    #chrome_options.add_experimental_option("prefs", prefs)
     
     if not HANDLE_DRIVER:
         driver = webdriver.Chrome(options=chrome_options)
@@ -452,7 +450,7 @@ def runRewards():
 
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
-        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{round(points/1300,2)}\n')
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,2)}\n')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
             sleep(10)
@@ -558,7 +556,7 @@ def runRewards():
                     # add delay to prevent ban
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
-                print(f'\n\tPC Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tPC Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -603,7 +601,7 @@ def runRewards():
                         pass
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-                print(f'\n\tMobile Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tMobile Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
                 driver.quit()
 
             driver = getDriver()
