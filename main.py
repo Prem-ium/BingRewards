@@ -112,7 +112,7 @@ def get_current_ip(type, proxies):
         # Wait some time (to prevent Docker containers from constantly restarting)
         sleep(60)
         raise Exception
-def IPCheck():
+def check_ip_address():
     # Compares desired IP address with actual external IP address
     # Print current IPv4 and check IPv6
     current_ipv4 = get_current_ip("v4", proxies)
@@ -632,6 +632,6 @@ if __name__ == "__main__":
         alerts = apprise_init()
 
     # Run checks on IP address & start main function, if all is good
-    IPCheck()
+    check_ip_address()
     main()
 
