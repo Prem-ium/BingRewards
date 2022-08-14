@@ -2,11 +2,6 @@ import os
 import random
 import traceback
 import requests
-#os.system("pip install apprise")
-import apprise
-#os.system("pip install RandomWords")
-from random_words import RandomWords
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,6 +13,15 @@ from selenium.webdriver.chrome.service import Service
 from time import sleep
 from dotenv import load_dotenv
 
+try:
+    import apprise
+    from random_words import RandomWords
+except ImportError:
+    os.system("pip install RandomWords")
+    os.system("pip install apprise")
+    import apprise
+    from random_words import RandomWords
+    
 # Load ENV
 load_dotenv()
 
@@ -596,7 +600,7 @@ def runRewards():
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
             print(f'\tUpdated Points:\t{points}')
-            if APPRISE_ALERTS:
+            if APPRISE_ALERTS and differenceReport > 0:
                 alerts.notify(title=f'Bing Rewards Automation Completed!', 
                     body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n...')
                 
@@ -604,7 +608,7 @@ def runRewards():
         totalPointsReport += points
         totalDifference += differenceReport
         print(f'\n\n')
-    if APPRISE_ALERTS and ranRewards:
+    if APPRISE_ALERTS and ranRewards and totalDifference > 0:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
                     body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 2)}\n\n...')
     return
