@@ -1,12 +1,11 @@
 import os
-import time
 import random
 import traceback
+import requests
 #os.system("pip install apprise")
 import apprise
 #os.system("pip install RandomWords")
 from random_words import RandomWords
-import requests
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,8 +15,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
-from dotenv import load_dotenv
 from time import sleep
+from dotenv import load_dotenv
 
 # Load ENV
 load_dotenv()
@@ -82,9 +81,7 @@ def get_current_ip(type, proxies):
         print(f"Unable to get IP{type} address")
         if type == "v4":
             # Send message to console and apprise alert if configured
-            print(
-                f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?"
-            )
+            print(f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
             if APPRISE_ALERTS:
                 alerts.notify(
                     title=f"Failed to connect to icanhazip.com over {type}",
