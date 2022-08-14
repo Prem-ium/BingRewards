@@ -558,7 +558,7 @@ def runRewards():
                     # add delay to prevent ban
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
-                print(f'\n\tPC Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tPC Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -603,7 +603,7 @@ def runRewards():
                         pass
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-                print(f'\n\tMobile Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tMobile Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
                 driver.quit()
 
             driver = getDriver()
