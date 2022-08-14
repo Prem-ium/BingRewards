@@ -2,6 +2,7 @@ import os
 import random
 import traceback
 import requests
+import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -423,12 +424,10 @@ def getPoints(EMAIL, PASSWORD, driver):
     finally:
         sleep(random.uniform(8, 20))
     try:
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
-        points = points.replace(',', '')
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
         return int(points)
     except:
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text
-        points = points.replace(',', '')
+        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text.strip().replace(',', '')
         pass
         return int(points)
 
@@ -548,6 +547,7 @@ def runRewards():
                     # add delay to prevent ban
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
+                print(f'\n\tPC Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -592,9 +592,7 @@ def runRewards():
                         pass
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-
-                print("\n\tAccount [" + EMAIL + "] has completed mobile searches]\n")
-
+                print(f'\n\tMobile Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
                 driver.quit()
 
             driver = getDriver()
