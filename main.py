@@ -14,13 +14,11 @@ from time import sleep
 from dotenv import load_dotenv
 
 try:
-    import apprise
     from random_words import RandomWords
 except ImportError:
     os.system("pip install RandomWords")
-    os.system("pip install apprise")
-    import apprise
     from random_words import RandomWords
+    pass
     
 # Load ENV
 load_dotenv()
@@ -46,6 +44,12 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
     APPRISE_ALERTS = APPRISE_ALERTS.split(",")
+    try:
+        import apprise
+    except ImportError:
+        os.system("pip install apprise")
+        import apprise
+        pass
 
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
 
