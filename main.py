@@ -487,11 +487,21 @@ def runRewards():
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
+
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranDailySets or ranMoreActivities):
             ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n\n...')
+
+            if driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
+                streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
+                print(f'\tStreak Earned!:\t{streak}')
+
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'Bing Rewards Automation Streak Earned!', 
+                                body=f'Email:\t\t{EMAIL} \nEarned:\t\t{streak}')
+            
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get(os.environ['URL'])
