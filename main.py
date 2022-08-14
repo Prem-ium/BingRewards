@@ -98,8 +98,7 @@ def get_current_ip(type, proxies):
             # Wait some time (to prevent Docker containers from constantly restarting)
             sleep(300)
             raise Exception(
-                f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?"
-            )
+                f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
         if type == "v6":
             # We can just fail softly if this error occurs with v6
             # Note that a ConnectionError is raised if a v4-only host tries to connect to a v6 site
@@ -109,8 +108,7 @@ def get_current_ip(type, proxies):
         # Catch all other errors
         # Send message to console and apprise alert if configured
         print(
-            f"An exception occurred while trying to get your current IP address: {e}",
-            "error",
+            f"An exception occurred while trying to get your current IP address: {e}"
         )
         if APPRISE_ALERTS:
             alerts.notify(
@@ -120,6 +118,7 @@ def get_current_ip(type, proxies):
         # Wait some time (to prevent Docker containers from constantly restarting)
         sleep(60)
         raise Exception
+
 def check_ip_address():
     # Compares desired IP address with actual external IP address
     # Print current IPv4 and check IPv6
@@ -133,8 +132,7 @@ def check_ip_address():
         # Raise exception if they don't match, otherwise print success and continue
         if wanted_ipv4 != current_ipv4:
             # Send message to console and apprise if configured
-            print(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}",
-                "error",)
+            print(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}")
             if APPRISE_ALERTS:
                 alerts.notify(title=f'IPv4 Address Mismatch', 
                     body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
@@ -147,10 +145,7 @@ def check_ip_address():
         # Raise exception if they don't match, otherwise print success and continue
         if wanted_ipv6 != current_ipv6:
             # Send message to console and apprise if configured
-            print(
-                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}",
-                "error",
-            )
+            print(f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}")
             if APPRISE_ALERTS:
                 alerts.notify(title=f'IPv6 Address Mismatch', 
                     body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
@@ -642,4 +637,3 @@ if __name__ == "__main__":
     # Run checks on IP address & start main function, if all is good
     check_ip_address()
     main()
-
