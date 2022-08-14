@@ -115,6 +115,45 @@ def get_current_ip(type, proxies):
         # Wait some time (to prevent Docker containers from constantly restarting)
         sleep(60)
         raise Exception
+def IPCheck():
+    # Compares desired IP address with actual external IP address
+    # Print current IPv4 and check IPv6
+    current_ipv4 = get_current_ip("v4", proxies)
+    print(f"Current IPv4 Address: {current_ipv4}")
+    current_ipv6 = get_current_ip("v6", proxies)
+    if current_ipv6:
+        print(f"Current IPv6 Address: {current_ipv6}")
+    # If declared in .env, check the IPv4 address
+    if wanted_ipv4:
+        # Raise exception if they don't match, otherwise print success and continue
+        if wanted_ipv4 != current_ipv4:
+            # Send message to console and apprise if configured
+            print(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}",
+                "error",)
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'IPv4 Address Mismatch', 
+                    body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
+            raise Exception(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}"
+            )
+        else:
+            print("IPv4 addresses match!")
+    # If declared in .env, check the IPv6 address
+    if wanted_ipv6 and current_ipv6:
+        # Raise exception if they don't match, otherwise print success and continue
+        if wanted_ipv6 != current_ipv6:
+            # Send message to console and apprise if configured
+            print(
+                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}",
+                "error",
+            )
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'IPv6 Address Mismatch', 
+                    body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
+            raise Exception(
+                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}"
+            )
+        else:
+            print("IPv6 addresses match!")
 
 def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
@@ -576,54 +615,13 @@ def main():
                     body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t{round(totalDifference/1300, 2)}\n\n...')
     #totalPointsReport = 0
     return
-
 # Main function
 if __name__ == "__main__":
     # Initialize apprise alerts
     if APPRISE_ALERTS:
         alerts = apprise_init()
 
-    # Compares desired IP address with actual external IP address
-    # Print current IPv4 and check IPv6
-    current_ipv4 = get_current_ip("v4", proxies)
-    print(f"Current IPv4 Address: {current_ipv4}")
-    current_ipv6 = get_current_ip("v6", proxies)
-    if current_ipv6:
-        print(f"Current IPv6 Address: {current_ipv6}")
-    # If declared in .env, check the IPv4 address
-    if wanted_ipv4:
-        # Raise exception if they don't match, otherwise print success and continue
-        if wanted_ipv4 != current_ipv4:
-            # Send message to console and apprise if configured
-            print(
-                f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}",
-                "error",
-            )
-            if APPRISE_ALERTS:
-                alerts.notify(title=f'IPv4 Address Mismatch', 
-                    body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
-            raise Exception(
-                f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}"
-            )
-        else:
-            print("IPv4 addresses match!")
-    # If declared in .env, check the IPv6 address
-    if wanted_ipv6 and current_ipv6:
-        # Raise exception if they don't match, otherwise print success and continue
-        if wanted_ipv6 != current_ipv6:
-            # Send message to console and apprise if configured
-            print(
-                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}",
-                "error",
-            )
-            if APPRISE_ALERTS:
-                alerts.notify(title=f'IPv6 Address Mismatch', 
-                    body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
-            raise Exception(
-                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}"
-            )
-        else:
-            print("IPv6 addresses match!")
+    IPCheck()
 
     # If IP checks pass, then start main loop
     while True:
