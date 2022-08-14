@@ -494,7 +494,7 @@ def runRewards():
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n\n...')
 
-            if driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
+            if driver.find_elements(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b')[0].text.__contains__('Awesome!'):
                 streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
                 print(f'\tStreak Earned!:\t{streak}')
 
