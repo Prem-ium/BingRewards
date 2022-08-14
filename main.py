@@ -159,10 +159,10 @@ def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
-    sleep(2)
+    sleep(random.uniform(2, 4))
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
-    sleep(3)
+    sleep(random.uniform(3, 6))
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 def completeSet(driver):
@@ -181,7 +181,7 @@ def completePoll(driver):
     try:
         driver.refresh()
         try:
-            sleep(5)
+            sleep(random.uniform(3, 5))
             driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         except:
             driver.refresh()
@@ -405,6 +405,7 @@ def getDriver(isMobile = False):
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
     driver.implicitly_wait(4)
+    sleep(random.uniform(3, 5))
     try:
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
         login(EMAIL, PASSWORD, driver)
@@ -413,8 +414,7 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        sleep(random.uniform(7, 12))
-    # Error arrises on return statement, therefore it is necessary to have reductant code
+        sleep(random.uniform(7, 15))
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
         points = points.replace(',', '')
@@ -425,12 +425,13 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
         return int(points)
 
-def main():
+def runRewards():
     totalPointsReport = 0
     totalDifference = 0
     differenceReport = 0
     rw = RandomWords()
     ranRewards = False
+
     for x in ACCOUNTS:
         driver = getDriver()
 
@@ -491,8 +492,6 @@ def main():
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get(os.environ['URL'])
-                # TO TRY:
-                # driver.get('https://login.live.com/')
                 driver.maximize_window()
                 try:
                     login(EMAIL, PASSWORD, driver)
@@ -553,8 +552,6 @@ def main():
                         
                 driver.implicitly_wait(4)
                 driver.get(os.environ['URL'])
-                # TO TRY:
-                # driver.get('https://login.live.com/')
                 driver.maximize_window()
 
                 try:
@@ -601,7 +598,7 @@ def main():
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
-            print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
+            print(f'\tUpdated Points:\t{points}')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Completed!', 
                     body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n...')
@@ -612,29 +609,32 @@ def main():
         print(f'\n\n')
     if APPRISE_ALERTS and ranRewards:
         alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t{round(totalDifference/1300, 2)}\n\n...')
-    #totalPointsReport = 0
+                    body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 2)}\n\n...')
     return
+
 # Main function
+def main():
+    # Infinitily loop through rewards
+    while True:
+        try:
+            # Run Bing Rewards Automation
+            runRewards()
+            print('Bing Rewards Automation Complete! Sleeping for a bit before rechecking...')
+            sleep(14400)
+        except Exception as e:
+            print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'Bing Rewards Failed!',
+                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
+            sleep(600)
+            continue
+
 if __name__ == "__main__":
     # Initialize apprise alerts
     if APPRISE_ALERTS:
         alerts = apprise_init()
 
+    # Run checks on IP address & start main function, if all is good
     IPCheck()
+    main()
 
-    # If IP checks pass, then start main loop
-    while True:
-        try:
-            main()
-            print('Bing Automation complete. Sleeping for some time before resuming checks.')
-            sleep(14400)
-        except Exception as e:
-            print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
-
-            if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards Failed!',
-                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
-
-            sleep(600)
-            continue
