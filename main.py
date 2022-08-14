@@ -260,11 +260,10 @@ def completeMore(driver):
             i+=1
             try:
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
-            except Exception as e:
+            except:
                 pass
             try:
-                extra = element.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a/mee-rewards-points/div/div/span[1]')
-                class_name = extra.get_attribute('class')
+                class_name = element.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a/mee-rewards-points/div/div/span[1]').get_attribute('class')
 
                 if (class_name == "mee-icon mee-icon-AddMedium" or class_name == "mee-icon mee-icon-HourGlass"):
                     assign = driver.find_element(By.XPATH, value=f'//*[@id="more-activities"]/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a')
@@ -414,7 +413,7 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        sleep(random.uniform(7, 15))
+        sleep(random.uniform(8, 20))
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text
         points = points.replace(',', '')
@@ -446,7 +445,7 @@ def runRewards():
 
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
-        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}')
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{round(points/1300,2)}\n')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
             sleep(10)
@@ -478,9 +477,6 @@ def runRewards():
         finally:
             print()
 
-        ranDailySets = False 
-        ranMoreActivities = False
-
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
@@ -488,7 +484,7 @@ def runRewards():
             ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
-                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n ')
+                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n\n...')
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get(os.environ['URL'])
@@ -548,7 +544,7 @@ def runRewards():
 
             if (Number_Mobile_Search > 0):
                 rw = RandomWords()
-                driver = getDriver(True)
+                driver = getDriver(isMobile = True)
                         
                 driver.implicitly_wait(4)
                 driver.get(os.environ['URL'])
@@ -594,22 +590,25 @@ def runRewards():
                 driver.quit()
 
             driver = getDriver()
-            driver.implicitly_wait(3)
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
-            print(f'\tUpdated Points:\t{points}')
-            if APPRISE_ALERTS and differenceReport > 0:
-                alerts.notify(title=f'Bing Rewards Automation Completed!', 
-                    body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n...')
-                
+            if differenceReport > 0:
+                print(f'\tTotal points: {points}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 2)}!\n')
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'Bing Rewards Automation Completed!', 
+                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n...')
+                    
         driver.quit()
         totalPointsReport += points
         totalDifference += differenceReport
         print(f'\n\n')
-    if APPRISE_ALERTS and ranRewards and totalDifference > 0:
-        alerts.notify(title=f'Bing Rewards Automation Complete', 
-                    body=f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 2)}\n\n...')
+    if ranRewards and totalDifference > 0:
+        report = f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 2)}'
+        print(report)
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'Bing Rewards Automation Complete', 
+                        body=f'{report}\n\n...')
     return
 
 # Main function
