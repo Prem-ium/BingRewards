@@ -493,15 +493,16 @@ def runRewards():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n\n...')
+            try:
+                if driver.find_elements(By.XPATH, '//*[@id="streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
+                    streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
+                    print(f'\tStreak Earned!:\t{streak}')
 
-            if driver.find_elements(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b')[0].text.__contains__('Awesome!'):
-                streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
-                print(f'\tStreak Earned!:\t{streak}')
-
-                if APPRISE_ALERTS:
-                    alerts.notify(title=f'Bing Rewards Automation Streak Earned!', 
-                                body=f'Email:\t\t{EMAIL} \nEarned:\t\t{streak}')
-            
+                    if APPRISE_ALERTS:
+                        alerts.notify(title=f'Bing Rewards Automation Streak Earned!', 
+                                    body=f'Email:\t\t{EMAIL} \nEarned:\t\t{streak}')
+            except:
+                pass
             if (Number_PC_Search > 0):
                 rw = RandomWords()
                 driver.get(os.environ['URL'])
