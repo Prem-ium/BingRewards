@@ -62,9 +62,9 @@ else:
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
-    # Get start and end time, defaulting to 9:00am and 9:00pm
+    # Default start at 4 AM, end at 10PM
     START_TIME = float(os.environ.get("START_TIME", "4"))
-    END_TIME = float(os.environ.get("END_TIME", "23"))
+    END_TIME = float(os.environ.get("END_TIME", "22"))
 
     # Make sure start and end times are valid, otherwise switch them
     if START_TIME > END_TIME:
