@@ -62,9 +62,6 @@ else:
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
-else:
-    TIMER = False
-if TIMER:
     # Get start and end time, defaulting to 9:00am and 9:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
     END_TIME = float(os.environ.get("END_TIME", "23"))
@@ -75,6 +72,10 @@ if TIMER:
         temp = START_TIME
         START_TIME = END_TIME
         END_TIME = temp
+else:
+    TIMER = False
+
+    
 
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
@@ -172,6 +173,7 @@ def check_ip_address():
             )
         else:
             print("IPv6 addresses match!")
+    print()
 
 def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
@@ -469,7 +471,7 @@ def runRewards():
 
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
-        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{round(points/1300,2)}\n')
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
             sleep(10)
@@ -509,7 +511,7 @@ def runRewards():
             ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
-                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 2)}\n\n\n...')
+                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 3)}\n\n\n...')
             try:
                 if driver.find_elements(By.XPATH, '//*[@id="streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
                     streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
@@ -628,17 +630,17 @@ def runRewards():
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points: {points}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 2)}!\n')
+                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n')
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'Bing Rewards Automation Completed!', 
-                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 2)}\n\n...')
+                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 3)}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
         totalDifference += differenceReport
         print(f'\n\n')
     if ranRewards and totalDifference > 0:
-        report = f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 2)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 2)}'
+        report = f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}'
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'Bing Rewards Automation Complete', 
