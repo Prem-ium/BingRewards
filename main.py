@@ -183,6 +183,16 @@ def login(EMAIL, PASSWORD, driver):
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
     driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     sleep(random.uniform(3, 6))
+    try:
+        message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
+        if message.lower() == "your account has been locked":
+            print(f"uh oh, your account {EMAIL} has been locked!")
+            if APPRISE_ALERTS:
+                alerts.notify(title=f'Account Locked', 
+                    body=f'Your account {EMAIL} has been locked! Sign in and verify your account. Exiting...')
+            raise Exception(f"Login failed. Your account ({EMAIL})has been locked.")
+    except:
+        pass
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
 
 def completeSet(driver):
