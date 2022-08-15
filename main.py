@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from time import sleep
 from dotenv import load_dotenv
-
+from keep_alive import keep_alive
 try:
     from random_words import RandomWords
 except ImportError:
@@ -62,9 +62,9 @@ else:
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
-    # Default start at 4 AM, end at 10PM
+    # Get start and end time, defaulting to 9:00am and 9:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
-    END_TIME = float(os.environ.get("END_TIME", "22"))
+    END_TIME = float(os.environ.get("END_TIME", "23"))
 
     # Make sure start and end times are valid, otherwise switch them
     if START_TIME > END_TIME:
@@ -494,8 +494,10 @@ def runRewards():
                     print(f'\tMobile Searches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
             else:
                 Number_Mobile_Search = 0
-            
-            driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
+            try:
+                driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
+            except:
+                driver.get('https://rewards.microsoft.com/')
         except Exception as e:
             driver.get('https://rewards.microsoft.com/')
             print(traceback.format_exc())
@@ -664,6 +666,7 @@ def main():
             # Run Bing Rewards Automation
             runRewards()
             print('Bing Rewards Automation Complete! Sleeping for a bit before rechecking...')
+            keep_alive()
             sleep(14400)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
