@@ -176,12 +176,6 @@ def check_ip_address():
             print("IPv6 addresses match!")
     print()
 
-#class LockedAccountError(Exception):
- #   def __init__(self, email, message="Email has been locked!"):
-  #      self.email = email
-   #     self.message = message
-    #    super().__init__(self.message)
-
 def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
@@ -193,16 +187,13 @@ def login(EMAIL, PASSWORD, driver):
     try:
         message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
         if message.lower() == "your account has been locked":
-            print(f"uh oh, your account {EMAIL} has been locked!")
+            print(f"uh-oh, your account {EMAIL} has been locked by Microsoft!")
             if APPRISE_ALERTS:
-                alerts.notify(title=f'Account Locked', 
-                    body=f'Your account {EMAIL} has been locked! Sign in and verify your account. Exiting...')
+                alerts.notify(title=f'Bing Rewards Account Locked!', 
+                    body=f'Your account {EMAIL} has been locked! Sign in and verify your account.')
             return False
     except NoSuchElementException as e:
         pass
-    #except LockedAccountError:
-        #pass
-        #return False
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
     return True
     
