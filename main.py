@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from time import sleep
 from dotenv import load_dotenv
-from keep_alive import keep_alive
+
 try:
     from random_words import RandomWords
 except ImportError:
@@ -62,7 +62,7 @@ else:
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
-    # Get start and end time, defaulting to 9:00am and 9:00pm
+    # Get start and end time, defaulting to 4:00am and 10:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
     END_TIME = float(os.environ.get("END_TIME", "23"))
 
@@ -666,7 +666,6 @@ def main():
             # Run Bing Rewards Automation
             runRewards()
             print('Bing Rewards Automation Complete! Sleeping for a bit before rechecking...')
-            keep_alive()
             sleep(14400)
         except Exception as e:
             print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
