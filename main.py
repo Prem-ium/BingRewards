@@ -59,6 +59,23 @@ if (HANDLE_DRIVER.lower() == "true"):
 else:
     HANDLE_DRIVER = False
 
+TIMER = os.environ.get("TIMER", "False")
+if TIMER.lower() == "true":
+    TIMER = True
+else:
+    TIMER = False
+if TIMER:
+    # Get start and end time, defaulting to 9:00am and 9:00pm
+    START_TIME = float(os.environ.get("START_TIME", "4"))
+    END_TIME = float(os.environ.get("END_TIME", "23"))
+
+    # Make sure start and end times are valid, otherwise switch them
+    if START_TIME > END_TIME:
+        print("Start time must be before end time, switching times...")
+        temp = START_TIME
+        START_TIME = END_TIME
+        END_TIME = temp
+
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
 wanted_ipv6 = os.environ.get("WANTED_IPV6")
@@ -388,16 +405,18 @@ def getDriver(isMobile = False):
 
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
         chrome_options.add_experimental_option(
             "mobileEmulation", mobile_emulation)
     
-    #chrome_options.add_argument('--disable-infobars')
-    #chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
-    #prefs = {"credentials_enable_service": False,"profile.password_manager_enabled": False}
-    #chrome_options.add_experimental_option("prefs", prefs)
+    chrome_options.add_argument('--disable-infobars')
+    chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
+    prefs = {"credentials_enable_service": False,
+            "profile.password_manager_enabled": False}
+    chrome_options.add_experimental_option("prefs", prefs)
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     
     if not HANDLE_DRIVER:
         driver = webdriver.Chrome(options=chrome_options)
@@ -450,7 +469,7 @@ def runRewards():
 
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
-        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,2)}\n')
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{round(points/1300,2)}\n')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
             sleep(10)
@@ -556,7 +575,7 @@ def runRewards():
                     # add delay to prevent ban
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
-                print(f'\n\tPC Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tPC Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -601,7 +620,7 @@ def runRewards():
                         pass
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-                print(f'\n\tMobile Searches completed: {datetime.datetime.now}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tMobile Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
                 driver.quit()
 
             driver = getDriver()
@@ -630,6 +649,15 @@ def runRewards():
 def main():
     # Infinitily loop through rewards
     while True:
+        if TIMER:
+            run_rewards = False
+            while not run_rewards:
+                # Kill the program if the time is outside of the start and end times
+                if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
+                    run_rewards = True
+                else:
+                    print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now()}\n')
+                    sleep(5400)
         try:
             # Run Bing Rewards Automation
             runRewards()
