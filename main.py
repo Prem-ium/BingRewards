@@ -657,7 +657,7 @@ def main():
                     run_rewards = True
                 else:
                     print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now()}\n')
-                    sleep(3600)
+                    sleep(5400)
         try:
             # Run Bing Rewards Automation
             runRewards()
