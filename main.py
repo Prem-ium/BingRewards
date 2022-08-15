@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.service import Service
 from time import sleep
 from dotenv import load_dotenv
@@ -175,6 +176,12 @@ def check_ip_address():
             print("IPv6 addresses match!")
     print()
 
+#class LockedAccountError(Exception):
+ #   def __init__(self, email, message="Email has been locked!"):
+  #      self.email = email
+   #     self.message = message
+    #    super().__init__(self.message)
+
 def login(EMAIL, PASSWORD, driver):
     driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
@@ -190,10 +197,15 @@ def login(EMAIL, PASSWORD, driver):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Account Locked', 
                     body=f'Your account {EMAIL} has been locked! Sign in and verify your account. Exiting...')
-            raise Exception(f"Login failed. Your account ({EMAIL})has been locked.")
-    except:
+            return False
+    except NoSuchElementException as e:
         pass
+    #except LockedAccountError:
+        #pass
+        #return False
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+    return True
+    
 
 def completeSet(driver):
     sleep(random.uniform(10, 15))
@@ -445,7 +457,8 @@ def getPoints(EMAIL, PASSWORD, driver):
     sleep(random.uniform(3, 5))
     try:
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
-        login(EMAIL, PASSWORD, driver)
+        if not login(EMAIL, PASSWORD, driver):
+            return -404
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
         print(e)
@@ -481,6 +494,9 @@ def runRewards():
 
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
+        if (points == -404):
+            driver.quit()
+            continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
         driver.get('https://rewards.microsoft.com/pointsbreakdown')
         try:
