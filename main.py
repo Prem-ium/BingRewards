@@ -21,7 +21,7 @@ except ImportError:
     os.system("pip3 install RandomWords")
     from random_words import RandomWords
     pass
-    
+
 # Load ENV
 load_dotenv()
 
@@ -59,6 +59,14 @@ if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
 else:
     HANDLE_DRIVER = False
+
+try:
+    from pytz import timezone
+except ImportError:
+    os.system("pip3 install pytz")
+    from pytz import timezone
+    pass
+TZ = timezone(os.environ.get("TZ", "EST"))
 
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
@@ -597,7 +605,7 @@ def runRewards():
                     # add delay to prevent ban
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
-                print(f'\n\tPC Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tPC Searches completed: {datetime.datetime.now(TZ)}\n\t{EMAIL} has completed PC searches.\n')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -642,7 +650,7 @@ def runRewards():
                         pass
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-                print(f'\n\tMobile Searches completed: {datetime.datetime.now()}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\tMobile Searches completed: {datetime.datetime.now(TZ)}\n\t{EMAIL} has completed PC searches.\n')
                 driver.quit()
 
             driver = getDriver()
@@ -675,10 +683,10 @@ def main():
             run_rewards = False
             while not run_rewards:
                 # Kill the program if the time is outside of the start and end times
-                if (datetime.datetime.now().hour >= START_TIME and datetime.datetime.now().hour <= END_TIME):
+                if (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
                     run_rewards = True
                 else:
-                    print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now()}\n')
+                    print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now(TZ)}\n')
                     sleep(5400)
         try:
             # Run Bing Rewards Automation
