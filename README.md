@@ -29,6 +29,7 @@ Optional Variables:
    pip3 install Selenium
    pip3 install apprise
    pip3 install python-dotenv
+   pip3 install pytz
    ```
 Alternatively, you can clone this repository and install using requirements.txt
 ```sh
