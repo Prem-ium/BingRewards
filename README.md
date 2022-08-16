@@ -33,7 +33,7 @@ Optional Variables:
    ```
 Alternatively, you can clone this repository and install using requirements.txt
 ```sh
-   git clone https://github.com/sazncode/Bing-Rewards.git
+   git clone https://github.com/sazncode/BingRewards.git
    cd Bing-Rewards
    pip3 install -r requirements.txt
    ```
