@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 try:
     from random_words import RandomWords
 except ImportError:
-    os.system("pip install RandomWords")
+    os.system("pip3 install RandomWords")
     from random_words import RandomWords
     pass
 
@@ -49,7 +49,7 @@ if APPRISE_ALERTS:
     try:
         import apprise
     except ImportError:
-        os.system("pip install apprise")
+        os.system("pip3 install apprise")
         import apprise
         pass
 
@@ -67,6 +67,7 @@ except ImportError:
     from pytz import timezone
     pass
 TZ = timezone(os.environ.get("TZ", "EST"))
+
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
