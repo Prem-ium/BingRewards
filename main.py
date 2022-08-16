@@ -605,7 +605,7 @@ def runRewards():
                     # add delay to prevent ban
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
-                print(f'\n\tPC Searches completed: {datetime.datetime.now(TZ)}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
             driver.quit()
 
             if (Number_Mobile_Search > 0):
@@ -650,7 +650,7 @@ def runRewards():
                         pass
                     sleep(random.uniform(5, 25))
                     print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-                print(f'\n\tMobile Searches completed: {datetime.datetime.now(TZ)}\n\t{EMAIL} has completed PC searches.\n')
+                print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
                 driver.quit()
 
             driver = getDriver()
@@ -658,7 +658,7 @@ def runRewards():
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n')
+                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n')
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'Bing Rewards Automation Completed!', 
                         body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 3)}\n\n...')
@@ -668,7 +668,7 @@ def runRewards():
         totalDifference += differenceReport
         print(f'\n\n')
     if ranRewards and totalDifference > 0:
-        report = f'Total Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}'
+        report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}'
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'Bing Rewards Automation Complete', 
