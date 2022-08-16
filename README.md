@@ -1,5 +1,5 @@
 # Bing Rewards Automation
-A selenium based python project which auto completes Bing Reward's daily PC and mobile bing searches across multiple accounts. 
+An awesome python script to automate bing searches, quizes, polls, and more across multiple Bing Reward accounts.
 
 ## Environment Variables
 
@@ -20,6 +20,7 @@ Optional Variables:
 `WANTED_IPV6` = Your desired external IPv6 address. Set this if you want the bot to not run if your IPv6 address is different than this.
 
 `PROXY` = # Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
+
 
 ## Installation
 
