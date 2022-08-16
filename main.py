@@ -456,6 +456,7 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
     finally:
         sleep(random.uniform(8, 20))
+        driver.maximize_window()
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
         return int(points)
