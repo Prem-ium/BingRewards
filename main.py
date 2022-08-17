@@ -589,17 +589,17 @@ def MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search):
         print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def Mobile_Search_Helper(driver, EMAIL, PASSWORD, Number_Mobile_Search):
+def Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search, driver = getDriver(True)):
     try:
         MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
     except Exception as e:
         print(traceback.format_exc())
         sleep(500)
-        print('Attempting to restart PC search')
+        print('Attempting to restart Mobile search')
         driver.quit()
         driver = getDriver(True)
         try:
-            MobileSearch(driver, EMAIL, PASSWORD, driver, Number_Mobile_Search)
+            MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
         except Exception as e:
             pass
         pass
