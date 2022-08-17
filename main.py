@@ -700,7 +700,7 @@ def runRewards():
                 print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'Bing Rewards Automation Completed!', 
-                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
+                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
