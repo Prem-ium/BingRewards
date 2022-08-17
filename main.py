@@ -589,7 +589,8 @@ def MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search):
         print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search, driver = getDriver(True)):
+def Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search):
+    driver = getDriver(True)
     try:
         MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
     except Exception as e:
@@ -689,7 +690,7 @@ def runRewards():
                 PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search)
 
             if (Number_Mobile_Search > 0):
-                Mobile_Search_Helper(driver, EMAIL, PASSWORD, Number_Mobile_Search)
+                Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search)
 
             driver = getDriver()
             differenceReport = points
