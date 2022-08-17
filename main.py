@@ -9,9 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome.service import Service
 from time import sleep
 from dotenv import load_dotenv
 
@@ -57,6 +55,8 @@ HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
 
 if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.service import Service
 else:
     HANDLE_DRIVER = False
 
@@ -84,7 +84,6 @@ if TIMER.lower() == "true":
 else:
     TIMER = False
 
-    
 
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
@@ -235,7 +234,7 @@ def completePoll(driver):
         pass
     sleep(3)
     return
-
+# TODO: Clean up code
 def completeQuiz(driver):
     sleep(random.uniform(7, 14))
     try:
@@ -290,7 +289,7 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
-
+# TODO: Clean up code
 def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
@@ -364,7 +363,7 @@ def completeMore(driver):
         print(traceback.format_exc())
         pass
     return ran
-
+# TODO: Clean up code
 def dailySet(driver):
         ranSets = False
         try:
@@ -473,13 +472,159 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
         return int(points)
 
+def PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search):
+    rw = RandomWords()
+    driver.get(os.environ['URL'])
+    driver.maximize_window()
+    try:
+        login(EMAIL, PASSWORD, driver)
+    except:
+        pass
+    try:
+        driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
+        driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
+    except Exception:
+        pass
+    finally:
+        driver.get('https://www.bing.com/')
+
+    try:
+        driver.find_element(By.ID, 'id_l').click()
+        sleep(2)
+        driver.refresh()
+    except:
+        pass
+
+    # First test search
+    sleep(random.uniform(1, 6))
+    first = driver.find_element(By.ID, value="sb_form_q")
+    first.send_keys("test")
+    first.send_keys(Keys.RETURN)
+
+    # Main search loop
+    for x in range(1, Number_PC_Search+1):
+        sleep(random.uniform(1, 6))
+        # Create string to send
+        value = random.choice(TERMS) + rw.random_word()
+
+        # Clear search bar
+        ping = driver.find_element(By.ID, value="sb_form_q")
+        ping.clear()
+
+        # Send random keyword
+        ping.send_keys(value)
+
+        # add delay to prevent ban
+        sleep(4)
+        try:
+            go = driver.find_element(By.ID, value="sb_form_go")
+            go.click()
+
+        except:
+            driver.find_element(By.ID, value="sb_form_go").send_keys(Keys.RETURN)
+            pass
+
+        # add delay to prevent ban
+        sleep(random.uniform(5, 25))
+        print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
+    print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
+
+def PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search):
+    try:
+        PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search)
+    except Exception as e:
+        print(traceback.format_exc())
+        
+        sleep(500)
+        print('Attempting to restart PC search')
+        driver.quit()
+        driver = getDriver()
+        try:
+            PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search)
+        except Exception as e:
+            print('PC search failed, again! Skipping PC search.')
+        pass
+    finally:
+        driver.quit()
+
+def MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search):
+    rw = RandomWords()
+    driver.implicitly_wait(4)
+    driver.get(os.environ['URL'])
+    driver.maximize_window()
+
+    try:
+        driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
+        driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
+    except Exception:
+        pass
+
+    login(EMAIL, PASSWORD, driver)
+    print(f"\n\tAccount {EMAIL} logged in successfully! Auto search initiated.\n")
+    driver.get('https://www.bing.com/')
+    
+    # Main search loop
+    for x in range(1, Number_Mobile_Search + 1):
+        value = random.choice(TERMS) + rw.random_word()
+        try:
+            # Clear search bar
+            ping = driver.find_element(By.ID, value="sb_form_q")
+            ping.clear()
+
+            # Send random keyword
+            ping.send_keys(value)
+        except:
+            driver.get('https://www.bing.com/')
+            sleep(7)
+            # Clear search bar
+            ping = driver.find_element(By.ID, value="sb_form_q").send_keys(value)
+            pass
+        try:
+            go = driver.find_element(By.ID, value="sb_form_go")
+            go.click()
+        except Exception:
+            ping.send_keys(Keys.ENTER)
+            pass
+        sleep(random.uniform(5, 25))
+        print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
+    print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
+
+def Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search):
+    driver = getDriver(True)
+    try:
+        MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
+    except Exception as e:
+        print(traceback.format_exc())
+        sleep(500)
+        print('Attempting to restart Mobile search')
+        driver.quit()
+        driver = getDriver(True)
+        try:
+            MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
+        except Exception as e:
+            pass
+        pass
+    finally:
+        driver.quit()
+
+def wait():
+    run_rewards = False
+    while not run_rewards:
+        # Kill the program if the time is outside of the start and end times
+        if (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
+            run_rewards = True
+            return
+        else:
+            print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now(TZ)}\n')
+            sleep(5400)
+
 def runRewards():
     totalPointsReport = 0
     totalDifference = 0
     differenceReport = 0
     rw = RandomWords()
     ranRewards = False
-
+    loopTime = datetime.datetime.now(TZ)
     for x in ACCOUNTS:
         driver = getDriver()
 
@@ -530,6 +675,7 @@ def runRewards():
             pass
         finally:
             print()
+            recordTime = datetime.datetime.now(TZ)
 
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
@@ -539,136 +685,29 @@ def runRewards():
             ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
-                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 3)}\n\n\n...')
-            try:
-                if driver.find_elements(By.XPATH, '//*[@id="streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
-                    streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
-                    print(f'\tStreak Earned!:\t{streak}')
-
-                    if APPRISE_ALERTS:
-                        alerts.notify(title=f'Bing Rewards Automation Streak Earned!', 
-                                    body=f'Email:\t\t{EMAIL} \nEarned:\t\t{streak}')
-            except:
-                pass
+                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
             if (Number_PC_Search > 0):
-                rw = RandomWords()
-                driver.get(os.environ['URL'])
-                driver.maximize_window()
-                try:
-                    login(EMAIL, PASSWORD, driver)
-                except:
-                    pass
-                try:
-                    driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
-                    driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
-                except Exception:
-                    pass
-                finally:
-                    driver.get('https://www.bing.com/')
-
-                try:
-                    driver.find_element(By.ID, 'id_l').click()
-                    sleep(2)
-                    driver.refresh()
-                except:
-                    pass
-
-                # First test search
-                sleep(random.uniform(1, 6))
-                first = driver.find_element(By.ID, value="sb_form_q")
-                first.send_keys("test")
-                first.send_keys(Keys.RETURN)
-
-                # Main search loop
-                for x in range(1, Number_PC_Search+1):
-                    sleep(random.uniform(1, 6))
-                    # Create string to send
-                    value = random.choice(TERMS) + rw.random_word()
-
-                    # Clear search bar
-                    ping = driver.find_element(By.ID, value="sb_form_q")
-                    ping.clear()
-
-                    # Send random keyword
-                    ping.send_keys(value)
-
-                    # add delay to prevent ban
-                    sleep(4)
-                    try:
-                        go = driver.find_element(By.ID, value="sb_form_go")
-                        go.click()
-
-                    except:
-                        driver.find_element(By.ID, value="sb_form_go").send_keys(Keys.RETURN)
-                        pass
-
-                    # add delay to prevent ban
-                    sleep(random.uniform(5, 25))
-                    print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
-                print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
-            driver.quit()
+                PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search)
 
             if (Number_Mobile_Search > 0):
-                rw = RandomWords()
-                driver = getDriver(isMobile = True)
-                        
-                driver.implicitly_wait(4)
-                driver.get(os.environ['URL'])
-                driver.maximize_window()
-
-                try:
-                    driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
-                    driver.find_element(By.XPATH, value='//*[@id="HBSignIn"]/a[1]').click()
-                except Exception:
-                    pass
-
-                login(EMAIL, PASSWORD, driver)
-                print(f"\n\tAccount {EMAIL} logged in successfully! Auto search initiated.\n")
-                driver.get('https://www.bing.com/')
-                
-                # Main search loop
-                for x in range(1, Number_Mobile_Search + 1):
-                    value = random.choice(TERMS) + rw.random_word()
-                    try:
-                        # Clear search bar
-                        ping = driver.find_element(By.ID, value="sb_form_q")
-                        ping.clear()
-
-                        # Send random keyword
-                        ping.send_keys(value)
-                    except:
-                        driver.get('https://www.bing.com/')
-                        sleep(7)
-                        # Clear search bar
-                        ping = driver.find_element(By.ID, value="sb_form_q").send_keys(value)
-                        pass
-                    try:
-                        go = driver.find_element(By.ID, value="sb_form_go")
-                        go.click()
-                    except Exception:
-                        ping.send_keys(Keys.ENTER)
-                        pass
-                    sleep(random.uniform(5, 25))
-                    print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
-                print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
-                driver.quit()
+                Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search)
 
             driver = getDriver()
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n')
+                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'Bing Rewards Automation Completed!', 
-                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 3)}\n\n...')
+                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
         totalDifference += differenceReport
         print(f'\n\n')
     if ranRewards and totalDifference > 0:
-        report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}'
+        report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'Bing Rewards Automation Complete', 
@@ -679,22 +718,17 @@ def runRewards():
 def main():
     # Infinitily loop through rewards
     while True:
+        # If timer is set, check if the current time is between the start and end time-- and loop until it is
         if TIMER:
-            run_rewards = False
-            while not run_rewards:
-                # Kill the program if the time is outside of the start and end times
-                if (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
-                    run_rewards = True
-                else:
-                    print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now(TZ)}\n')
-                    sleep(5400)
+            wait()
         try:
             # Run Bing Rewards Automation
             runRewards()
             print('Bing Rewards Automation Complete! Sleeping for a bit before rechecking...')
             sleep(14400)
         except Exception as e:
-            print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
+            # Catch any errors, print them, and restart (in hopes of it being non-fatal)
+            print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Failed!',
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
