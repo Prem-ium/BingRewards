@@ -68,4 +68,4 @@ Replace the `<tag>` above with one of these (defaults to `latest`)
 - Apprise Alerts
 
 ## To-Do:
-- Selecting only correct answers on 'This or That' Quiz format. (Currently chooses choices at random for streak completion purposes.)
+- Improve Overall Code Readability/Preformance 
