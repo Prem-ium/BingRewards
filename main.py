@@ -479,7 +479,7 @@ def runRewards():
     differenceReport = 0
     rw = RandomWords()
     ranRewards = False
-
+    loopTime = datetime.datetime.now(TZ)
     for x in ACCOUNTS:
         driver = getDriver()
 
@@ -530,7 +530,7 @@ def runRewards():
             pass
         finally:
             print()
-
+        recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
@@ -539,7 +539,7 @@ def runRewards():
             ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
-                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 3)}\n\n\n...')
+                            body=f'Email:\t\t{EMAIL} \nPoints:\t\t {points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:{recordTime}\n\n\n...')
             try:
                 if driver.find_elements(By.XPATH, '//*[@id="streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
                     streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
@@ -658,10 +658,10 @@ def runRewards():
             points = getPoints(EMAIL, PASSWORD, driver)
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n')
+                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\tStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'Bing Rewards Automation Completed!', 
-                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 3)}\n\n...')
+                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points} \nEarned Points:\t\t\t{differenceReport} \nCash Value:\t\t${round(points / 1300, 3)}\n\tStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
@@ -672,7 +672,7 @@ def runRewards():
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'Bing Rewards Automation Complete', 
-                        body=f'{report}\n\n...')
+                        body=f'{report}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}\n\n...')
     return
 
 # Main function
