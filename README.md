@@ -68,4 +68,4 @@ Replace the `<tag>` above with one of these (defaults to `latest`)
 - Apprise Alerts
 
 ## To-Do:
-- Improve Overall Code Readability/Preformance 
+- Improve Overall Code Readability/Performance 
