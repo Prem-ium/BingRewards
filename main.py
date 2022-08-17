@@ -234,7 +234,7 @@ def completePoll(driver):
         pass
     sleep(3)
     return
-
+# TODO: Clean up code
 def completeQuiz(driver):
     sleep(random.uniform(7, 14))
     try:
@@ -289,7 +289,7 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
-
+# TODO: Clean up code
 def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
@@ -363,7 +363,7 @@ def completeMore(driver):
         print(traceback.format_exc())
         pass
     return ran
-
+# TODO: Clean up code
 def dailySet(driver):
         ranSets = False
         try:
@@ -674,7 +674,8 @@ def runRewards():
             pass
         finally:
             print()
-        recordTime = datetime.datetime.now(TZ)
+            recordTime = datetime.datetime.now(TZ)
+
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
@@ -684,16 +685,6 @@ def runRewards():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
-            try:
-                if driver.find_elements(By.XPATH, '//*[@id="streak"]/div[2]/mee-rich-paragraph/p/b').text.__contains__('Awesome!'):
-                    streak = driver.find_element(By.XPATH, '//*[@id-"streak"]/div[2]/mee-rich-paragraph/p/b').text
-                    print(f'\tStreak Earned!:\t{streak}')
-
-                    if APPRISE_ALERTS:
-                        alerts.notify(title=f'Bing Rewards Automation Streak Earned!', 
-                                    body=f'Email:\t\t{EMAIL} \nEarned:\t\t{streak}')
-            except:
-                pass
             if (Number_PC_Search > 0):
                 PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search)
 
@@ -726,6 +717,7 @@ def runRewards():
 def main():
     # Infinitily loop through rewards
     while True:
+        # If timer is set, check if the current time is between the start and end time-- and loop until it is
         if TIMER:
             wait()
         try:
@@ -734,7 +726,8 @@ def main():
             print('Bing Rewards Automation Complete! Sleeping for a bit before rechecking...')
             sleep(14400)
         except Exception as e:
-            print(f"EXCEPTION: {e}\n\nTRACEBACK: {traceback.format_exc()}")
+            # Catch any errors, print them, and restart (in hopes of it being non-fatal)
+            print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Failed!',
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
