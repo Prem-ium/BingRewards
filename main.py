@@ -96,9 +96,6 @@ proxy = os.environ.get("PROXY", "")
 # Populate proxy dictionary for requests
 proxies = {"http": f"{proxy}", "https": f"{proxy}"}
 
-# Set default search amount
-MOBILE_SEARCHES = 20
-PC_SEARCHES = 34
 
 # Methods
 def apprise_init():
@@ -479,12 +476,13 @@ def getDriver(isMobile = False):
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
     driver.implicitly_wait(5)
-    sleep(random.uniform(4, 6))
+    sleep(random.uniform(3, 5))
     try:
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
         if not login(EMAIL, PASSWORD, driver):
             return -404
         if driver.title.lower() == 'rewards error':
+            sleep(random.uniform(2, 4))
             driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
@@ -502,7 +500,7 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
         return int(points)
 
-def PCSearch(driver, EMAIL, PASSWORD):
+def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
     driver.get(os.environ['URL'])
     driver.maximize_window()
@@ -559,9 +557,9 @@ def PCSearch(driver, EMAIL, PASSWORD):
         print(f'\t{x} PC search of {PC_SEARCHES}. Now {int(x/PC_SEARCHES*100)}% done.')
     print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def PC_Search_Helper(driver, EMAIL, PASSWORD):
+def PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
     try:
-        PCSearch(driver, EMAIL, PASSWORD)
+        PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
         
@@ -570,15 +568,15 @@ def PC_Search_Helper(driver, EMAIL, PASSWORD):
         driver.quit()
         driver = getDriver()
         try:
-            updateSearches(driver)
-            PCSearch(driver, EMAIL, PASSWORD)
+            PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
+            PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES)
         except Exception as e:
             print('PC search failed, again! Skipping PC search.')
         pass
     finally:
         driver.quit()
 
-def MobileSearch(driver, EMAIL, PASSWORD):
+def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     rw = RandomWords()
     driver.implicitly_wait(4)
     driver.get(os.environ['URL'])
@@ -620,18 +618,21 @@ def MobileSearch(driver, EMAIL, PASSWORD):
         print(f'\t{x} mobile search of {MOBILE_SEARCHES}. Now {int(x/MOBILE_SEARCHES*100)}% done.')
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def Mobile_Search_Helper(EMAIL, PASSWORD):
+def Mobile_Search_Helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
     driver = getDriver(True)
     try:
-        MobileSearch(driver, EMAIL, PASSWORD)
+        MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
         sleep(500)
         print('Attempting to restart Mobile search')
         driver.quit()
+        driver = getDriver()
+        PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
+        driver.quit()
         driver = getDriver(True)
         try:
-            MobileSearch(driver, EMAIL, PASSWORD)
+            MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
         except Exception as e:
             pass
         pass
@@ -640,6 +641,9 @@ def Mobile_Search_Helper(EMAIL, PASSWORD):
   
 def updateSearches(driver):
     driver.get('https://rewards.microsoft.com/pointsbreakdown')
+    
+    PC_SEARCHES = 34
+    MOBILE_SEARCHES = 24
     try:
         sleep(10)
         PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
@@ -671,7 +675,7 @@ def updateSearches(driver):
         pass
     finally:
         print()
-        return
+        return PC_SEARCHES, MOBILE_SEARCHES
 
 def runRewards():
     totalPointsReport = 0
@@ -688,8 +692,9 @@ def runRewards():
         PASSWORD = x[colonIndex:len(x)]
 
         # Set default search amount
-        MOBILE_SEARCHES = 20
         PC_SEARCHES = 34
+        MOBILE_SEARCHES = 20
+
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
         if (points == -404):
@@ -697,11 +702,11 @@ def runRewards():
             continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
         recordTime = datetime.datetime.now(TZ)
-        updateSearches(driver)
+
+        PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
 
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
-
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
@@ -711,12 +716,12 @@ def runRewards():
             ranRewards = True
             
             if (PC_SEARCHES > 0):
-                PC_Search_Helper(driver, EMAIL, PASSWORD)
+                PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
             else:
                 driver.quit()
 
             if (MOBILE_SEARCHES > 0):
-                Mobile_Search_Helper(EMAIL, PASSWORD)
+                Mobile_Search_Helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
 
             driver = getDriver()
             differenceReport = points
