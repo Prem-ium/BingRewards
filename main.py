@@ -66,7 +66,7 @@ except ImportError:
     os.system("pip3 install pytz")
     from pytz import timezone
     pass
-TZ = timezone(os.environ.get("TZ", "EST"))
+TZ = timezone(os.environ.get("TZ", "America/New_York"))
 
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
