@@ -687,6 +687,9 @@ def runRewards():
         EMAIL = x[0:colonIndex-1]
         PASSWORD = x[colonIndex:len(x)]
 
+        # Set default search amount
+        MOBILE_SEARCHES = 20
+        PC_SEARCHES = 34
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
         if (points == -404):
@@ -694,13 +697,7 @@ def runRewards():
             continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
         recordTime = datetime.datetime.now(TZ)
-        try:
-            updateSearches(driver)
-        except:
-            # Set default search amount
-            MOBILE_SEARCHES = 20
-            PC_SEARCHES = 34
-            pass
+        updateSearches(driver)
 
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
