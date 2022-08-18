@@ -13,7 +13,6 @@ from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from dotenv import load_dotenv
 
-
 try:
     from random_words import RandomWords
 except ImportError:
@@ -72,7 +71,7 @@ TZ = timezone(os.environ.get("TZ", "EST"))
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
-    # Get start and end time, defaulting to 4:00am and 10:00pm
+    # Get start and end time, defaulting to 4:00am and 11:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
     END_TIME = float(os.environ.get("END_TIME", "23"))
 
@@ -97,6 +96,10 @@ proxy = os.environ.get("PROXY", "")
 # Populate proxy dictionary for requests
 proxies = {"http": f"{proxy}", "https": f"{proxy}"}
 
+# Set default search amount
+MOBILE_SEARCHES = 20
+PC_SEARCHES = 34
+
 # Methods
 def apprise_init():
     if APPRISE_ALERTS:
@@ -105,7 +108,17 @@ def apprise_init():
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
-
+def wait():
+    run_rewards = False
+    while not run_rewards:
+        # Kill the program if the time is outside of the start and end times
+        if (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
+            run_rewards = True
+            return
+        else:
+            print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now(TZ)}\n')
+            sleep(5400)
+          
 def get_current_ip(type, proxies):
     # try with icanhazip.com
     try:
@@ -430,7 +443,6 @@ def checkStreaks(driver, EMAIL):
             alerts.notify(title=f'Bing Rewards {EMAIL} Streak Earned!', body=f'{streaks}')
     except:
         pass
-    streaks = None
 def getDriver(isMobile = False):
     if not HANDLE_DRIVER:
         chrome_options = Options()
@@ -443,6 +455,7 @@ def getDriver(isMobile = False):
 
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
@@ -451,10 +464,8 @@ def getDriver(isMobile = False):
     
     #chrome_options.add_argument('--disable-infobars')
     #chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
-   # prefs = {"credentials_enable_service": False,
-            #"profile.password_manager_enabled": False}
-   # chrome_options.add_experimental_option("prefs", prefs)
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    #prefs = {"credentials_enable_service": False, "profile.password_manager_enabled": False}
+    #chrome_options.add_experimental_option("prefs", prefs)
     
     if not HANDLE_DRIVER:
         driver = webdriver.Chrome(options=chrome_options)
@@ -467,13 +478,14 @@ def getDriver(isMobile = False):
 
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
-    driver.implicitly_wait(4)
-    sleep(random.uniform(3, 5))
+    driver.implicitly_wait(5)
+    sleep(random.uniform(4, 6))
     try:
-        sleep(random.uniform(1, 3))
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
         if not login(EMAIL, PASSWORD, driver):
             return -404
+        if driver.title.lower() == 'rewards error':
+            driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
         print(e)
@@ -481,8 +493,7 @@ def getPoints(EMAIL, PASSWORD, driver):
     finally:
         driver.maximize_window()
         sleep(random.uniform(8, 20))
-    if driver.title.lower() == 'rewards error':
-        driver.get('https://rewards.microsoft.com/')
+   
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
         return int(points)
@@ -491,7 +502,7 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
         return int(points)
 
-def PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search):
+def PCSearch(driver, EMAIL, PASSWORD):
     rw = RandomWords()
     driver.get(os.environ['URL'])
     driver.maximize_window()
@@ -521,7 +532,7 @@ def PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search):
     first.send_keys(Keys.RETURN)
 
     # Main search loop
-    for x in range(1, Number_PC_Search+1):
+    for x in range(1, PC_SEARCHES+1):
         sleep(random.uniform(1, 6))
         # Create string to send
         value = random.choice(TERMS) + rw.random_word()
@@ -545,12 +556,12 @@ def PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search):
 
         # add delay to prevent ban
         sleep(random.uniform(5, 25))
-        print(f'\t{x} PC search of {Number_PC_Search}. Now {int(x/Number_PC_Search*100)}% done.')
+        print(f'\t{x} PC search of {PC_SEARCHES}. Now {int(x/PC_SEARCHES*100)}% done.')
     print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search):
+def PC_Search_Helper(driver, EMAIL, PASSWORD):
     try:
-        PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search)
+        PCSearch(driver, EMAIL, PASSWORD)
     except Exception as e:
         print(traceback.format_exc())
         
@@ -559,14 +570,15 @@ def PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search):
         driver.quit()
         driver = getDriver()
         try:
-            PCSearch(driver, EMAIL, PASSWORD, Number_PC_Search)
+            updateSearches(driver)
+            PCSearch(driver, EMAIL, PASSWORD)
         except Exception as e:
             print('PC search failed, again! Skipping PC search.')
         pass
     finally:
         driver.quit()
 
-def MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search):
+def MobileSearch(driver, EMAIL, PASSWORD):
     rw = RandomWords()
     driver.implicitly_wait(4)
     driver.get(os.environ['URL'])
@@ -583,7 +595,7 @@ def MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search):
     driver.get('https://www.bing.com/')
     
     # Main search loop
-    for x in range(1, Number_Mobile_Search + 1):
+    for x in range(1, MOBILE_SEARCHES + 1):
         value = random.choice(TERMS) + rw.random_word()
         try:
             # Clear search bar
@@ -605,13 +617,13 @@ def MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search):
             ping.send_keys(Keys.ENTER)
             pass
         sleep(random.uniform(5, 25))
-        print(f'\t{x} mobile search of {Number_Mobile_Search}. Now {int(x/Number_Mobile_Search*100)}% done.')
+        print(f'\t{x} mobile search of {MOBILE_SEARCHES}. Now {int(x/MOBILE_SEARCHES*100)}% done.')
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search):
+def Mobile_Search_Helper(EMAIL, PASSWORD):
     driver = getDriver(True)
     try:
-        MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
+        MobileSearch(driver, EMAIL, PASSWORD)
     except Exception as e:
         print(traceback.format_exc())
         sleep(500)
@@ -619,29 +631,52 @@ def Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search):
         driver.quit()
         driver = getDriver(True)
         try:
-            MobileSearch(driver, EMAIL, PASSWORD, Number_Mobile_Search)
+            MobileSearch(driver, EMAIL, PASSWORD)
         except Exception as e:
             pass
         pass
     finally:
         driver.quit()
-
-def wait():
-    run_rewards = False
-    while not run_rewards:
-        # Kill the program if the time is outside of the start and end times
-        if (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
-            run_rewards = True
-            return
+  
+def updateSearches(driver):
+    driver.get('https://rewards.microsoft.com/pointsbreakdown')
+    try:
+        sleep(10)
+        PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
+        
+        if (int(PC[0]) < int(PC[1])):
+            PC_SEARCHES = int((int(PC[1]) - int(PC[0])) / 5)
+            print(f'\tPC Searches Left:\t{PC_SEARCHES}')
         else:
-            print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now(TZ)}\n')
-            sleep(5400)
+            PC_SEARCHES = 0
+            print(f'\tPC Searches Completed:\t{PC[0]}/{PC[1]}')
+
+        if (int(PC[1]) > 50):
+            MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
+            if (int(MOBILE[0]) < int(MOBILE[1])):
+                MOBILE_SEARCHES = int((int(MOBILE[1]) - int(MOBILE[0])) / 5)
+                print(f'\tMobile Searches Left:\t{MOBILE_SEARCHES}')
+            else:
+                MOBILE_SEARCHES = 0
+                print(f'\tMobile Searches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
+        else:
+            MOBILE_SEARCHES = 0
+        try:
+            driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
+        except:
+            driver.get('https://rewards.microsoft.com/')
+    except Exception as e:
+        driver.get('https://rewards.microsoft.com/')
+        print(traceback.format_exc())
+        pass
+    finally:
+        print()
+        return
 
 def runRewards():
     totalPointsReport = 0
     totalDifference = 0
     differenceReport = 0
-    rw = RandomWords()
     ranRewards = False
     loopTime = datetime.datetime.now(TZ)
     for x in ACCOUNTS:
@@ -652,67 +687,39 @@ def runRewards():
         EMAIL = x[0:colonIndex-1]
         PASSWORD = x[colonIndex:len(x)]
 
-        # Set default search amount
-        Number_Mobile_Search = 20
-        Number_PC_Search = 34
-
         # Retireve points before completing searches
         points = getPoints(EMAIL, PASSWORD, driver)
         if (points == -404):
             driver.quit()
             continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
-        driver.get('https://rewards.microsoft.com/pointsbreakdown')
+        recordTime = datetime.datetime.now(TZ)
         try:
-            sleep(10)
-            PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
-            
-            if (int(PC[0]) < int(PC[1])):
-                Number_PC_Search = int((int(PC[1]) - int(PC[0])) / 5)
-                print(f'\tPC Searches Left:\t{Number_PC_Search}')
-            else:
-                Number_PC_Search = 0
-                print(f'\tPC Searches Completed:\t{PC[0]}/{PC[1]}')
-
-            if (int(PC[1]) > 50):
-                MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
-                if (int(MOBILE[0]) < int(MOBILE[1])):
-                    Number_Mobile_Search = int((int(MOBILE[1]) - int(MOBILE[0])) / 5)
-                    print(f'\tMobile Searches Left:\t{Number_Mobile_Search}')
-                else:
-                    Number_Mobile_Search = 0
-                    print(f'\tMobile Searches Completed:\t{MOBILE[0]}/{MOBILE[1]}')
-            else:
-                Number_Mobile_Search = 0
-            try:
-                driver.find_element(By.XPATH, '//*[@id="modal-host"]/div[2]/button').click()
-            except:
-                driver.get('https://rewards.microsoft.com/')
-        except Exception as e:
-            driver.get('https://rewards.microsoft.com/')
-            print(traceback.format_exc())
+            updateSearches(driver)
+        except:
+            # Set default search amount
+            MOBILE_SEARCHES = 20
+            PC_SEARCHES = 34
             pass
-        finally:
-            print()
-            recordTime = datetime.datetime.now(TZ)
 
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
 
-        if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranDailySets or ranMoreActivities):
-            checkStreaks(driver, EMAIL)
-            ranRewards = True
+        if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
-            if (Number_PC_Search > 0):
-                PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search)
+            checkStreaks(driver, EMAIL)
+            ranRewards = True
+            
+            if (PC_SEARCHES > 0):
+                PC_Search_Helper(driver, EMAIL, PASSWORD)
             else:
                 driver.quit()
 
-            if (Number_Mobile_Search > 0):
-                Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search)
+            if (MOBILE_SEARCHES > 0):
+                Mobile_Search_Helper(EMAIL, PASSWORD)
 
             driver = getDriver()
             differenceReport = points
