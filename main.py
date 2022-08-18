@@ -691,6 +691,8 @@ def runRewards():
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
             if (Number_PC_Search > 0):
                 PC_Search_Helper(driver, EMAIL, PASSWORD, Number_PC_Search)
+            else:
+                driver.quit()
 
             if (Number_Mobile_Search > 0):
                 Mobile_Search_Helper(EMAIL, PASSWORD, Number_Mobile_Search)
