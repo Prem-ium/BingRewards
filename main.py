@@ -13,6 +13,7 @@ from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from dotenv import load_dotenv
 
+
 try:
     from random_words import RandomWords
 except ImportError:
@@ -414,7 +415,22 @@ def dailySet(driver):
             pass
 
         return ranSets
-
+def checkStreaks(driver, EMAIL):
+    driver.get('https://rewards.microsoft.com/')
+    try:
+        if driver.find_element(By.XPATH, value='//*[@id="rewardsBanner"]/div/div/div[3]/div[3]/mee-rewards-user-status-item/mee-rewards-user-status-streak/div/div/div/div/div/p[2]/mee-rewards-counter-animation/span'):
+            streaks = driver.find_element(By.XPATH, value='//*[@id="rewardsBanner"]/div/div/div[3]/div[3]/mee-rewards-user-status-item/mee-rewards-user-status-streak/div/div/div/div/div/p[2]/mee-rewards-counter-animation/span').text
+            print(f'\t{streaks}\n')
+        if driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p/b'):
+            streaks2 = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p/b').text
+            streaks += f'\t{streaks2} for your streak!\n'
+        if streaks:
+            print(streaks)
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'Bing Rewards {EMAIL} Streak Earned!', body=f'{streaks}')
+    except:
+        pass
+    streaks = None
 def getDriver(isMobile = False):
     if not HANDLE_DRIVER:
         chrome_options = Options()
@@ -685,6 +701,7 @@ def runRewards():
 
 
         if (Number_PC_Search > 0 or Number_Mobile_Search > 0 or ranDailySets or ranMoreActivities):
+            checkStreaks(driver, EMAIL)
             ranRewards = True
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
