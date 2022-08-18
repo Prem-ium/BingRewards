@@ -463,13 +463,10 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        sleep(random.uniform(8, 20))
         driver.maximize_window()
-    try:
-        if driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/h1').text.lower() == "it's not you, it's us." or driver.current_window_handle == "https://rewards.microsoft.com/error" or driver.find_elements(By.ID, value = 'rewards-error'):
-            driver.get('https://rewards.microsoft.com/')
-    except:
-        pass
+        sleep(random.uniform(8, 20))
+    if driver.title.lower() == 'rewards error':
+        driver.get('https://rewards.microsoft.com/')
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
         return int(points)
