@@ -433,11 +433,11 @@ def getDriver(isMobile = False):
         chrome_options.add_experimental_option(
             "mobileEmulation", mobile_emulation)
     
-    chrome_options.add_argument('--disable-infobars')
-    chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
-    prefs = {"credentials_enable_service": False,
-            "profile.password_manager_enabled": False}
-    chrome_options.add_experimental_option("prefs", prefs)
+    #chrome_options.add_argument('--disable-infobars')
+    #chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
+   # prefs = {"credentials_enable_service": False,
+            #"profile.password_manager_enabled": False}
+   # chrome_options.add_experimental_option("prefs", prefs)
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     
     if not HANDLE_DRIVER:
@@ -454,6 +454,7 @@ def getPoints(EMAIL, PASSWORD, driver):
     driver.implicitly_wait(4)
     sleep(random.uniform(3, 5))
     try:
+        sleep(random.uniform(1, 3))
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
         if not login(EMAIL, PASSWORD, driver):
             return -404
@@ -462,8 +463,10 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        sleep(random.uniform(8, 20))
         driver.maximize_window()
+        sleep(random.uniform(8, 20))
+    if driver.title.lower() == 'rewards error':
+        driver.get('https://rewards.microsoft.com/')
     try:
         points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
         return int(points)
