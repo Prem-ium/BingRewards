@@ -226,11 +226,11 @@ def completeSet(driver):
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         sleep(8)
-        driver.refresh()
         print('\tExplore completed!')
     except:
-        driver.refresh()
         pass
+    finally:
+        driver.refresh()
     return
 
 def completePoll(driver):
@@ -431,8 +431,8 @@ def dailySet(driver):
 
         return ranSets
 def checkStreaks(driver, EMAIL):
-    driver.get('https://rewards.microsoft.com/')
     try:
+        driver.get('https://rewards.microsoft.com/')
         bonusNotification = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p/b').text
         if bonusNotification is not None and 'Awesome!' in bonusNotification:
             print(f'\t{bonusNotification} for a streak bonus!\n')
