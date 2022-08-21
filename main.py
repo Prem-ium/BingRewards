@@ -760,7 +760,7 @@ def main():
             # Run Bing Rewards Automation
             runRewards()
             print('Bing Rewards Automation Complete! Sleeping for a bit before rechecking...')
-            sleep(14400)
+            sleep(3600 * random.randint(1, 6))
         except Exception as e:
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
             print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
