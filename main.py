@@ -439,7 +439,7 @@ def checkStreaks(driver, EMAIL):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards {EMAIL} Streak Earned!', body=f'{bonusNotification}\n\n...')
         else:
-            bonusNotification = driver.find_element(By.XPATH, value='//*[@id="rewardsBanner"]/div/div/div[3]/div[3]/mee-rewards-user-status-item/mee-rewards-user-status-streak/div/div/div/div/div/p[2]/mee-rewards-counter-animation/span').text
+            bonusNotification = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p').text
             if APPRISE_ALERTS and len(bonusNotification) > 5:
                 alerts.notify(title=f'Bing Rewards {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
     except:
