@@ -261,7 +261,6 @@ def completeQuiz(driver):
     driver.refresh()
     try:
         numberOfQuestions = (driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1])[:-1]
-        # numberOfQuestions = numberOfQuestions[:-1]
         for i in range(int(numberOfQuestions)):
             driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
             sleep(8)
@@ -311,14 +310,10 @@ def completeMore(driver):
     driver.get('https://rewards.microsoft.com/')
     try:
         count = len(driver.find_elements(By.CLASS_NAME, 'ds-card-sec')) - 6
-        #for i in range(15):
         for i in range(count):
             i+=1
             try:
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
-            except:
-                pass
-            try:
                 class_name = element.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a/mee-rewards-points/div/div/span[1]').get_attribute('class')
 
                 if (class_name == "mee-icon mee-icon-AddMedium" or class_name == "mee-icon mee-icon-HourGlass"):
@@ -682,9 +677,7 @@ def updateSearches(driver):
         return PC_SEARCHES, MOBILE_SEARCHES
 
 def runRewards():
-    totalPointsReport = 0
-    totalDifference = 0
-    differenceReport = 0
+    totalPointsReport = totalDifference = differenceReport = 0
     ranRewards = False
     loopTime = datetime.datetime.now(TZ)
     for x in ACCOUNTS:
@@ -705,10 +698,9 @@ def runRewards():
             driver.quit()
             continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
-        recordTime = datetime.datetime.now(TZ)
 
         PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
-
+        recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
 
@@ -751,7 +743,6 @@ def runRewards():
 
 # Main function
 def main():
-    # Infinitily loop through rewards
     while True:
         # If timer is set, check if the current time is between the start and end time-- and loop until it is
         if TIMER:
