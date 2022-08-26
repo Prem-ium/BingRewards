@@ -106,15 +106,11 @@ def apprise_init():
             alerts.add(service)
         return alerts
 def wait():
-    run_rewards = False
-    while not run_rewards:
-        # Kill the program if the time is outside of the start and end times
-        if (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
-            run_rewards = True
-            return
-        else:
-            print(f'Not running because it is not between {START_TIME} and {END_TIME} \n{datetime.datetime.now(TZ)}\n')
-            sleep(5400)
+    if not datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME:
+        range = abs((START_TIME - datetime.datetime.now(TZ).hour))
+        print(f'Timer is enabled.\nStart Time: {START_TIME}. Current time: {datetime.datetime.now(TZ).hour}\nCurrent time is not within range. Sleeping for {range} hours.')
+        sleep((range) * 3600)
+    return
           
 def get_current_ip(type, proxies):
     # try with icanhazip.com
