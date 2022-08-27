@@ -191,7 +191,6 @@ def check_ip_address():
     print()
 
 def login(EMAIL, PASSWORD, driver):
-    driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
     sleep(random.uniform(2, 4))
@@ -467,6 +466,7 @@ def getDriver(isMobile = False):
             service=Service(ChromeDriverManager(cache_valid_range=30).install()),
             options=chrome_options)
 
+    driver.maximize_window()
     return driver
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -485,7 +485,6 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        driver.maximize_window()
         sleep(random.uniform(8, 20))
    
     try:
@@ -499,7 +498,6 @@ def getPoints(EMAIL, PASSWORD, driver):
 def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
     driver.get(os.environ['URL'])
-    driver.maximize_window()
     try:
         login(EMAIL, PASSWORD, driver)
     except:
@@ -558,9 +556,8 @@ def PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
-        
+        print('Attempting to restart PC search in 500 seconds')
         sleep(500)
-        print('Attempting to restart PC search')
         driver.quit()
         driver = getDriver()
         try:
@@ -576,7 +573,6 @@ def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     rw = RandomWords()
     driver.implicitly_wait(4)
     driver.get(os.environ['URL'])
-    driver.maximize_window()
 
     try:
         driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
@@ -620,8 +616,8 @@ def Mobile_Search_Helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
         MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
+        print('Attempting to restart Mobile search in 500 seconds')
         sleep(500)
-        print('Attempting to restart Mobile search')
         driver.quit()
         driver = getDriver()
         PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
@@ -754,7 +750,7 @@ def main():
             print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Failed!',
-                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
+                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 600 seconds...\n\n ')
             sleep(600)
             continue
 
