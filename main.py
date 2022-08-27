@@ -191,7 +191,6 @@ def check_ip_address():
     print()
 
 def login(EMAIL, PASSWORD, driver):
-    driver.maximize_window()
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
     driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
     sleep(random.uniform(2, 4))
@@ -467,6 +466,7 @@ def getDriver(isMobile = False):
             service=Service(ChromeDriverManager(cache_valid_range=30).install()),
             options=chrome_options)
 
+    driver.maximize_window()
     return driver
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -485,7 +485,6 @@ def getPoints(EMAIL, PASSWORD, driver):
         print(e)
         pass
     finally:
-        driver.maximize_window()
         sleep(random.uniform(8, 20))
    
     try:
@@ -499,7 +498,6 @@ def getPoints(EMAIL, PASSWORD, driver):
 def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
     driver.get(os.environ['URL'])
-    driver.maximize_window()
     try:
         login(EMAIL, PASSWORD, driver)
     except:
@@ -576,7 +574,6 @@ def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     rw = RandomWords()
     driver.implicitly_wait(4)
     driver.get(os.environ['URL'])
-    driver.maximize_window()
 
     try:
         driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
