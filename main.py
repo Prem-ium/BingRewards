@@ -556,9 +556,8 @@ def PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
-        
+        print('Attempting to restart PC search in 500 seconds')
         sleep(500)
-        print('Attempting to restart PC search')
         driver.quit()
         driver = getDriver()
         try:
@@ -617,8 +616,8 @@ def Mobile_Search_Helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
         MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
+        print('Attempting to restart Mobile search in 500 seconds')
         sleep(500)
-        print('Attempting to restart Mobile search')
         driver.quit()
         driver = getDriver()
         PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
@@ -751,7 +750,7 @@ def main():
             print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Failed!',
-                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart...\n\n ')
+                        body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 600 seconds...\n\n ')
             sleep(600)
             continue
 
