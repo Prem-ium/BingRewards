@@ -453,12 +453,7 @@ def getDriver(isMobile = False):
         mobile_emulation = {"deviceName": "Nexus 5"}
         chrome_options.add_experimental_option(
             "mobileEmulation", mobile_emulation)
-    
-    #chrome_options.add_argument('--disable-infobars')
-    #chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
-    #prefs = {"credentials_enable_service": False, "profile.password_manager_enabled": False}
-    #chrome_options.add_experimental_option("prefs", prefs)
-    
+
     if not HANDLE_DRIVER:
         driver = webdriver.Chrome(options=chrome_options)
     else:
@@ -673,6 +668,7 @@ def runRewards():
     totalPointsReport = totalDifference = differenceReport = 0
     ranRewards = False
     loopTime = datetime.datetime.now(TZ)
+    print(f'\nStarting Bing Rewards Automation:\t{loopTime}\n')
     for x in ACCOUNTS:
         driver = getDriver()
 
