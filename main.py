@@ -3,36 +3,36 @@ import random
 import traceback
 import requests
 import datetime
+import apprise
+from time import sleep
+from dotenv import load_dotenv
+from pytz import timezone
+from random_words import RandomWords
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-from time import sleep
-from dotenv import load_dotenv
-
-try:
-    from random_words import RandomWords
-except ImportError:
-    os.system("pip3 install RandomWords")
-    from random_words import RandomWords
-    pass
 
 # Load ENV
 load_dotenv()
 
+# LOGIN EXAMPLE:
+# "EMAIL:PASSWORD,EMAIL:PASSWORD"
 if not os.environ["LOGIN"]:
     raise Exception("LOGIN not set. Please enter your login information in .env variable 'LOGIN' in the following format: 'EMAIL:PASSWORD,EMAIL2:PASSWORD2,EMAIL3:PASSWORD3'")
 else:
-    # LOGIN EXAMPLE:
-    # "EMAIL:PASSWORD,EMAIL:PASSWORD"
     ACCOUNTS = os.environ["LOGIN"].replace(" ", "").split(",")
 
+# Check number of accounts (limit to 5 per IP address)
 if (len(ACCOUNTS) > 5):
     raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
 
+# Get the sign in URL
 if not os.environ["URL"]:
     raise Exception("URL not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
 
@@ -41,40 +41,37 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
 
 # Optional Variables
-APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
-if APPRISE_ALERTS:
-    APPRISE_ALERTS = APPRISE_ALERTS.split(",")
-    try:
-        import apprise
-    except ImportError:
-        os.system("pip3 install apprise")
-        import apprise
-        pass
-
+# Whether to use the chromewebdriver or not
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
-
 if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
-    from webdriver_manager.chrome import ChromeDriverManager
-    from selenium.webdriver.chrome.service import Service
+    
 else:
     HANDLE_DRIVER = False
 
-try:
-    from pytz import timezone
-except ImportError:
-    os.system("pip3 install pytz")
-    from pytz import timezone
-    pass
+# Apprise Alerts
+APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
+if APPRISE_ALERTS:
+    APPRISE_ALERTS = APPRISE_ALERTS.split(",")
+
+# Get IPs if it's set in .env
+wanted_ipv4 = os.environ.get("WANTED_IPV4")
+wanted_ipv6 = os.environ.get("WANTED_IPV6")
+
+# Get proxy settings and populate proxies dictionary
+proxy = os.environ.get("PROXY", "")
+proxies = {"http": f"{proxy}", "https": f"{proxy}"}
+
+# Configure timezone
 TZ = timezone(os.environ.get("TZ", "America/New_York"))
 
+# Whether or not to use a timer, and if so, what time to use
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
     # Get start and end time, defaulting to 4:00am and 11:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
     END_TIME = float(os.environ.get("END_TIME", "23"))
-
     # Make sure start and end times are valid, otherwise switch them
     if START_TIME > END_TIME:
         print("Start time must be before end time, switching times...")
@@ -84,19 +81,6 @@ if TIMER.lower() == "true":
 else:
     TIMER = False
 
-
-# Get IPs if it's set in .env
-wanted_ipv4 = os.environ.get("WANTED_IPV4")
-wanted_ipv6 = os.environ.get("WANTED_IPV6")
-
-# Get proxy settings from .env
-# Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
-proxy = os.environ.get("PROXY", "")
-
-# Populate proxy dictionary for requests
-proxies = {"http": f"{proxy}", "https": f"{proxy}"}
-
-
 # Methods
 def apprise_init():
     if APPRISE_ALERTS:
@@ -105,6 +89,7 @@ def apprise_init():
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
+
 def wait():
     if not datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME:
         range = abs((START_TIME - datetime.datetime.now(TZ).hour))
@@ -213,8 +198,7 @@ def login(EMAIL, PASSWORD, driver):
         pass
     
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
-    return True
-    
+    return True  
 
 def completeSet(driver):
     sleep(random.uniform(10, 15))
@@ -245,6 +229,7 @@ def completePoll(driver):
         pass
     sleep(3)
     return
+
 # TODO: Clean up code
 def completeQuiz(driver):
     sleep(random.uniform(7, 14))
@@ -299,6 +284,7 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
+
 # TODO: Clean up code
 def completeMore(driver):
     ran = False
@@ -369,6 +355,7 @@ def completeMore(driver):
         print(traceback.format_exc())
         pass
     return ran
+
 # TODO: Clean up code
 def dailySet(driver):
         ranSets = False
@@ -420,6 +407,7 @@ def dailySet(driver):
             pass
 
         return ranSets
+
 def checkStreaks(driver, EMAIL):
     try:
         driver.get('https://rewards.microsoft.com/')
@@ -435,6 +423,7 @@ def checkStreaks(driver, EMAIL):
                 alerts.notify(title=f'Bing Rewards {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
     except:
         pass
+
 def getDriver(isMobile = False):
     if not HANDLE_DRIVER:
         chrome_options = Options()
@@ -536,11 +525,9 @@ def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
         try:
             go = driver.find_element(By.ID, value="sb_form_go")
             go.click()
-
         except:
             driver.find_element(By.ID, value="sb_form_go").send_keys(Keys.RETURN)
             pass
-
         # add delay to prevent ban
         sleep(random.uniform(5, 25))
         print(f'\t{x} PC search of {PC_SEARCHES}. Now {int(x/PC_SEARCHES*100)}% done.')
