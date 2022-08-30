@@ -219,16 +219,51 @@ def check_ip_address():
     print()
 
 def login(EMAIL, PASSWORD, driver):
-    driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
-    driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
+    # Find email and input it
+    try:
+        username_field = driver.find_element(By.XPATH, value='//*[@id="i0116"]')
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(username_field)
+        )
+        username_field.send_keys(EMAIL)
+        username_field.send_keys(Keys.ENTER)
+    except:
+        print(f'Unable to find email field for account {EMAIL}')
+        return False
     sleep(random.uniform(2, 4))
-    driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
-    driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
+    # Check if personal/work prompt is present
+    try:
+        message = driver.find_element(By.XPATH, value='//*[@id="loginDescription"]').text
+        if message.lower() == "it looks like this email is used with more than one account from microsoft. which one do you want to use?":
+            try:
+                personal = driver.find_element(By.XPATH, value='//*[@id="msaTileTitle"]')
+                WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable(personal)
+                )
+                personal.click()
+                sleep(random.uniform(2, 4))
+            except:
+                print(f'Peronal/Work prompt was present for account {EMAIL} but unable to get past it.')
+                return False
+    except:
+        pass
+    # Find password and input it
+    try:
+        password_field = driver.find_element(By.XPATH, value='//*[@id="i0118"]')
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(password_field)
+        )
+        password_field.send_keys(PASSWORD)
+        password_field.send_keys(Keys.ENTER)
+    except:
+        print(f'Unable to find password field for account {EMAIL}')
+        return False
     sleep(random.uniform(3, 6))
     try:
         driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
     except:
         pass
+    # Check if account is locked
     try:
         message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
         if message.lower() == "your account has been locked":
