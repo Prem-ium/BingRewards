@@ -13,23 +13,61 @@ from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from dotenv import load_dotenv
 
+# In case imports fail, retry using pip and pip3
+# RandomWords
 try:
     from random_words import RandomWords
 except ImportError:
-    os.system("pip3 install RandomWords")
-    from random_words import RandomWords
-    pass
+    os.system("pip install RandomWords")
+    try:
+        from random_words import RandomWords
+    except ImportError:
+        os.system("pip3 install RandomWords")
+        try:
+            from random_words import RandomWords
+        except:
+            print("Unable to import RandomWords")
+            raise Exception
+# Apprise
+try:
+    import apprise
+except ImportError:
+    os.system("pip3 install apprise")
+    try:
+        import apprise
+    except ImportError:
+        os.system("pip3 install apprise")
+        try:
+            import apprise
+        except:
+            print("Unable to import apprise")
+            raise Exception
+# pytz
+try:
+    from pytz import timezone
+except ImportError:
+    os.system("pip install pytz")
+    try:
+        from pytz import timezone
+    except ImportError:
+        os.system("pip3 install pytz")
+        try:
+            from pytz import timezone
+        except:
+            print("Unable to import pytz")
+            raise Exception
 
 # Load ENV
 load_dotenv()
 
+# LOGIN EXAMPLE:
+# "EMAIL:PASSWORD,EMAIL:PASSWORD"
 if not os.environ["LOGIN"]:
     raise Exception("LOGIN not set. Please enter your login information in .env variable 'LOGIN' in the following format: 'EMAIL:PASSWORD,EMAIL2:PASSWORD2,EMAIL3:PASSWORD3'")
 else:
-    # LOGIN EXAMPLE:
-    # "EMAIL:PASSWORD,EMAIL:PASSWORD"
     ACCOUNTS = os.environ["LOGIN"].replace(" ", "").split(",")
 
+# Check number of accounts (limit to 5 per IP address to avoid bans)
 if (len(ACCOUNTS) > 5):
     raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
 
@@ -41,18 +79,8 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
 
 # Optional Variables
-APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
-if APPRISE_ALERTS:
-    APPRISE_ALERTS = APPRISE_ALERTS.split(",")
-    try:
-        import apprise
-    except ImportError:
-        os.system("pip3 install apprise")
-        import apprise
-        pass
-
+# Whether to use the chromewebdriver or not
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
-
 if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
     from webdriver_manager.chrome import ChromeDriverManager
@@ -60,14 +88,26 @@ if (HANDLE_DRIVER.lower() == "true"):
 else:
     HANDLE_DRIVER = False
 
-try:
-    from pytz import timezone
-except ImportError:
-    os.system("pip3 install pytz")
-    from pytz import timezone
-    pass
+# Apprise Alerts
+APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
+if APPRISE_ALERTS:
+    APPRISE_ALERTS = APPRISE_ALERTS.split(",")
+
+# Get IPs if it's set in .env
+wanted_ipv4 = os.environ.get("WANTED_IPV4")
+wanted_ipv6 = os.environ.get("WANTED_IPV6")
+
+# Get proxy settings from .env
+# Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
+proxy = os.environ.get("PROXY", "")
+
+# Populate proxy dictionary for requests
+proxies = {"http": f"{proxy}", "https": f"{proxy}"}
+
+# Configure timezone
 TZ = timezone(os.environ.get("TZ", "America/New_York"))
 
+# Whether or not to use a timer, and if so, what time to use
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
@@ -84,19 +124,6 @@ if TIMER.lower() == "true":
 else:
     TIMER = False
 
-
-# Get IPs if it's set in .env
-wanted_ipv4 = os.environ.get("WANTED_IPV4")
-wanted_ipv6 = os.environ.get("WANTED_IPV6")
-
-# Get proxy settings from .env
-# Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
-proxy = os.environ.get("PROXY", "")
-
-# Populate proxy dictionary for requests
-proxies = {"http": f"{proxy}", "https": f"{proxy}"}
-
-
 # Methods
 def apprise_init():
     if APPRISE_ALERTS:
@@ -105,6 +132,7 @@ def apprise_init():
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
+
 def wait():
     if not datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME:
         range = abs((START_TIME - datetime.datetime.now(TZ).hour))
@@ -214,7 +242,6 @@ def login(EMAIL, PASSWORD, driver):
     
     driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
     return True
-    
 
 def completeSet(driver):
     sleep(random.uniform(10, 15))
@@ -245,6 +272,7 @@ def completePoll(driver):
         pass
     sleep(3)
     return
+
 # TODO: Clean up code
 def completeQuiz(driver):
     sleep(random.uniform(7, 14))
@@ -299,6 +327,7 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
+
 # TODO: Clean up code
 def completeMore(driver):
     ran = False
@@ -369,6 +398,7 @@ def completeMore(driver):
         print(traceback.format_exc())
         pass
     return ran
+
 # TODO: Clean up code
 def dailySet(driver):
         ranSets = False
@@ -420,6 +450,7 @@ def dailySet(driver):
             pass
 
         return ranSets
+
 def checkStreaks(driver, EMAIL):
     try:
         driver.get('https://rewards.microsoft.com/')
@@ -435,6 +466,7 @@ def checkStreaks(driver, EMAIL):
                 alerts.notify(title=f'Bing Rewards {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
     except:
         pass
+
 def getDriver(isMobile = False):
     if not HANDLE_DRIVER:
         chrome_options = Options()
