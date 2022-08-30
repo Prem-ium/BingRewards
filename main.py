@@ -23,9 +23,11 @@ except ImportError:
         from random_words import RandomWords
     except ImportError:
         os.system("pip3 install RandomWords")
-        from random_words import RandomWords
-        pass
-    pass
+        try:
+            from random_words import RandomWords
+        except:
+            print("Unable to import RandomWords")
+            raise Exception
 # Apprise
 try:
     import apprise
@@ -35,9 +37,11 @@ except ImportError:
         import apprise
     except ImportError:
         os.system("pip3 install apprise")
-        import apprise
-        pass
-    pass
+        try:
+            import apprise
+        except:
+            print("Unable to import apprise")
+            raise Exception
 # pytz
 try:
     from pytz import timezone
@@ -47,9 +51,11 @@ except ImportError:
         from pytz import timezone
     except ImportError:
         os.system("pip3 install pytz")
-        from pytz import timezone
-        pass
-    pass
+        try:
+            from pytz import timezone
+        except:
+            print("Unable to import pytz")
+            raise Exception
 
 # Load ENV
 load_dotenv()
@@ -460,7 +466,7 @@ def checkStreaks(driver, EMAIL):
                 alerts.notify(title=f'Bing Rewards {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
     except:
         pass
-    
+
 def getDriver(isMobile = False):
     if not HANDLE_DRIVER:
         chrome_options = Options()
