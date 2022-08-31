@@ -522,6 +522,18 @@ def getPoints(EMAIL, PASSWORD, driver):
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
         if not login(EMAIL, PASSWORD, driver):
             return -404
+        # If it's the first sign in, join microsoft rewards
+        if driver.current_url == 'https://rewards.microsoft.com/welcome':
+            try:
+                join_rewards = driver.find_element(By.XPATH, value='//*[@id="start-earning-rewards-link"]')
+                WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable(join_rewards)
+                )
+                join_rewards.click()
+                print(f'Joined microsoft rewards on account {EMAIL}')
+            except:
+                print("Got rewards welcome page, but couldn't join rewards.")
+                return -404
         if driver.title.lower() == 'rewards error':
             sleep(random.uniform(2, 4))
             driver.get('https://rewards.microsoft.com/')
