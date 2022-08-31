@@ -532,8 +532,14 @@ def getPoints(EMAIL, PASSWORD, driver):
                 join_rewards.click()
                 print(f'Joined microsoft rewards on account {EMAIL}')
             except:
+                print(traceback.format_exc())
                 print("Got rewards welcome page, but couldn't join rewards.")
                 return -404
+            try:
+                if driver.current_url == 'https://rewards.microsoft.com/welcometour':
+                    driver.find_element(By.XPATH, value='//*[@id="welcome-tour"]/mee-rewards-slide/div/section/section/div/a[2]').click()
+            except:
+                driver.get('https://rewards.microsoft.com/')
         if driver.title.lower() == 'rewards error':
             sleep(random.uniform(2, 4))
             driver.get('https://rewards.microsoft.com/')
