@@ -21,21 +21,12 @@ except ImportError:
     os.system("pip install RandomWords")
     from random_words import RandomWords
    
-# Apprise
-try:
-    import apprise
-except ImportError:
-    os.system("pip install apprise")
-    import apprise
-    
 # pytz
 try:
     from pytz import timezone
 except ImportError:
     os.system("pip install pytz")
     from pytz import timezone
-    
-
 # Load ENV
 load_dotenv()
 
@@ -71,7 +62,13 @@ else:
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
     APPRISE_ALERTS = APPRISE_ALERTS.split(",")
-
+    # Apprise
+    try:
+        import apprise
+    except ImportError:
+        os.system("pip install apprise")
+        import apprise
+        
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
 wanted_ipv6 = os.environ.get("WANTED_IPV6")
@@ -198,10 +195,23 @@ def check_ip_address():
     print()
 
 def login(EMAIL, PASSWORD, driver):
-    driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
-    driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
+    # Find email and input it
+    try:
+        username_field = driver.find_element(By.XPATH, value='//*[@id="i0116"]')
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(username_field)
+        )
+        username_field.send_keys(EMAIL)
+        username_field.send_keys(Keys.ENTER)
+    except:
+        try:
+            driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
+            driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
+        except:
+            print(f'Unable to find email field for account {EMAIL}')
+            return False
     sleep(random.uniform(2, 4))
-     # Check if personal/work prompt is present
+    # Check if personal/work prompt is present
     try:
         message = driver.find_element(By.XPATH, value='//*[@id="loginDescription"]').text
         if message.lower() == "it looks like this email is used with more than one account from microsoft. which one do you want to use?":
@@ -217,8 +227,21 @@ def login(EMAIL, PASSWORD, driver):
                 return False
     except:
         pass
-    driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
-    driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
+    # Find password and input it
+    try:
+        password_field = driver.find_element(By.XPATH, value='//*[@id="i0118"]')
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(password_field)
+        )
+        password_field.send_keys(PASSWORD)
+        password_field.send_keys(Keys.ENTER)
+    except:
+        try:
+            driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
+            driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
+        except:
+            print(f'Unable to find password field for account {EMAIL}')
+            return False
     sleep(random.uniform(3, 6))
     try:
         driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
