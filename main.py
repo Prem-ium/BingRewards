@@ -503,6 +503,10 @@ def getDriver(isMobile = False):
         mobile_emulation = {"deviceName": "Nexus 5"}
         chrome_options.add_experimental_option(
             "mobileEmulation", mobile_emulation)
+    else:
+        # Set edge user agent if not mobile
+        user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
+        chrome_options.add_argument(f'user-agent={user_agent}')
 
     if not HANDLE_DRIVER:
         driver = webdriver.Chrome(options=chrome_options)
