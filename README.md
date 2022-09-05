@@ -30,15 +30,23 @@ The bot can be run using Python or Docker.
 View on [Docker Hub](https://hub.docker.com/repository/docker/nelsondane/bing-rewards)
 1. Download and install Docker on your system
 2. Configure your `.env` file (See below and example for options)
-3. Start the bot using Docker Run:
+3. To start the bot using our prebuilt images:
  ```sh
    docker run -it --env-file ./.env --restart unless-stopped --name bing-rewards nelsondane/bing-rewards:<tag>
    ```
-   This creates a new container called bing-rewards. Make sure you have the correct path to your `.env` file you created.
+   To build the image yourself, cd into the repository and run:
+   ```sh
+   docker build -t bing-rewards .
+   ```
+   Then start the bot with:
+   ```sh
+   docker run -it --env-file ./.env --restart unless-stopped --name bing-rewards bing-rewards
+   ```
+   Both methods will create a new container called `bing-rewards`. Make sure you have the correct path to your `.env` file you created.
 
-4. Let the bot log in and begin working. DO NOT PRESS CTRL-c. This will kill the container and the bot. To exit the logs view, press CTRL-p then CTRL-q. This will exit the logs view but let the bot keep running.
+4. Let the bot log in and begin working. DO NOT PRESS `CTRL-c`. This will kill the container and the bot. To exit the logs view, press `CTRL-p` then `CTRL-q`. This will exit the logs view but let the bot keep running.
 
-### Available Docker Tags
+### Available Docker Hub Tags
 Replace the `<tag>` above with one of these (defaults to `latest`)
 - `latest`: latest stable release on [Sazn's GitHub](https://github.com/sazncode/Bing-Rewards)
 - `beta`: latest beta release on [NelsonDane's GitHub](https://github.com/NelsonDane/Bing-Rewards)
