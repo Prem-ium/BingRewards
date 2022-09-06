@@ -1,12 +1,9 @@
 name: Docker Build and Push Main
 
 on:
-#   schedule:
-#     # Run once a day at 1am
-#     - cron: '0 1 * * *'
-   push:
-    branches:
-      - main
+   schedule:
+     # Run once a day at 1am
+     - cron: '0 1 * * *'
 
 jobs:
   docker:
