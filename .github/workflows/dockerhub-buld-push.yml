@@ -32,6 +32,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.dockerhub_repo_name }}:beta
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bing-rewards:beta
           cache-from: type=gha
           cache-to: type=gha,mode=max
