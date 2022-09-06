@@ -1,0 +1,17 @@
+name: Docker Build and Push Main
+
+on:
+  schedule:
+    # Run once a day at 1am
+    - cron: '0 1 * * *'
+
+jobs:
+  call-workflow-dockerhub-build-push:
+    if: github.repository == 'NelsonDane/BingRewardsBeta'
+    uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub_build_push.yml@main
+    with:
+      dockerhub_repo_name: bing-rewards
+      image_tag: latest
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
