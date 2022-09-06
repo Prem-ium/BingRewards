@@ -1,0 +1,18 @@
+name: Update Docker Hub Description
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - README.md
+      - .github/workflows/dockerhub-description.yml
+
+jobs:
+  call-dockerhub-action:
+    if: github.repository == 'NelsonDane/BingRewardsBeta'
+    uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub-description.yml@main
+    with:
+      dockerhub_repo_name: bing-rewards
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
