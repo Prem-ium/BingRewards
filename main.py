@@ -110,9 +110,10 @@ def apprise_init():
         return alerts
 
 def wait():
-    if not (datetime.datetime.now(TZ).hour >= START_TIME and datetime.datetime.now(TZ).hour <= END_TIME):
-        range = (24 - datetime.datetime.now(TZ).hour) + START_TIME
-        print(f'Timer is enabled.\nStart Time: {START_TIME}. Current time: {datetime.datetime.now(TZ).hour}\nCurrent time is not within range. Sleeping for {range} hours.')
+    currentHour = datetime.datetime.now(TZ).hour
+    if not (currentHour >= START_TIME and currentHour <= END_TIME):
+        range = (START_TIME-currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
+        print(f'Timer is enabled.\nStart Time: {START_TIME}.\nCurrent time: {currentHour}\nEnd Time: {END_TIME}\nCurrent time is not within range. Sleeping for {range} hours.')
         sleep((range) * 3600)
     return
           
