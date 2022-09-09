@@ -7,6 +7,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - PC & Mobile Search Automation
 - Bing Quiz, Poll, and Explore Automation
 - 'More Activities' Automation
+- Proxy Support
 - Locked Account Handling
 - Apprise Alerts
 - Streak Notifications
@@ -78,3 +79,7 @@ To run this project, you will need to add the following environment variables to
 `START_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 4, 4 AM
 
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 23, 11 PM
+
+## TO-DO:
+- Auto Redemption of Rewards
+
