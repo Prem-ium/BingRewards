@@ -108,14 +108,6 @@ def apprise_init():
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
-
-def wait():
-    currentHour = datetime.datetime.now(TZ).hour
-    if not (currentHour >= START_TIME and currentHour <= END_TIME):
-        range = (START_TIME-currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
-        print(f'Timer is enabled.\nStart Time: {START_TIME}.\nCurrent time: {currentHour}\nEnd Time: {END_TIME}\nCurrent time is not within range. Sleeping for {range} hours.')
-        sleep((range) * 3600)
-    return
           
 def get_current_ip(type, proxies):
     # try with icanhazip.com
@@ -195,6 +187,14 @@ def check_ip_address():
             print("IPv6 addresses match!")
     print()
 
+def wait():
+    currentHour = datetime.datetime.now(TZ).hour
+    if not (currentHour >= START_TIME and currentHour <= END_TIME):
+        range = (START_TIME-currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
+        print(f'Timer is enabled.\nStart Time: {START_TIME}.\nCurrent time: {currentHour}\nEnd Time: {END_TIME}\nCurrent time is not within range. Sleeping for {range} hours.')
+        sleep((range) * 3600)
+    return
+
 def login(EMAIL, PASSWORD, driver):
     # Find email and input it
     try:
@@ -249,18 +249,31 @@ def login(EMAIL, PASSWORD, driver):
     except:
         pass
     try:
-        message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
-        if message.lower() == "your account has been locked":
-            print(f"uh-oh, your account {EMAIL} has been locked by Microsoft!")
-            if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards Account Locked!', 
-                    body=f'Your account {EMAIL} has been locked! Sign in and verify your account.')
-            return False
-    except NoSuchElementException as e:
-        pass
-    
-    driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
-    return True
+        driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+        return True
+    except:
+        try:
+            message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
+            if message.lower() == "your account has been locked":
+                print(f"uh-oh, your account {EMAIL} has been locked by Microsoft!")
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'Bing Rewards Account Locked!', 
+                        body=f'Your account {EMAIL} has been locked! Sign in and verify your account.')
+                return False
+        except NoSuchElementException as e:
+            pass
+        try:
+            message = driver.find_element(By.XPATH, value='//*[@id="iPageTitle"]').text
+            if message.lower() == "help us protect your account":
+                print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'Bing Rewards Account Secuirity Notice!', 
+                        body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number! Please sign in and verify your account.\nAttempting to skip, if still possible.\n\n\n...')
+                sleep(50)
+                driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
+        except:
+            driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+        return True
 
 def completeSet(driver):
     sleep(random.uniform(10, 15))
@@ -537,9 +550,13 @@ def getPoints(EMAIL, PASSWORD, driver):
                 join_rewards.click()
                 print(f'Joined microsoft rewards on account {EMAIL}')
             except:
-                print(traceback.format_exc())
-                print("Got rewards welcome page, but couldn't join rewards.")
-                return -404
+                try:
+                    driver.find_element(By.XPATH, value='//*[@id="start-earning-rewards-link"]').click()
+                    print(f'Joined microsoft rewards on account {EMAIL}')
+                except:
+                    print(traceback.format_exc())
+                    print("Got rewards welcome page, but couldn't join rewards.")
+                    return -404
             try:
                 if driver.current_url == 'https://rewards.microsoft.com/welcometour':
                     driver.find_element(By.XPATH, value='//*[@id="welcome-tour"]/mee-rewards-slide/div/section/section/div/a[2]').click()
