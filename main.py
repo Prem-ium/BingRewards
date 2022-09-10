@@ -13,7 +13,7 @@ from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from dotenv import load_dotenv
 
-# In case imports fail, retry using pip and pip3
+# In case imports fail, retry using pip
 # RandomWords
 try:
     from random_words import RandomWords
@@ -68,7 +68,8 @@ if APPRISE_ALERTS:
     except ImportError:
         os.system("pip install apprise")
         import apprise
-        
+
+ACTIVITY_URL = os.environ.get("ACTIVITY_URL", "")
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
 wanted_ipv6 = os.environ.get("WANTED_IPV6")
@@ -402,30 +403,23 @@ def punchcard(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
     sleep(5)
-    print('\tAttempting to complete punchcard(s)...')
     quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
+    links = []
     for quest in quests:
-        try:
-            WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable(quest)
-            )
-        except:
-            pass
-        quest.click()
-        chwd = driver.window_handles
-        if (chwd[1]):
-            driver._switch_to.window(chwd[1])
+        links.append(quest.get_attribute('href'))
+
+    for link in links:
+        driver.get(link)
+        sleep(5)
         offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
         p = driver.current_window_handle
         offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
         chwd = driver.window_handles
-        if (chwd[2]):
-            driver._switch_to.window(chwd[2])
+        if (chwd[1]):
+            driver._switch_to.window(chwd[1])
         # Combine this code with completeMore, eventually
         try:
             completeQuiz(driver)
-            driver.close()
-            driver._switch_to.window(p)
             driver.close()
             driver._switch_to.window(chwd[0])
             ran = True
@@ -435,8 +429,6 @@ def punchcard(driver):
         try:
             completeSet(driver)
             driver.close()
-            driver._switch_to.window(p)
-            driver.close()
             driver._switch_to.window(chwd[0])
             ran = True
             continue
@@ -445,16 +437,13 @@ def punchcard(driver):
         try:
             completePoll(driver)
             driver.close()
-            driver._switch_to.window(p)
-            driver.close()
             driver._switch_to.window(chwd[0])
             ran = True
             continue
         except:
             driver.close()
-            driver._switch_to.window(p)
-            driver.close()
             driver._switch_to.window(chwd[0])
+            ran = True
             pass
     return ran
 # TODO: Clean up code
@@ -856,6 +845,56 @@ def updateSearches(driver):
     finally:
         print()
         return PC_SEARCHES, MOBILE_SEARCHES
+def guessTask(driver, p = False):
+    p = driver.window_handles[len(driver.window_handles) - 1]
+    try:
+        completeQuiz(driver)
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return True
+    except:
+        pass
+    try:
+        completeSet(driver)
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return True
+    except:
+        pass
+    try:
+        completePoll(driver)
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return True
+    except:
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return False
+def bruteComplete(driver):
+    for x in ACCOUNTS:
+        driver = getDriver()
+
+        # Grab email
+        colonIndex = x.index(":")+1
+        EMAIL = x[0:colonIndex-1]
+        PASSWORD = x[colonIndex:len(x)]
+        driver.get(os.environ['URL'])
+        if (getPoints(EMAIL, PASSWORD, driver) == -404):
+            driver.quit()
+            continue      
+        driver.get(os.environ['ACTIVITY_URL'])
+        try:
+            guessTask(driver)
+        except:
+            pass
+        finally:
+            driver.quit()
+
+
 
 def runRewards():
     totalPointsReport = totalDifference = differenceReport = 0
@@ -891,7 +930,6 @@ def runRewards():
             print(traceback.format_exc())
             ranPunchCard = False
             pass
-
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities or ranPunchCard):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME} Automation Starting', 
@@ -949,6 +987,7 @@ def main():
             sleep(600)
             continue
 
+
 if __name__ == "__main__":
     # Initialize apprise alerts
     if APPRISE_ALERTS:
@@ -956,4 +995,7 @@ if __name__ == "__main__":
 
     # Run checks on IP address & start main function, if all is good
     check_ip_address()
+    # if ACTIVITY_URL:
+    #     bruteComplete(getDriver())
+    # else:
     main()
