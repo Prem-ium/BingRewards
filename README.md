@@ -6,6 +6,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - Multiple Bing Rewards Accounts
 - PC & Mobile Search Automation
 - Bing Quiz, Poll, and Explore Automation
+- Quests / Punchcard Automation (needs improvement)
 - 'More Activities' Automation
 - Proxy Support
 - Locked Account Handling
