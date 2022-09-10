@@ -80,6 +80,21 @@ To run this project, you will need to add the following environment variables to
 
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 23, 11 PM
 
-## TO-DO:
-- Auto Redemption of Rewards
+## Earning Potential:
 
+Conservatively calculating potential points/earnings per month using this bot w/ a lvl 2 account:
+
+PC Searches: (150 * 30) = 4500
+
+Mobile Searches: (100 * 30) = 3000
+
+Edge Bonus: (20*30) = 600
+
+Daily Sets: (30*30) = 900
+
+
+This adds up to 9000 points, conservatively (not accounting for streak bonuses or more activities which usually net very high, random amount of points), which ends up being a minimum of $6.92/per month per account on level 2. $34.61/ per month with an instance of 5 level 2 reward accounts.
+
+## Notes:
+
+- This bot uses the new $1.00 = 1300 points conversion rate. Older Bing Reward accounts may have the old conversion rate of $1.00 = 1050 points. 
