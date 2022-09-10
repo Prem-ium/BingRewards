@@ -99,7 +99,8 @@ if TIMER.lower() == "true":
         END_TIME = temp
 else:
     TIMER = False
-
+# Import bot name from .env
+bot_name = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 # Methods
 def apprise_init():
     if APPRISE_ALERTS:
@@ -257,7 +258,7 @@ def login(EMAIL, PASSWORD, driver):
             if message.lower() == "your account has been locked":
                 print(f"uh-oh, your account {EMAIL} has been locked by Microsoft!")
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'Bing Rewards Account Locked!', 
+                    alerts.notify(title=f'{bot_name} Account Locked!', 
                         body=f'Your account {EMAIL} has been locked! Sign in and verify your account.')
                 return False
         except NoSuchElementException as e:
@@ -267,7 +268,7 @@ def login(EMAIL, PASSWORD, driver):
             if message.lower() == "help us protect your account":
                 print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'Bing Rewards Account Secuirity Notice!', 
+                    alerts.notify(title=f'{bot_name} Account Secuirity Notice!', 
                         body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number! Please sign in and verify your account.\nAttempting to skip, if still possible.\n\n\n...')
                 sleep(50)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
@@ -404,6 +405,12 @@ def punchcard(driver):
     print('\tAttempting to complete punchcard(s)...')
     quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
     for quest in quests:
+        try:
+            WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable(quest)
+            )
+        except:
+            pass
         quest.click()
         chwd = driver.window_handles
         if (chwd[1]):
@@ -580,45 +587,51 @@ def checkStreaks(driver, EMAIL):
         if bonusNotification is not None and 'Awesome!' in bonusNotification:
             print(f'\t{bonusNotification} for a streak bonus!\n')
             if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards {EMAIL} Streak Earned!', body=f'{bonusNotification}\n\n...')
+                alerts.notify(title=f'{bot_name} {EMAIL} Streak Earned!', body=f'{bonusNotification}\n\n...')
         else:
             bonusNotification = f"You're currently on a {driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status/div/div/div/div/div[3]/div[3]/mee-rewards-user-status-item/mee-rewards-user-status-streak/div/div/div/div/div/p[1]/mee-rewards-counter-animation').text} Streak!\n{driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p').text}"
 
             if APPRISE_ALERTS and len(bonusNotification) > 5:
-                alerts.notify(title=f'Bing Rewards {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
+                alerts.notify(title=f'{bot_name} {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
     except:
         pass
 
 def getDriver(isMobile = False):
-    if not HANDLE_DRIVER:
-        chrome_options = Options()
-    else:
-        chrome_options = webdriver.ChromeOptions()
+    try:
+        if not HANDLE_DRIVER:
+            chrome_options = Options()
+        else:
+            chrome_options = webdriver.ChromeOptions()
 
-    if proxy:
-        chrome_options.add_argument(f'--proxy-server={proxy}')
-        print(f"Set Chrome proxy to {proxy}")
+        if proxy:
+            chrome_options.add_argument(f'--proxy-server={proxy}')
+            print(f"Set Chrome proxy to {proxy}")
 
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
 
-    if (isMobile):   
-        mobile_emulation = {"deviceName": "Nexus 5"}
-        chrome_options.add_experimental_option(
-            "mobileEmulation", mobile_emulation)
-    else:
-        # Set to edge user agent if not mobile
-        user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
-        chrome_options.add_argument(f'user-agent={user_agent}')
+        if (isMobile):   
+            mobile_emulation = {"deviceName": "Nexus 5"}
+            chrome_options.add_experimental_option(
+                "mobileEmulation", mobile_emulation)
+        else:
+            # Set to edge user agent if not mobile
+            user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
+            chrome_options.add_argument(f'user-agent={user_agent}')
 
-    if not HANDLE_DRIVER:
-        driver = webdriver.Chrome(options=chrome_options)
-    else:
-        driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-            options=chrome_options)
-
+        if not HANDLE_DRIVER:
+            driver = webdriver.Chrome(options=chrome_options)
+        else:
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                options=chrome_options)
+    except:
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'{bot_name} Driver Error', body=f'Error creating driver for {bot_name}\n\n...')
+        print('{traceback.format_exc()}\n\nAttempting to retry...\n\n')
+        sleep(100)
+        return getDriver(isMobile)
     driver.maximize_window()
     return driver
 
@@ -876,11 +889,12 @@ def runRewards():
             ranPunchCard = punchcard(driver)
         except Exception as e:
             print(traceback.format_exc())
+            ranPunchCard = False
             pass
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities or ranPunchCard):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards Automation Starting', 
+                alerts.notify(title=f'{bot_name} Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
             checkStreaks(driver, EMAIL)
             ranRewards = True
@@ -900,7 +914,7 @@ def runRewards():
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'Bing Rewards Automation Completed!', 
+                    alerts.notify(title=f'{bot_name} Automation Completed!', 
                         body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                     
         driver.quit()
@@ -911,7 +925,7 @@ def runRewards():
         report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
-            alerts.notify(title=f'Bing Rewards Automation Complete', 
+            alerts.notify(title=f'{bot_name} Automation Complete', 
                         body=f'{report}\n\n...')
     return
 
@@ -930,7 +944,7 @@ def main():
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
             print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
             if APPRISE_ALERTS:
-                alerts.notify(title=f'Bing Rewards Failed!',
+                alerts.notify(title=f'{bot_name} Failed!',
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 600 seconds...\n\n ')
             sleep(600)
             continue
