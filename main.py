@@ -316,6 +316,7 @@ def completeQuiz(driver):
     driver.refresh()
     try:
         numberOfQuestions = (driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1])[:-1]
+        # numberOfQuestions = numberOfQuestions[:-1]
         for i in range(int(numberOfQuestions)):
             driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
             sleep(8)
@@ -328,16 +329,50 @@ def completeQuiz(driver):
     
     if (driver.find_elements(By.XPATH, value='//*[@id="rqStartQuiz"]') or driver.find_elements(By.CLASS_NAME, value='btOptions') or driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span')):
         try:
-            driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]').click()
-        except:
-            pass
+            start = driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]')
+            WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(start)
+            )
+            start.click()
+        except Exception as e:
+            try:
+                driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]').click()
+            except:
+                print(e)
+                pass
         try:
             sleep(3)
             if (driver.find_elements(By.XPATH, value='//*[@id="rqHeaderCredits"]')):
                 section = len(driver.find_element(By.XPATH, value='//*[@id="rqHeaderCredits"]').find_elements(By.XPATH, value='*'))
+                try:
+                    for i in range(section):
+                        try:
+                            choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
+                            for i in range(choices * 2):
+                                buttons = len(driver.find_elements(By.CLASS_NAME, value='rq_button'))
+                                sleep(5)
+                                option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                                option.click()
+                                sleep(10)
+                                try:
+                                    while (driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!'):
+                                        option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                                        option.click()
+                                        sleep(5)
+                                except:
+                                    pass
+                            print('\tQuiz completed!')
+                            return
+                        except:
+                            pass
+                except:
+                    pass
                 for i in range(section):
-                    choices = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span').text
-                    choices = int(choices[-1]) - int(choices[0])
+                    try:
+                        choices = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span').text
+                        choices = int(choices[-1]) - int(choices[0])
+                    except:
+                        choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
                     try:
                         for i in range(choices * 2):
                             sleep(5)
@@ -359,7 +394,59 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
-
+def punchcard(driver):
+    ran = False
+    driver.get('https://rewards.microsoft.com/')
+    sleep(5)
+    print('\tAttempting to complete punchcard(s)...')
+    quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
+    for quest in quests:
+        quest.click()
+        chwd = driver.window_handles
+        if (chwd[1]):
+            driver._switch_to.window(chwd[1])
+        offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
+        p = driver.current_window_handle
+        offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
+        chwd = driver.window_handles
+        if (chwd[2]):
+            driver._switch_to.window(chwd[2])
+        # Combine this code with completeMore, eventually
+        try:
+            completeQuiz(driver)
+            driver.close()
+            driver._switch_to.window(p)
+            driver.close()
+            driver._switch_to.window(chwd[0])
+            ran = True
+            continue
+        except:
+            pass
+        try:
+            completeSet(driver)
+            driver.close()
+            driver._switch_to.window(p)
+            driver.close()
+            driver._switch_to.window(chwd[0])
+            ran = True
+            continue
+        except:
+            pass
+        try:
+            completePoll(driver)
+            driver.close()
+            driver._switch_to.window(p)
+            driver.close()
+            driver._switch_to.window(chwd[0])
+            ran = True
+            continue
+        except:
+            driver.close()
+            driver._switch_to.window(p)
+            driver.close()
+            driver._switch_to.window(chwd[0])
+            pass
+    return ran
 # TODO: Clean up code
 def completeMore(driver):
     ran = False
@@ -782,8 +869,8 @@ def runRewards():
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
-
-        if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
+        ranPunchCard = punchcard(driver)
+        if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities or ranPunchCard):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
