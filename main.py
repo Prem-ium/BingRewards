@@ -629,7 +629,7 @@ def getDriver(isMobile = False):
     except:
         if APPRISE_ALERTS:
             alerts.notify(title=f'{bot_name} Driver Error', body=f'Error creating driver for {bot_name}\n\n...')
-        print('{traceback.format_exc()}\n\nAttempting to retry...\n\n')
+        print(f'{traceback.format_exc()}\n\nAttempting to retry...\n\n')
         sleep(100)
         return getDriver(isMobile)
     driver.maximize_window()
