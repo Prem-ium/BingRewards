@@ -73,7 +73,7 @@ To run this project, you will need to add the following environment variables to
 
 `PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
 
-`bot_name` = Bot name, helpful for multiple instances of the bot running with proxy. 
+`BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
 
 `TZ` = Your desired Time-Zone. Defaults to America/New York
 
