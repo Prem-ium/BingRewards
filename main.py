@@ -361,6 +361,9 @@ def completeQuiz(driver):
                                         sleep(5)
                                 except:
                                     pass
+                                if ("great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower()):
+                                    sleep(5)
+                                    break
                             print('\tQuiz completed!')
                             return
                         except:
@@ -869,7 +872,12 @@ def runRewards():
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
-        ranPunchCard = punchcard(driver)
+        try:
+            ranPunchCard = punchcard(driver)
+        except Exception as e:
+            print(traceback.format_exc())
+            pass
+
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities or ranPunchCard):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'Bing Rewards Automation Starting', 
