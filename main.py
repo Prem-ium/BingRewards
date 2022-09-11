@@ -871,26 +871,6 @@ def guessTask(driver, p = False):
         driver._switch_to.window(p)
         driver.refresh()
         return False
-def bruteComplete(driver):
-    for x in ACCOUNTS:
-        driver = getDriver()
-
-        # Grab email
-        colonIndex = x.index(":")+1
-        EMAIL = x[0:colonIndex-1]
-        PASSWORD = x[colonIndex:len(x)]
-        driver.get(os.environ['URL'])
-        if (getPoints(EMAIL, PASSWORD, driver) == -404):
-            driver.quit()
-            continue      
-        driver.get(os.environ['ACTIVITY_URL'])
-        try:
-            guessTask(driver)
-        except:
-            pass
-        finally:
-            driver.quit()
-
 
 
 def runRewards():
@@ -991,7 +971,4 @@ if __name__ == "__main__":
 
     # Run checks on IP address & start main function, if all is good
     check_ip_address()
-    # if ACTIVITY_URL:
-    #     bruteComplete(getDriver())
-    # else:
     main()

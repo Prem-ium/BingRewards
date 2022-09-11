@@ -83,7 +83,6 @@ To run this project, you will need to add the following environment variables to
 
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 23, 11 PM
 
-`ACTIVITY_URL` = Assign an activity URL to Brute force complete a single activity across all accounts, in beta.
 
 ## Earning Potential:
 
