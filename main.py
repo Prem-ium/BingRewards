@@ -400,7 +400,6 @@ def completeQuiz(driver):
             print(e)
             pass
 def punchcard(driver):
-    ran = False
     driver.get('https://rewards.microsoft.com/')
     sleep(5)
     quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
@@ -425,7 +424,6 @@ def punchcard(driver):
             completeQuiz(driver)
             driver.close()
             driver._switch_to.window(chwd[0])
-            ran = True
             continue
         except:
             pass
@@ -433,7 +431,6 @@ def punchcard(driver):
             completeSet(driver)
             driver.close()
             driver._switch_to.window(chwd[0])
-            ran = True
             continue
         except:
             pass
@@ -441,14 +438,11 @@ def punchcard(driver):
             completePoll(driver)
             driver.close()
             driver._switch_to.window(chwd[0])
-            ran = True
             continue
         except:
             driver.close()
             driver._switch_to.window(chwd[0])
-            ran = True
             pass
-    return ran
 # TODO: Clean up code
 def completeMore(driver):
     ran = False
@@ -928,12 +922,11 @@ def runRewards():
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
         try:
-            ranPunchCard = punchcard(driver)
+            punchcard(driver)
         except Exception as e:
             print(traceback.format_exc())
-            ranPunchCard = False
             pass
-        if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities or ranPunchCard):
+        if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME} Automation Starting', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
