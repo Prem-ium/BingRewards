@@ -329,7 +329,7 @@ def completeQuiz(driver):
     except Exception as e:
         pass
     
-    if (driver.find_elements(By.XPATH, value='//*[@id="rqStartQuiz"]') or driver.find_elements(By.CLASS_NAME, value='btOptions') or driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span')):
+    if (driver.find_elements(By.XPATH, value='//*[@id="rqStartQuiz"]') or driver.find_elements(By.CLASS_NAME, value='btOptions') or driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span') or driver.find_elements(By.CLASS_NAME, value='rq_button')):
         try:
             start = driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]')
             WebDriverWait(driver, 10).until(
