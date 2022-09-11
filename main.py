@@ -410,10 +410,13 @@ def punchcard(driver):
 
     for link in links:
         driver.get(link)
-        sleep(5)
-        offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
         p = driver.current_window_handle
-        offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
+        try:
+            driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
+        except:
+            sleep(5)
+            offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
+            offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
         chwd = driver.window_handles
         if (chwd[1]):
             driver._switch_to.window(chwd[1])
