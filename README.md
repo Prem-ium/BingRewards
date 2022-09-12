@@ -6,7 +6,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - Multiple Bing Rewards Accounts
 - PC & Mobile Search Automation
 - Bing Quiz, Poll, and Explore Automation
-- Quests / Punchcard Automation (needs improvement)
+- Quests / Punchcard Automation
 - 'More Activities' Automation
 - Proxy Support
 - Locked Account Handling
@@ -83,6 +83,7 @@ To run this project, you will need to add the following environment variables to
 
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 23, 11 PM
 
+`KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
 
 ## Earning Potential:
 

@@ -58,6 +58,12 @@ if (HANDLE_DRIVER.lower() == "true"):
 else:
     HANDLE_DRIVER = False
 
+
+if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
+    from keep_alive import keep_alive
+    keep_alive()
+
+
 # Apprise Alerts
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
@@ -69,7 +75,7 @@ if APPRISE_ALERTS:
         os.system("pip install apprise")
         import apprise
 
-ACTIVITY_URL = os.environ.get("ACTIVITY_URL", "")
+
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
 wanted_ipv6 = os.environ.get("WANTED_IPV6")
@@ -871,6 +877,7 @@ def guessTask(driver, p = False):
         driver._switch_to.window(p)
         driver.refresh()
         return False
+
 
 
 def runRewards():
