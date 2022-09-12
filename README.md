@@ -10,6 +10,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - 'More Activities' Automation
 - Proxy Support
 - Locked Account Handling
+- Auto-Redemption
 - Apprise Alerts
 - Streak Notifications
 

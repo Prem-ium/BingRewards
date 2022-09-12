@@ -346,7 +346,6 @@ def completeQuiz(driver):
             try:
                 driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]').click()
             except:
-                print(e)
                 pass
         try:
             sleep(3)
@@ -612,6 +611,42 @@ def getDriver(isMobile = False):
         return getDriver(isMobile)
     driver.maximize_window()
     return driver
+
+def redeem(driver, EMAIL):
+    driver.get("https://rewards.microsoft.com/")
+    try:
+        position = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/p').text.replace(" ", "").split("/")
+
+        if (int(position[0]) < int(position[1])):
+            print(f"{position[1] - position[0]} points left to redeem goal!")
+            return
+        elif(int(position[0]) >= int(position[1])):
+            print("\tPoints are ready to be redeemed!\n\tIf this is the first time, manual SMS verification is required.")
+    except ValueError:
+        print("Looks like you haven't assigned a goal yet! PLease do so soon!")
+        return
+    try:
+        try:
+            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
+        except:
+            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
+        sleep(3)
+        try:
+            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a/span[1]').click()
+        except:
+            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a').click()
+        sleep(3)
+        try:
+            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button/span[1]').click()
+        except:
+            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button').click()
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'{BOT_NAME} {EMAIL} Points Redeemed', body=f'Points have been redeemed!\n\n...')
+    except Exception as e:
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'{BOT_NAME} Redeem Error', body=f'Error redeeming points for {EMAIL}\n\n...')
+        print(e)
+        pass
 
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
@@ -886,6 +921,7 @@ def runRewards():
             driver = getDriver()
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
+            redeem(driver)
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
@@ -896,7 +932,7 @@ def runRewards():
         driver.quit()
         totalPointsReport += points
         totalDifference += differenceReport
-        print(f'\n\n')
+        print(f'\t{datetime.datetime.now(TZ)}\n\n')
     if ranRewards and totalDifference > 0:
         report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
