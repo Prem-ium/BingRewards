@@ -206,16 +206,16 @@ def wait():
 def login(EMAIL, PASSWORD, driver):
     # Find email and input it
     try:
-        username_field = driver.find_element(By.XPATH, value='//*[@id="i0116"]')
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable(username_field)
-        )
-        username_field.send_keys(EMAIL)
-        username_field.send_keys(Keys.ENTER)
+        driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
+        driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
     except:
         try:
-            driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
-            driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(Keys.ENTER)
+            username_field = driver.find_element(By.XPATH, value='//*[@id="i0116"]')
+            WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(username_field)
+            )
+            username_field.send_keys(EMAIL)
+            username_field.send_keys(Keys.ENTER)
         except:
             print(f'Unable to find email field for account {EMAIL}')
             return False
@@ -238,16 +238,16 @@ def login(EMAIL, PASSWORD, driver):
         pass
     # Find password and input it
     try:
-        password_field = driver.find_element(By.XPATH, value='//*[@id="i0118"]')
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable(password_field)
-        )
-        password_field.send_keys(PASSWORD)
-        password_field.send_keys(Keys.ENTER)
+        driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
+        driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
     except:
         try:
-            driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
-            driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(Keys.ENTER)
+            password_field = driver.find_element(By.XPATH, value='//*[@id="i0118"]')
+            WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(password_field)
+            )
+            password_field.send_keys(PASSWORD)
+            password_field.send_keys(Keys.ENTER)
         except:
             print(f'Unable to find password field for account {EMAIL}')
             return False
