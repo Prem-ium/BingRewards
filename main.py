@@ -199,7 +199,7 @@ def wait():
     currentHour = datetime.datetime.now(TZ).hour
     if not (currentHour >= START_TIME and currentHour <= END_TIME):
         range = (START_TIME-currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
-        print(f'Timer is enabled.\nStart Time: {START_TIME}.\nCurrent time: {currentHour}\nEnd Time: {END_TIME}\nCurrent time is not within range. Sleeping for {range} hours.')
+        print(f'Timer is enabled.\nStart Time: {START_TIME}.\nEnd Time: {END_TIME}.\n\nCurrent time: {currentHour}.\nCurrent time is not within range. Sleeping for {range} hours.')
         sleep((range) * 3600)
     return
 
@@ -405,6 +405,40 @@ def completeQuiz(driver):
         except Exception as e:
             print(e)
             pass
+
+def guessTask(driver, p = "False"):
+    try:
+        if p.lower() == "false":
+            p = driver.window_handles[len(driver.window_handles) - 1]
+    except:
+        pass
+    try:
+        completeQuiz(driver)
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return True
+    except:
+        pass
+    try:
+        completeSet(driver)
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return True
+    except:
+        pass
+    try:
+        completePoll(driver)
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return True
+    except:
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return False
 def punchcard(driver):
     driver.get('https://rewards.microsoft.com/')
     sleep(5)
@@ -423,33 +457,15 @@ def punchcard(driver):
             offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
             offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
         chwd = driver.window_handles
+        p = driver.current_window_handle
         if (chwd[1]):
             driver._switch_to.window(chwd[1])
-        # Combine this code with completeMore, eventually
+        
         try:
-            completeQuiz(driver)
-            driver.close()
-            driver._switch_to.window(chwd[0])
-            continue
+            guessTask(driver, p)
         except:
             pass
-        try:
-            completeSet(driver)
-            driver.close()
-            driver._switch_to.window(chwd[0])
-            continue
-        except:
-            pass
-        try:
-            completePoll(driver)
-            driver.close()
-            driver._switch_to.window(chwd[0])
-            continue
-        except:
-            driver.close()
-            driver._switch_to.window(chwd[0])
-            pass
-# TODO: Clean up code
+
 def completeMore(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
@@ -473,37 +489,7 @@ def completeMore(driver):
                     if (chwd[1]):
                         driver._switch_to.window(chwd[1])
                         try:
-                            try:
-                                completeQuiz(driver)
-                                driver.close()
-                                driver._switch_to.window(p)
-                                driver.refresh()
-                                ran = True
-                                continue
-                            except:
-                                pass
-                            try:
-                                completeSet(driver)
-                                driver.close()
-                                driver._switch_to.window(p)
-                                driver.refresh()
-                                ran = True
-                                continue
-                            except:
-                                pass
-                            try:
-                                completePoll(driver)
-                                driver.close()
-                                driver._switch_to.window(p)
-                                driver.refresh()
-                                ran = True
-                                continue
-                            except:
-                                driver.close()
-                                driver._switch_to.window(p)
-                                driver.refresh()
-                                ran = True
-                                pass
+                            ran = guessTask(driver, p)
                         except:
                             print(traceback.format_exc())
                             pass
@@ -848,37 +834,6 @@ def updateSearches(driver):
     finally:
         print()
         return PC_SEARCHES, MOBILE_SEARCHES
-def guessTask(driver, p = False):
-    p = driver.window_handles[len(driver.window_handles) - 1]
-    try:
-        completeQuiz(driver)
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return True
-    except:
-        pass
-    try:
-        completeSet(driver)
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return True
-    except:
-        pass
-    try:
-        completePoll(driver)
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return True
-    except:
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return False
-
-
 
 def runRewards():
     totalPointsReport = totalDifference = differenceReport = 0
