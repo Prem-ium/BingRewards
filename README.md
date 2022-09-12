@@ -82,7 +82,7 @@ To run this project, you will need to add the following environment variables to
 
 `START_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 4, 4 AM
 
-`END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 23, 11 PM
+`END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 20, 8 PM
 
 `KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
 

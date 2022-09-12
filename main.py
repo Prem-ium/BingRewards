@@ -94,9 +94,9 @@ TZ = timezone(os.environ.get("TZ", "America/New_York"))
 TIMER = os.environ.get("TIMER", "False")
 if TIMER.lower() == "true":
     TIMER = True
-    # Get start and end time, defaulting to 4:00am and 11:00pm
+    # Get start and end time, defaulting to 4:00am and 8:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
-    END_TIME = float(os.environ.get("END_TIME", "23"))
+    END_TIME = float(os.environ.get("END_TIME", "20"))
 
     # Make sure start and end times are valid, otherwise switch them
     if START_TIME > END_TIME:
@@ -924,15 +924,15 @@ def runRewards():
             redeem(driver)
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\nValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
+                print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} Automation Completed!', 
-                        body=f'Email:\t\t\t{EMAIL} \nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
+                    alerts.notify(title=f'{BOT_NAME} Automation Completed!\n\n{EMAIL} REPORT:', 
+                        body=f'Points:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
         totalDifference += differenceReport
-        print(f'\t{datetime.datetime.now(TZ)}\n\n')
+        print(f'\tFinished: {datetime.datetime.now(TZ)}\n\n')
     if ranRewards and totalDifference > 0:
         report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
