@@ -646,6 +646,11 @@ def redeem(driver, EMAIL):
         position = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/p').text.replace(" ", "").split("/")
         points = int(position[0].replace(",", ""))
         total = int(position[1].replace(",", ""))
+        try:
+            goal = driver.find_element(By.XPATH, value = '//*[@id="dashboard-set-goal"]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/h3').text
+            print(f'\t{goal}')
+        except:
+            pass
         if (points < total):
             print(f"\t{total - points} points left to redeem your goal!")
             return
@@ -697,7 +702,7 @@ def redeem(driver, EMAIL):
             except:
                 pass
             pass
-
+        sleep(random.uniform(20, 50))
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME} {EMAIL} Points Redeemed', body=f'Points have been redeemed!\n\n...')
     except Exception as e:
@@ -953,6 +958,7 @@ def runRewards():
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
 
         PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
+        
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
