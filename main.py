@@ -921,7 +921,7 @@ def runRewards():
             driver = getDriver()
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
-            redeem(driver)
+            redeem(driver, EMAIL)
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
