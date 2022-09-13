@@ -70,7 +70,7 @@ To run this project, you will need to add the following environment variables to
 
 `KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
 
-`AUTO_REDEEM` = Handle auto redeemption of rewards (checks goal)
+`AUTO_REDEEM` = Handle auto redeemption of rewards (checks goal). Amazon is chosen as default
 
 `BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
 

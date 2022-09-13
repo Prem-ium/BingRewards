@@ -456,6 +456,7 @@ def punchcard(driver):
 
     for link in links:
         driver.get(link)
+        sleep(random.uniform(3, 5))
         p = driver.current_window_handle
         try:
             driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
@@ -470,7 +471,9 @@ def punchcard(driver):
         
         try:
             guessTask(driver, p)
+            sleep(random.uniform(3, 5))
         except:
+            sleep(random.uniform(3, 5))
             pass
 
 def completeMore(driver):
@@ -623,6 +626,21 @@ def getDriver(isMobile = False):
 def redeem(driver, EMAIL):
     driver.get("https://rewards.microsoft.com/")
     try:
+        element = driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a/span/ng-transclude')
+        setG = element.text
+        if ("set goal" in setG.lower()):
+            element.click()
+            sleep(3)
+
+            elements = driver.find_elements(By.CLASS_NAME,"c-image")
+            for e in elements:
+                if("amazon.com" in e.get_attribute("alt").lower()):
+                    print('\tAmazon set as goal!')
+                    e.click()
+                    break
+    except:
+        driver.get("https://rewards.microsoft.com/")
+    try:
         position = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/p').text.replace(" ", "").split("/")
 
         if (int(position[0]) < int(position[1])):
@@ -630,20 +648,20 @@ def redeem(driver, EMAIL):
             return
         elif(int(position[0]) >= int(position[1])):
             print("\tPoints are ready to be redeemed!\n\tIf this is the first time, manual SMS verification is required.")
-    except ValueError:
-        print("Looks like you haven't assigned a goal yet! PLease do so soon!")
+    except Exception as e:
+        print("An error occured while trying to parse points.\n\n{e}\n\n")
         return
     try:
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
         except:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
-        sleep(3)
+        sleep(random.uniform(3, 5))
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a/span[1]').click()
         except:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a').click()
-        sleep(3)
+        sleep(random.uniform(3, 5))
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button/span[1]').click()
         except:
@@ -906,11 +924,16 @@ def runRewards():
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
+
         try:
             punchcard(driver)
         except Exception as e:
             print(traceback.format_exc())
             pass
+
+        if AUTO_REDEEM:
+            redeem(driver)
+
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME} Automation Starting', 
@@ -929,8 +952,10 @@ def runRewards():
             driver = getDriver()
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
+
             if AUTO_REDEEM:
                 redeem(driver, EMAIL)
+
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
