@@ -932,7 +932,7 @@ def runRewards():
             pass
 
         if AUTO_REDEEM:
-            redeem(driver)
+            redeem(driver, EMAIL)
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
