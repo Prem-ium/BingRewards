@@ -936,7 +936,7 @@ def runRewards():
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME} Automation Starting', 
+                alerts.notify(title=f'{BOT_NAME} Automation Starting\n\n', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
             checkStreaks(driver, EMAIL)
             ranRewards = True
@@ -960,8 +960,8 @@ def runRewards():
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} Automation Completed!\n\n{EMAIL} REPORT:', 
-                        body=f'Points:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
+                    alerts.notify(title=f'{BOT_NAME} Automation Completed!\n\n{EMAIL}:', 
+                        body=f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
@@ -971,7 +971,7 @@ def runRewards():
         report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME} Automation Complete', 
+            alerts.notify(title=f'{BOT_NAME} Automation Complete\n', 
                         body=f'{report}\n\n...')
     return
 
