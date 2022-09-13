@@ -639,33 +639,65 @@ def redeem(driver, EMAIL):
                     e.click()
                     break
     except:
+        pass
+    finally:
         driver.get("https://rewards.microsoft.com/")
     try:
         position = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/p').text.replace(" ", "").split("/")
-
-        if (int(position[0]) < int(position[1])):
-            print(f"{position[1] - position[0]} points left to redeem goal!")
+        points = int(position[0].replace(",", ""))
+        total = int(position[1].replace(",", ""))
+        if (points < total):
+            print(f"\t{total - points} points left to redeem your goal!")
             return
-        elif(int(position[0]) >= int(position[1])):
+        elif(points >= total):
             print("\tPoints are ready to be redeemed!\n\tIf this is the first time, manual SMS verification is required.")
     except Exception as e:
-        print("An error occured while trying to parse points.\n\n{e}\n\n")
+        print(traceback.format_exc())
         return
     try:
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
+            sleep(random.uniform(3, 5))
         except:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
-        sleep(random.uniform(3, 5))
+        
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a/span[1]').click()
         except:
-            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a').click()
-        sleep(random.uniform(3, 5))
+            try:
+                driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a').click()
+                sleep(random.uniform(3, 5))
+            except:
+                pass
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button/span[1]').click()
+            sleep(random.uniform(3, 5))
         except:
-            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button').click()
+            try:
+                driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button').click()
+            except:
+                pass
+
+        try:
+            driver.find_element(By.XPATH, value = '//*[@id="redeem-pdp_000800000064"]').click()
+            sleep(random.uniform(3, 5))
+        except:
+            try:
+                driver.find_element(By.XPATH, value = '//*[@id="redeem-pdp_000800000064"]/span[1]').click()
+            except:
+                pass
+            pass
+            
+        try:
+            driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]').click()
+            sleep(random.uniform(3, 5))
+        except:
+            try:
+                driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]/span[1]').click()
+            except:
+                pass
+            pass
+
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME} {EMAIL} Points Redeemed', body=f'Points have been redeemed!\n\n...')
     except Exception as e:
@@ -924,7 +956,6 @@ def runRewards():
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
-
         try:
             punchcard(driver)
         except Exception as e:
