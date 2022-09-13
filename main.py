@@ -59,6 +59,14 @@ else:
     HANDLE_DRIVER = False
 
 
+# Whether to fully automate redemptions
+AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
+if (AUTO_REDEEM.lower() == "true"):
+    AUTO_REDEEM = True
+else:
+    AUTO_REDEEM = False
+
+# Whether to use keep_alive.py
 if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
     from keep_alive import keep_alive
     keep_alive()
@@ -921,7 +929,8 @@ def runRewards():
             driver = getDriver()
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
-            redeem(driver, EMAIL)
+            if AUTO_REDEEM:
+                redeem(driver, EMAIL)
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')

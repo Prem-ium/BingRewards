@@ -68,13 +68,17 @@ To run this project, you will need to add the following environment variables to
 
 `APPRISE_ALERTS` = Notifications and Alerts. See .env example for more details
 
+`KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
+
+`AUTO_REDEEM` = Handle auto redeemption of rewards (checks goal)
+
+`BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
+
 `WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.
 
 `WANTED_IPV6` = Your desired external IPv6 address. Set this if you want the bot to not run if your IPv6 address is different than this.
 
 `PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
-
-`BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
 
 `TZ` = Your desired Time-Zone. Defaults to America/New York
 
@@ -84,7 +88,7 @@ To run this project, you will need to add the following environment variables to
 
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 20, 8 PM
 
-`KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
+
 
 ## Earning Potential:
 
