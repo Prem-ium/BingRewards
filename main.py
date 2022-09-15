@@ -273,7 +273,7 @@ def login(EMAIL, PASSWORD, driver):
             if message.lower() == "your account has been locked":
                 print(f"uh-oh, your account {EMAIL} has been locked by Microsoft!")
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} Account Locked!', 
+                    alerts.notify(title=f'{BOT_NAME}: Account Locked!', 
                         body=f'Your account {EMAIL} has been locked! Sign in and verify your account.')
                 return False
         except NoSuchElementException as e:
@@ -283,7 +283,7 @@ def login(EMAIL, PASSWORD, driver):
             if message.lower() == "help us protect your account":
                 print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} Account Secuirity Notice!', 
+                    alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!', 
                         body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number! Please sign in and verify your account.\nAttempting to skip, if still possible.\n\n\n...')
                 sleep(50)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
@@ -457,6 +457,13 @@ def punchcard(driver):
     for link in links:
         driver.get(link)
         sleep(random.uniform(3, 5))
+        try:
+            message = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[4]').text
+
+            if message.lower() == 'congratulations!':
+                continue
+        except:
+            pass
         p = driver.current_window_handle
         try:
             driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
@@ -575,12 +582,12 @@ def checkStreaks(driver, EMAIL):
         if bonusNotification is not None and 'Awesome!' in bonusNotification:
             print(f'\t{bonusNotification} for a streak bonus!\n')
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME} {EMAIL} Streak Earned!', body=f'{bonusNotification}\n\n...')
+                alerts.notify(title=f'{BOT_NAME}: {EMAIL} Streak Earned!', body=f'{bonusNotification}\n\n...')
         else:
             bonusNotification = f"You're currently on a {driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status/div/div/div/div/div[3]/div[3]/mee-rewards-user-status-item/mee-rewards-user-status-streak/div/div/div/div/div/p[1]/mee-rewards-counter-animation').text} Streak!\n{driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p').text}"
 
             if APPRISE_ALERTS and len(bonusNotification) > 5:
-                alerts.notify(title=f'{BOT_NAME} {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
+                alerts.notify(title=f'{BOT_NAME}: {EMAIL} Streak Info', body=f'{bonusNotification}\n\n...')
     except:
         pass
 
@@ -616,7 +623,7 @@ def getDriver(isMobile = False):
                 options=chrome_options)
     except:
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME} Driver Error', body=f'Error creating driver for {BOT_NAME}\n\n...')
+            alerts.notify(title=f'{BOT_NAME}: Driver Error', body=f'Error creating driver for {BOT_NAME}\n\n...')
         print(f'{traceback.format_exc()}\n\nAttempting to retry...\n\n')
         sleep(100)
         return getDriver(isMobile)
@@ -634,7 +641,7 @@ def redeem(driver, EMAIL):
 
             elements = driver.find_elements(By.CLASS_NAME,"c-image")
             for e in elements:
-                if("amazon.com" in e.get_attribute("alt").lower()):
+                if ("amazon.com" in e.get_attribute("alt").lower()):
                     print('\tAmazon set as goal!')
                     e.click()
                     break
@@ -653,12 +660,12 @@ def redeem(driver, EMAIL):
             pass
         if (points < total):
             print(f"\t{total - points} points left to redeem your goal!")
-            return
+            return f'\t{total - points} points left to redeem your goal!'
         elif(points >= total):
             print("\tPoints are ready to be redeemed!\n\tIf this is the first time, manual SMS verification is required.")
     except Exception as e:
         print(traceback.format_exc())
-        return
+        return "\tRan into an exception"
     try:
         try:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
@@ -699,20 +706,22 @@ def redeem(driver, EMAIL):
                 print("\tPhone verification required!")
 
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} {EMAIL} Phone Verification Required', body=f'\n\nPhone Verification is required for the first redemption.\n\n{EMAIL} has enough points for your goal.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.\n\n...')
+                    alerts.notify(title=f'{BOT_NAME}: {EMAIL} Phone Verification Required', body=f'\n\nPhone Verification is required for the first redemption.\n\n{EMAIL} has enough points for your goal.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.\n\n...')
                 print('\tSleeping for a bit to allow manual verification...')
                 sleep(300)
                 driver.get("https://rewards.microsoft.com/")
-                return
+                return "\tPhone Verification Required"
         except:
             pass
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME} {EMAIL} Points Redeemed', body=f'Points have been redeemed!\n\n...')
+            alerts.notify(title=f'{BOT_NAME}: {EMAIL} Points Redeemed', body=f'Points have been redeemed!\n\n...')
+        return "\tPoints Redeemed"
     except Exception as e:
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME} Redeem Error', body=f'Error redeeming points for {EMAIL}\n\n...')
+            alerts.notify(title=f'{BOT_NAME}: Redeem Error', body=f'Error redeeming points for {EMAIL}\n\n...')
         print(e)
-        pass
+        return "\tRan into an exception"
+        
 
 
 def getPoints(EMAIL, PASSWORD, driver):
@@ -977,7 +986,7 @@ def runRewards():
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME} Automation Starting\n\n', 
+                alerts.notify(title=f'{BOT_NAME}: Automation Starting\n\n', 
                             body=f'Email:\t\t{EMAIL} \nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
             checkStreaks(driver, EMAIL)
             ranRewards = True
@@ -993,16 +1002,19 @@ def runRewards():
             driver = getDriver()
             differenceReport = points
             points = getPoints(EMAIL, PASSWORD, driver)
-
+            message = ''
             if AUTO_REDEEM:
-                redeem(driver, EMAIL)
+                message = redeem(driver, EMAIL)
 
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
+                report = f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} Automation Completed!\n\n{EMAIL}:', 
-                        body=f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n...')
+                    if message != '':
+                        report = report + '\n\n' + message
+                    alerts.notify(title=f'{BOT_NAME}: Automation Completed!\n{EMAIL}:', 
+                        body=f'{report}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
@@ -1012,7 +1024,7 @@ def runRewards():
         report = f'\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME} Automation Complete\n', 
+            alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 
                         body=f'{report}\n\n...')
     return
 
@@ -1031,7 +1043,7 @@ def main():
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
             print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation...')
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME} Failed!',
+                alerts.notify(title=f'{BOT_NAME}: Failed!',
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 600 seconds...\n\n ')
             sleep(600)
             continue
