@@ -665,44 +665,47 @@ def redeem(driver, EMAIL):
             sleep(random.uniform(3, 5))
         except:
             driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
-        
         try:
-            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a/span[1]').click()
-        except:
             try:
-                driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/a').click()
+                url = driver.current_url
+                url = url.split('https://rewards.microsoft.com/redeem/')
+                id = url[1]
+            except Exception as e:
+                print(traceback.format_exc())
+
+            try:
+                driver.find_element(By.XPATH, value = f'//*[@id="redeem-pdp_{id}"]').click()
                 sleep(random.uniform(3, 5))
             except:
-                pass
-        try:
-            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button/span[1]').click()
-            sleep(random.uniform(3, 5))
-        except:
+                try:
+                    driver.find_element(By.XPATH, value = f'//*[@id="redeem-pdp_{id}"]/span[1]').click()
+                except:
+                    pass
+                pass  
             try:
-                driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div[2]/form/div[2]/button').click()
+                driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]').click()
+                sleep(random.uniform(3, 5))
             except:
-                pass
+                try:
+                    driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]/span[1]').click()
+                except:
+                    pass
+        except:
+            pass
+        
+        try:
+            veri = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutChallenge"]/form/div[1]').text
+            if (veri.lower() == 'phone verification'):
+                print("\tPhone verification required!")
 
-        try:
-            driver.find_element(By.XPATH, value = '//*[@id="redeem-pdp_000800000064"]').click()
-            sleep(random.uniform(3, 5))
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'{BOT_NAME} {EMAIL} Phone Verification Required', body=f'Phone Verification is required for the first redemption.\n{EMAIL} has enough points for your goal.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.')
+                print('\tSleeping for a bit to allow manual verification...')
+                sleep(300)
+                driver.get("https://rewards.microsoft.com/")
+                return
         except:
-            try:
-                driver.find_element(By.XPATH, value = '//*[@id="redeem-pdp_000800000064"]/span[1]').click()
-            except:
-                pass
             pass
-            
-        try:
-            driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]').click()
-            sleep(random.uniform(3, 5))
-        except:
-            try:
-                driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]/span[1]').click()
-            except:
-                pass
-            pass
-        sleep(random.uniform(20, 50))
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME} {EMAIL} Points Redeemed', body=f'Points have been redeemed!\n\n...')
     except Exception as e:
@@ -710,6 +713,7 @@ def redeem(driver, EMAIL):
             alerts.notify(title=f'{BOT_NAME} Redeem Error', body=f'Error redeeming points for {EMAIL}\n\n...')
         print(e)
         pass
+
 
 def getPoints(EMAIL, PASSWORD, driver):
     points = -1
