@@ -699,7 +699,7 @@ def redeem(driver, EMAIL):
                 print("\tPhone verification required!")
 
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME} {EMAIL} Phone Verification Required', body=f'Phone Verification is required for the first redemption.\n{EMAIL} has enough points for your goal.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.')
+                    alerts.notify(title=f'{BOT_NAME} {EMAIL} Phone Verification Required', body=f'\n\nPhone Verification is required for the first redemption.\n\n{EMAIL} has enough points for your goal.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.\n\n...')
                 print('\tSleeping for a bit to allow manual verification...')
                 sleep(300)
                 driver.get("https://rewards.microsoft.com/")
