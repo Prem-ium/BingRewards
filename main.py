@@ -59,10 +59,13 @@ else:
     HANDLE_DRIVER = False
 
 
+
 # Whether to fully automate redemptions
 AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
 if (AUTO_REDEEM.lower() == "true"):
     AUTO_REDEEM = True
+
+    GOAL = os.environ.get("GOAL", "amazon.com").lower()
 else:
     AUTO_REDEEM = False
 
@@ -638,11 +641,10 @@ def redeem(driver, EMAIL):
         if ("set goal" in setG.lower()):
             element.click()
             sleep(3)
-
             elements = driver.find_elements(By.CLASS_NAME,"c-image")
             for e in elements:
-                if ("amazon.com" in e.get_attribute("alt").lower()):
-                    print('\tAmazon set as goal!')
+                if (GOAL in e.get_attribute("alt").lower()):
+                    print('\tGoal set!')
                     e.click()
                     break
     except:
@@ -1009,10 +1011,8 @@ def runRewards():
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
-                report = f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                report = f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n{message}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
-                    if message != '':
-                        report = report + '\n\n' + message
                     alerts.notify(title=f'{BOT_NAME}: Automation Completed!\n{EMAIL}:', 
                         body=f'{report}\n\n...')
                     

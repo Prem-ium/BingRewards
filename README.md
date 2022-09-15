@@ -72,6 +72,8 @@ To run this project, you will need to add the following environment variables to
 
 `AUTO_REDEEM` = Handle auto redeemption of rewards (checks goal). Amazon is chosen as default
 
+`GOAL` = Selecting goal reward, defaults to Amazon. 
+
 `BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
 
 `WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.
