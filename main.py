@@ -58,6 +58,8 @@ if (HANDLE_DRIVER.lower() == "true"):
 else:
     HANDLE_DRIVER = False
 
+
+
 # Whether to fully automate redemptions
 AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
 if (AUTO_REDEEM.lower() == "true"):
@@ -72,6 +74,7 @@ if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
     from keep_alive import keep_alive
     keep_alive()
 
+
 # Apprise Alerts
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
@@ -82,6 +85,7 @@ if APPRISE_ALERTS:
     except ImportError:
         os.system("pip install apprise")
         import apprise
+
 
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
@@ -444,42 +448,46 @@ def guessTask(driver, p = "False"):
         driver.refresh()
         return False
 def punchcard(driver):
-    driver.get('https://rewards.microsoft.com/')
-    sleep(5)
-    quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
-    links = []
-    for quest in quests:
-        links.append(quest.get_attribute('href'))
+    try:
+        driver.get('https://rewards.microsoft.com/')
+        sleep(5)
+        quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
+        links = []
+        for quest in quests:
+            links.append(quest.get_attribute('href'))
 
-    for link in links:
-        driver.get(link)
-        sleep(random.uniform(1, 3))
-        try:
-            message = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[4]').text
-            message2 = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[2]').text
-            if message.lower() == 'congratulations!' or "rent" in message2.lower() or "buy" in message2.lower():
-                continue
-        except:
-            pass
-        p = driver.current_window_handle
-        sleep(random.uniform(1, 3))
-        try:
-            driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
-        except:
-            sleep(5)
-            offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
-            offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
-        chwd = driver.window_handles
-        p = driver.current_window_handle
-        if (chwd[1]):
-            driver._switch_to.window(chwd[1])
-        
-        try:
-            guessTask(driver, p)
-            sleep(random.uniform(3, 5))
-        except:
-            sleep(random.uniform(3, 5))
-            pass
+        for link in links:
+            driver.get(link)
+            sleep(random.uniform(1, 3))
+            try:
+                message = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[4]').text
+                message2 = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[2]').text
+                if message.lower() == 'congratulations!' or "rent" in message2.lower() or "buy" in message2.lower():
+                    continue
+            except:
+                pass
+            p = driver.current_window_handle
+            sleep(random.uniform(1, 3))
+            try:
+                driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
+            except:
+                sleep(5)
+                offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
+                offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
+            chwd = driver.window_handles
+            p = driver.current_window_handle
+            if (chwd[1]):
+                driver._switch_to.window(chwd[1])
+            
+            try:
+                guessTask(driver, p)
+                sleep(random.uniform(3, 5))
+            except:
+                sleep(random.uniform(3, 5))
+                pass
+    except Exception as e:
+        print(traceback.format_exc())
+        pass
 
 def completeMore(driver):
     ran = False
@@ -961,12 +969,8 @@ def runRewards():
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
-        try:
-            punchcard(driver)
-        except Exception as e:
-            print(traceback.format_exc())
-            pass
-
+        punchcard(driver)
+ 
         if AUTO_REDEEM:
             redeem(driver, EMAIL)
 
@@ -1031,6 +1035,7 @@ def main():
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 10 minutes...\n\n ')
             sleep(600)
             continue
+
 
 if __name__ == "__main__":
     # Initialize apprise alerts
