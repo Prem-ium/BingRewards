@@ -42,7 +42,7 @@ if (len(ACCOUNTS) > 5):
     raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
 
 if not os.environ["URL"]:
-    raise Exception("URL not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
+    raise Exception("URL env variable not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
 
 TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
          "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
@@ -58,8 +58,6 @@ if (HANDLE_DRIVER.lower() == "true"):
 else:
     HANDLE_DRIVER = False
 
-
-
 # Whether to fully automate redemptions
 AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
 if (AUTO_REDEEM.lower() == "true"):
@@ -74,7 +72,6 @@ if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
     from keep_alive import keep_alive
     keep_alive()
 
-
 # Apprise Alerts
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
@@ -85,7 +82,6 @@ if APPRISE_ALERTS:
     except ImportError:
         os.system("pip install apprise")
         import apprise
-
 
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
@@ -214,7 +210,7 @@ def wait():
         sleep((range) * 3600)
     return
 
-def login(EMAIL, PASSWORD, driver):
+def login(EMAIL, PASSWORD, driver, restart = False):
     # Find email and input it
     try:
         driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
@@ -228,7 +224,6 @@ def login(EMAIL, PASSWORD, driver):
             username_field.send_keys(EMAIL)
             username_field.send_keys(Keys.ENTER)
         except:
-            print(f'Unable to find email field for account {EMAIL}')
             return False
     sleep(random.uniform(2, 4))
     # Check if personal/work prompt is present
@@ -243,7 +238,7 @@ def login(EMAIL, PASSWORD, driver):
                 personal.click()
                 sleep(random.uniform(2, 4))
             except:
-                print(f'Peronal/Work prompt was present for account {EMAIL} but unable to get past it.')
+                print(f'Personal/Work prompt was present for account {EMAIL} but unable to get past it.')
                 return False
     except:
         pass
@@ -287,7 +282,7 @@ def login(EMAIL, PASSWORD, driver):
                 print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!', 
-                        body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and verify your account.\nAttempting to skip, if still possible.\n\n\n...')
+                        body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and add one to your account.\n\n\nAttempting to skip, if still possible...')
                 sleep(50)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
         except:
@@ -1025,8 +1020,9 @@ def main():
         try:
             # Run Bing Rewards Automation
             runRewards()
-            print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\nSleeping for a bit before rechecking...\n\n')
-            sleep(3600 * random.randint(1, 6))
+            hours = random.randint(1, 6)
+            print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\nSleeping for {hours} hours before rechecking...\n\n')
+            sleep(3600 * hours)
         except Exception as e:
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
             print(f'Exception: {e}\n\n{traceback.format_exc()}\n\n\n Attempting to restart Bing Rewards Automation in 10 minutes...')
