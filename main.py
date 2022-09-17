@@ -210,7 +210,7 @@ def wait():
         sleep((range) * 3600)
     return
 
-def login(EMAIL, PASSWORD, driver, restart = False):
+def login(EMAIL, PASSWORD, driver):
     # Find email and input it
     try:
         driver.find_element(By.XPATH, value='//*[@id="i0116"]').send_keys(EMAIL)
