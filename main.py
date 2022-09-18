@@ -279,11 +279,11 @@ def login(EMAIL, PASSWORD, driver):
         try:
             message = driver.find_element(By.XPATH, value='//*[@id="iPageTitle"]').text
             if message.lower() == "help us protect your account":
-                print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
+                print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 1 minute, if possible...")
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!', 
                         body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and add one to your account.\n\n\nAttempting to skip, if still possible...')
-                sleep(5)
+                sleep(60)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
         except Exception as e:
             print(e)
@@ -1035,7 +1035,6 @@ def main():
                         body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 10 minutes...\n\n ')
             sleep(600)
             continue
-
 
 if __name__ == "__main__":
     # Initialize apprise alerts
