@@ -283,10 +283,14 @@ def login(EMAIL, PASSWORD, driver):
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!', 
                         body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and add one to your account.\n\n\nAttempting to skip, if still possible...')
-                sleep(50)
+                sleep(5)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
-        except:
-            driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+        except Exception as e:
+            print(e)
+            try:
+                driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+            except:
+                driver.find_element(By.XPATH, value='//*[@id="iShowSkip"]').click()
         return True
 
 def completeSet(driver):
