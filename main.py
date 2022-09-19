@@ -593,7 +593,8 @@ def checkStreaks(driver, EMAIL):
             if len(bonusNotification) > 5:
                 return bonusNotification
     except:
-        pass
+        return "N/A"
+    return "N/A"
 
 def getDriver(isMobile = False):
     try:
@@ -974,8 +975,8 @@ def runRewards():
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME}: {EMAIL} Automation Starting\n\n', 
-                            body=f'Points:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
+                alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
+                            body=f'{EMAIL}\nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
             streaks = checkStreaks(driver, EMAIL)
             ranRewards = True
             
@@ -999,8 +1000,8 @@ def runRewards():
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 report = f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n{message}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME}: {EMAIL} Automation Completed!:\n', 
-                        body=f'{report}\n\n...')
+                    alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
+                        body=f'{EMAIL}\n{report}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
