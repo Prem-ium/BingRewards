@@ -586,13 +586,12 @@ def checkStreaks(driver, EMAIL):
         bonusNotification = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p/b').text
         if bonusNotification is not None and 'Awesome!' in bonusNotification:
             print(f'\t{bonusNotification} for a streak bonus!\n')
-            if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME}: Streak Earned!', body=f'{EMAIL}:\t\t\t{bonusNotification}\n\n...')
+            return bonusNotification
         else:
             bonusNotification = f"{driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status/div/div/div/div/div[3]/div[3]/mee-rewards-user-status-item/mee-rewards-user-status-streak/div/div/div/div/div/p[1]/mee-rewards-counter-animation').text} Days Streak!\n{driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p').text}"
 
-            if APPRISE_ALERTS and len(bonusNotification) > 5:
-                alerts.notify(title=f'{BOT_NAME}: Streak Progress', body=f'{EMAIL}:\t{bonusNotification}\n\n...')
+            if len(bonusNotification) > 5:
+                return bonusNotification
     except:
         pass
 
@@ -977,7 +976,7 @@ def runRewards():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: {EMAIL} Automation Starting\n\n', 
                             body=f'Points:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
-            checkStreaks(driver, EMAIL)
+            streaks = checkStreaks(driver, EMAIL)
             ranRewards = True
             
             if (PC_SEARCHES > 0):
@@ -997,7 +996,7 @@ def runRewards():
 
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
+                print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 report = f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n{message}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: {EMAIL} Automation Completed!:\n', 
