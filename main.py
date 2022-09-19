@@ -288,9 +288,15 @@ def login(EMAIL, PASSWORD, driver):
         except Exception as e:
             print(e)
             try:
-                driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+                sleep(2)
+                driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
             except:
-                driver.find_element(By.XPATH, value='//*[@id="iShowSkip"]').click()
+                try:
+                    driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+                except:
+                    driver.find_element(By.XPATH, value='//*[@id="iShowSkip"]').click()
+            finally:
+                driver.get('https://rewards.microsoft.com/')
         return True
 
 def completeSet(driver):
