@@ -13,6 +13,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - Auto-Redemption
 - Apprise Alerts
 - Streak Notifications
+- Suspended Account Notifications
 
 ## Installation
 The bot can be run using Python or Docker.

@@ -746,8 +746,17 @@ def getPoints(EMAIL, PASSWORD, driver):
             except:
                 driver.get('https://rewards.microsoft.com/')
         if driver.title.lower() == 'rewards error':
-            sleep(random.uniform(2, 4))
-            driver.get('https://rewards.microsoft.com/')
+            try:
+                message = driver.find_element(By.XPATH, value='//*[@id="error"]/h1').text
+                if "microsoft rewards account has been suspended" in message.lower():
+                    print(f"\t{EMAIL} account has been suspended.")
+
+                    if APPRISE_ALERTS:
+                        alerts.notify(title=f'{BOT_NAME}: Account Suspended', body=f'Unfortunately, {EMAIL}\'s Bing Rewards account has been suspended. Please remove login details from the bot.\n\n...')
+                    return -404
+            except:
+                sleep(random.uniform(2, 4))
+                driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
         print(e)
@@ -974,7 +983,7 @@ def runRewards():
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
-                            body=f'{EMAIL}\nPoints:\t\t{points} (${round(points/1300, 3)})\n\nStarting:\t{recordTime}\n\n\n...')
+                            body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points} (${round(points/1300, 3)})\nStarting:\t{recordTime}\n...')
             streaks = checkStreaks(driver, EMAIL)
             ranRewards = True
             
@@ -996,7 +1005,7 @@ def runRewards():
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
-                report = f'\nPoints:\t\t\t{points} (${round(points / 1300, 3)})\n\nEarned Points:\t\t\t{differenceReport} (${round(differenceReport/1300,3)})\n\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                report = f'\nPoints:\t\t\t{points} (${round(points / 1300, 3)})\nEarned Points:\t\t\t{differenceReport} (${round(differenceReport/1300,3)})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
                         body=f'{EMAIL}\n{report}\n\n...')
