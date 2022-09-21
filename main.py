@@ -279,24 +279,16 @@ def login(EMAIL, PASSWORD, driver):
         try:
             message = driver.find_element(By.XPATH, value='//*[@id="iPageTitle"]').text
             if message.lower() == "help us protect your account":
-                print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 1 minute, if possible...")
+                print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!', 
                         body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and add one to your account.\n\n\nAttempting to skip, if still possible...')
-                sleep(60)
+                sleep(50)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
-        except Exception as e:
-            print(e)
-            try:
-                sleep(2)
-                driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
-            except:
-                try:
-                    driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
-                except:
-                    driver.find_element(By.XPATH, value='//*[@id="iShowSkip"]').click()
-            finally:
-                driver.get('https://rewards.microsoft.com/')
+        except:
+            driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
+        finally:
+            driver.get('https://rewards.microsoft.com/')
         return True
 
 def completeSet(driver):
@@ -982,7 +974,7 @@ def runRewards():
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
-                            body=f'{EMAIL}\nPoints:\t\t{points} \nCash Value:\t\t${round(points/1300, 3)}\nStarting:\t{recordTime}\n\n\n...')
+                            body=f'{EMAIL}\nPoints:\t\t{points} (${round(points/1300, 3)})\n\nStarting:\t{recordTime}\n\n\n...')
             streaks = checkStreaks(driver, EMAIL)
             ranRewards = True
             
@@ -1004,7 +996,7 @@ def runRewards():
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
-                report = f'\nPoints:\t\t\t{points}\nCash Value:\t\t${round(points / 1300, 3)}\n\nEarned Points:\t\t\t{differenceReport}\nEarned Cash Value:\t${round(differenceReport/1300,3)}\n{message}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                report = f'\nPoints:\t\t\t{points} (${round(points / 1300, 3)})\n\nEarned Points:\t\t\t{differenceReport} (${round(differenceReport/1300,3)})\n\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
                         body=f'{EMAIL}\n{report}\n\n...')
@@ -1014,7 +1006,7 @@ def runRewards():
         totalDifference += differenceReport
         print(f'\tFinished: {datetime.datetime.now(TZ)}\n\n')
     if ranRewards and totalDifference > 0:
-        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport}\nCash Value of Total Points:\t\t${round(totalPointsReport/1300, 3)}\n\nTotal Earned (in latest run):\t\t{totalDifference}\nCash Value of Earned (in latest run):\t\t${round(totalDifference/1300, 3)}\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
+        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport} (${round(totalPointsReport/1300, 3)})\n\nTotal Earned (in latest run):\t\t{totalDifference} (${round(totalDifference/1300, 3)})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 
