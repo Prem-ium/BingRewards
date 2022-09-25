@@ -1005,10 +1005,10 @@ def runRewards():
             differenceReport = points - differenceReport
             if differenceReport > 0:
                 print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
-                report = f'\nPoints:\t\t\t{points} (${round(points / 1300, 3)})\nEarned Points:\t\t\t{differenceReport} (${round(differenceReport/1300,3)})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                report = f'Points:\t\t\t{points} (${round(points / 1300, 3)})\nEarned Points:\t\t\t{differenceReport} (${round(differenceReport/1300,3)})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
-                        body=f'{EMAIL}\n{report}\n\n...')
+                        body=f'Email:\t{EMAIL}\n{report}\n\n...')
                     
         driver.quit()
         totalPointsReport += points
