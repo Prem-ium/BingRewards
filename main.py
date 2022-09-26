@@ -1,3 +1,4 @@
+from email import message
 import os
 import random
 import traceback
@@ -706,6 +707,17 @@ def redeem(driver, EMAIL):
                 return f"Phone Verification Required for {EMAIL}"
         except:
             pass
+        try:
+            message = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
+            if ("issue with your account or order" in message.lower()):
+                message = f'Issue with your account({EMAIL}) or order. Please check your account & contact support.\n'
+                print(message)
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'{BOT_NAME}: ACCOUNT ISSUE', body=message)
+                return message
+        except:
+            pass
+
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Reward Redeemed', body=f'{EMAIL}\'s Points have been redeemed for the set goal!\n\n...')
         return f"\n{EMAIL} Points Redeemed"
