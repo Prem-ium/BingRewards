@@ -204,7 +204,7 @@ def check_ip_address():
 
 def wait():
     currentHour = datetime.datetime.now(TZ).hour
-    if not (currentHour >= START_TIME and currentHour <= END_TIME):
+    if not (currentHour >= START_TIME and currentHour < END_TIME):
         range = (START_TIME-currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
         print(f'Timer is enabled.\nStart Time: {START_TIME}.\nEnd Time: {END_TIME}.\n\nCurrent time: {currentHour}.\nCurrent time is not within range. Sleeping for {range} hours.')
         sleep((range) * 3600)
