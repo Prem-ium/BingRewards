@@ -310,9 +310,13 @@ def completePoll(driver):
             driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         except:
             driver.refresh()
+            sleep(random.uniform(2, 7))
             pass
-        sleep(random.uniform(2, 7))
-        driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
+        try:
+            driver.find_element(By.XPATH, value=f'//*[@id="btoption{int(random.uniform(2,10) % 2)}"]/div[2]/div[2]').click()
+        except:
+            driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
+
         sleep(8)
         print('\tPoll completed!')
     except:
