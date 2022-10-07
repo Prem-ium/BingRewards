@@ -75,6 +75,8 @@ To run this project, you will need to add the following environment variables to
 
 `GOAL` = Selecting goal reward, defaults to Amazon. 
 
+`AUTOMATE_PUNCHCARD` = True or False. Whether bot should automate punchcards.
+
 `BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
 
 `WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.

@@ -72,6 +72,12 @@ if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
     from keep_alive import keep_alive
     keep_alive()
 
+
+if (os.environ.get("AUTOMATE_PUNCHCARD", "false").lower() == "true"):
+    AUTOMATE_PUNCHCARD = True
+else:
+    AUTOMATE_PUNCHCARD = False
+
 # Apprise Alerts
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
@@ -990,7 +996,8 @@ def runRewards():
         recordTime = datetime.datetime.now(TZ)
         ranDailySets = dailySet(driver)
         ranMoreActivities = completeMore(driver)
-        punchcard(driver)
+        if AUTOMATE_PUNCHCARD:
+            punchcard(driver)
  
         if AUTO_REDEEM:
             redeem(driver, EMAIL)
