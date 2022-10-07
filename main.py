@@ -717,12 +717,12 @@ def redeem(driver, EMAIL):
         except:
             pass
         try:
-            message = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
+            error = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
             if ("issue with your account or order" in message.lower()):
-                message = f'Issue with your account({EMAIL}) or order. Please check your account & contact support.\n'
+                message = f'{EMAIL} has encountered the following message while attempting to auto-redeem rewards:\n{error}\n'
                 print(message)
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME}: ACCOUNT ISSUE', body=message)
+                    alerts.notify(title=f'{BOT_NAME}: Account/Order Issue', body=message)
                 return message
         except:
             pass
@@ -884,6 +884,7 @@ def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     
     # Main search loop
     for x in range(1, MOBILE_SEARCHES + 1):
+        sleep(random.uniform(1, 6))
         value = random.choice(TERMS) + rw.random_word()
         try:
             # Clear search bar
@@ -1053,7 +1054,7 @@ def main():
         try:
             # Run Bing Rewards Automation
             runRewards()
-            hours = random.randint(1, 6)
+            hours = random.randint(3, 8)
             print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\nSleeping for {hours} hours before rechecking...\n\n')
             sleep(3600 * hours)
         except Exception as e:
