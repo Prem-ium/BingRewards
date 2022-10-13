@@ -275,10 +275,11 @@ def login(EMAIL, PASSWORD, driver):
         try:
             message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
             if message.lower() == "your account has been locked":
-                print(f"uh-oh, your account {EMAIL} has been locked by Microsoft!")
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Locked!', 
                         body=f'Your account {EMAIL} has been locked! Sign in and verify your account.\n\n...')
+                print(f"uh-oh, your account {EMAIL} has been locked by Microsoft! Sleeping for 15 minutes to allow you to verify your account.\nPlease restart the bot when you've verified.")
+                sleep(900)
                 return False
         except NoSuchElementException as e:
             pass
@@ -784,14 +785,22 @@ def getPoints(EMAIL, PASSWORD, driver):
         pass
     finally:
         sleep(random.uniform(8, 20))
-   
     try:
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-        return int(points)
+        try:
+            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+            return int(points)
+        except:
+            points = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+            pass
+            return int(points)
     except:
-        points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text.strip().replace(',', '')
-        pass
-        return int(points)
+        try:
+            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+            return int(points)
+        except:
+            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text.strip().replace(',', '')
+            pass
+            return int(points)
 
 def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
