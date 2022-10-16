@@ -720,7 +720,7 @@ def redeem(driver, EMAIL):
         try:
             error = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
             if ("issue with your account or order" in message.lower()):
-                message = f'{EMAIL} has encountered the following message while attempting to auto-redeem rewards:\n{error}\n'
+                message = f'{EMAIL} has encountered the following message while attempting to auto-redeem rewards:\n{error}\nUnfortunately, this is likely means this account has been shadow-banned. You may test your luck and contact support or just close the account to try again on another account.\n\n...'
                 print(message)
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account/Order Issue', body=message)
