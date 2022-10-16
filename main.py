@@ -217,91 +217,47 @@ def check_ip_address():
         else:
             print("IPv6 addresses match!")
     print()
-def getChromeDriver(isMobile = False):
-    try:
+def getDriver(isMobile = False):
+    if BROWSER.lower() == "chrome":
         if not HANDLE_DRIVER:
-            chrome_options = Options()
+            options = Options()
         else:
-            chrome_options = webdriver.ChromeOptions()
+            options = webdriver.ChromeOptions()
+    elif BROWSER.lower() == "edge":
+        options = webdriver.EdgeOptions()
+    elif BROWSER.lower() == "firefox":
+        options = webdriver.FirefoxOptions()
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--disable-blink-features=AutomationControlled")
 
-        if proxy:
-            chrome_options.add_argument(f'--proxy-server={proxy}')
-            print(f"Set Chrome proxy to {proxy}")
-
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-
-        if (isMobile):   
-            mobile_emulation = {"deviceName": "Nexus 5"}
-            chrome_options.add_experimental_option(
-                "mobileEmulation", mobile_emulation)
-        else:
-            # Set to edge user agent if not mobile
-            user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
-            chrome_options.add_argument(f'user-agent={user_agent}')
-
-        if not HANDLE_DRIVER:
-            driver = webdriver.Chrome(options=chrome_options)
-        else:
-            driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-                options=chrome_options)
-    except:
-        if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME}: Driver Error', body=f'Error creating driver for {BOT_NAME}\n\n...')
-        print(f'{traceback.format_exc()}\n\nAttempting to retry...\n\n')
-        sleep(100)
-        return getChromeDriver(isMobile)
-    driver.maximize_window()
-    return driver
-def getEdgeDriver(isMobile = False):
-    try:
-        edge_options = webdriver.EdgeOptions()
-
-        edge_options.add_argument('--no-sandbox')
-        edge_options.add_argument('--disable-dev-shm-usage')
-        edge_options.add_argument("--disable-blink-features=AutomationControlled")
-
-        if (isMobile):   
-            mobile_emulation = {"deviceName": "Nexus 5"}
-            edge_options.add_experimental_option("mobileEmulation", mobile_emulation)
-
-        driver = webdriver.Edge(
-            service=Service(EdgeChromiumDriverManager(cache_valid_range=30).install()),
-            options=edge_options)
-    except:
-        print(f'Driver could not be created.\n{traceback.format_exc()}\n\nAttempting to retry...\n\n')
-        return getEdgeDriver(isMobile)
-    driver.maximize_window()
-    return driver
-
-def getFirefoxDriver(isMobile = False):
-    firefox_options = webdriver.FirefoxOptions()
-    firefox_options.add_argument('--no-sandbox')
-    firefox_options.add_argument('--disable-dev-shm-usage')
-    firefox_options.add_argument("--disable-blink-features=AutomationControlled")
+    if proxy:
+            options.add_argument(f'--proxy-server={proxy}')
+            print(f"Set Browser proxy to {proxy}")
 
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
-        firefox_options.add_experimental_option("mobileEmulation", mobile_emulation)
+        options.add_experimental_option("mobileEmulation", mobile_emulation)
     else:
         # Set to edge user agent if not mobile
         user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
-        firefox_options.add_argument(f'user-agent={user_agent}')
-
-    return webdriver.Firefox(
+        options.add_argument(f'user-agent={user_agent}')
+    if BROWSER.lower() == "chrome":
+        if not HANDLE_DRIVER:
+            driver = webdriver.Chrome(options=options)
+        else:
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                options=options)
+        return driver
+    elif BROWSER.lower() == "edge":
+        return webdriver.Edge(
+            service=Service(EdgeChromiumDriverManager(cache_valid_range=30).install()),
+            options=options)
+    elif BROWSER.lower() == "firefox":
+        return webdriver.Firefox(
             service=Service(GeckoDriverManager(cache_valid_range=30).install()),
-            options=firefox_options)
-            
-def getDriver(isMobile = False):
-    if BROWSER.lower() == 'chrome':
-        return getChromeDriver(isMobile)
-    elif BROWSER.lower() == 'edge':
-        return getEdgeDriver(isMobile)
-    elif BROWSER.lower() == 'firefox':
-        return getFirefoxDriver(isMobile)
-
+            options=options)
 
 def wait():
     currentHour = datetime.datetime.now(TZ).hour
