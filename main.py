@@ -13,20 +13,18 @@ from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from dotenv import load_dotenv
 
-# In case imports fail, retry using pip
-# RandomWords
 try:
     from random_words import RandomWords
 except ImportError:
     os.system("pip install RandomWords")
     from random_words import RandomWords
    
-# pytz
 try:
     from pytz import timezone
 except ImportError:
     os.system("pip install pytz")
     from pytz import timezone
+
 # Load ENV
 load_dotenv()
 
@@ -49,8 +47,11 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
 
 # Optional Variables
+# Import bot name from .env
+BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
+
 # Whether to use the chromewebdriver or not
-HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
+HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True")
 if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
     
@@ -82,7 +83,7 @@ if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
     from keep_alive import keep_alive
     keep_alive()
 
-
+# Whether to automate punch-cards.
 if (os.environ.get("AUTOMATE_PUNCHCARD", "false").lower() == "true"):
     AUTOMATE_PUNCHCARD = True
 else:
@@ -129,19 +130,16 @@ if TIMER.lower() == "true":
         END_TIME = temp
 else:
     TIMER = False
-# Import bot name from .env
-BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
+
 # Methods
 def apprise_init():
     if APPRISE_ALERTS:
         alerts = apprise.Apprise()
-        # Add all services from .env
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
           
 def get_current_ip(type, proxies):
-    # try with icanhazip.com
     try:
         current_ip = (
             (requests.get(f"https://ip{type}.icanhazip.com", proxies=proxies)).text
@@ -162,13 +160,11 @@ def get_current_ip(type, proxies):
             raise Exception(
                 f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
         if type == "v6":
-            # We can just fail softly if this error occurs with v6
-            # Note that a ConnectionError is raised if a v4-only host tries to connect to a v6 site
+            # We can just fail softly if this error occurs with v6. Note that a ConnectionError is raised if a v4-only host tries to connect to a v6 site
             # We can make this fail hard once v6 is actually widely available....
             return None
     except Exception as e:
-        # Catch all other errors
-        # Send message to console and apprise alert if configured
+        # Catch all other errors.
         print(
             f"An exception occurred while trying to get your current IP address: {e}"
         )
@@ -183,7 +179,6 @@ def get_current_ip(type, proxies):
 
 def check_ip_address():
     # Compares desired IP address with actual external IP address
-    # Print current IPv4 and check IPv6
     current_ipv4 = get_current_ip("v4", proxies)
     print(f"Current IPv4 Address: {current_ipv4}")
     current_ipv6 = get_current_ip("v6", proxies)
@@ -191,9 +186,7 @@ def check_ip_address():
         print(f"Current IPv6 Address: {current_ipv6}")
     # If declared in .env, check the IPv4 address
     if wanted_ipv4:
-        # Raise exception if they don't match, otherwise print success and continue
         if wanted_ipv4 != current_ipv4:
-            # Send message to console and apprise if configured
             print(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}")
             if APPRISE_ALERTS:
                 alerts.notify(title=f'IPv4 Address Mismatch', 
@@ -204,9 +197,7 @@ def check_ip_address():
             print("IPv4 addresses match!")
     # If declared in .env, check the IPv6 address
     if wanted_ipv6 and current_ipv6:
-        # Raise exception if they don't match, otherwise print success and continue
         if wanted_ipv6 != current_ipv6:
-            # Send message to console and apprise if configured
             print(f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}")
             if APPRISE_ALERTS:
                 alerts.notify(title=f'IPv6 Address Mismatch', 
@@ -227,6 +218,7 @@ def getDriver(isMobile = False):
         options = webdriver.EdgeOptions()
     elif BROWSER.lower() == "firefox":
         options = webdriver.FirefoxOptions()
+
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument("--disable-blink-features=AutomationControlled")
@@ -238,10 +230,11 @@ def getDriver(isMobile = False):
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
         options.add_experimental_option("mobileEmulation", mobile_emulation)
-    else:
+    elif BROWSER.lower() is not "edge":
         # Set to edge user agent if not mobile
         user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
         options.add_argument(f'user-agent={user_agent}')
+
     if BROWSER.lower() == "chrome":
         if not HANDLE_DRIVER:
             driver = webdriver.Chrome(options=options)
@@ -249,15 +242,16 @@ def getDriver(isMobile = False):
             driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager(cache_valid_range=30).install()),
                 options=options)
-        return driver
     elif BROWSER.lower() == "edge":
-        return webdriver.Edge(
+        driver = webdriver.Edge(
             service=Service(EdgeChromiumDriverManager(cache_valid_range=30).install()),
             options=options)
     elif BROWSER.lower() == "firefox":
-        return webdriver.Firefox(
+        driver = webdriver.Firefox(
             service=Service(GeckoDriverManager(cache_valid_range=30).install()),
             options=options)
+    driver.maximize_window()
+    return driver
 
 def wait():
     currentHour = datetime.datetime.now(TZ).hour
@@ -667,7 +661,7 @@ def redeem(driver, EMAIL):
             elements = driver.find_elements(By.CLASS_NAME,"c-image")
             for e in elements:
                 if (GOAL in e.get_attribute("alt").lower()):
-                    print('\tGoal set!')
+                    print(f'\tGoal set as {GOAL}!')
                     e.click()
                     break
     except:
