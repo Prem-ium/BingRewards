@@ -53,10 +53,20 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "False")
 if (HANDLE_DRIVER.lower() == "true"):
     HANDLE_DRIVER = True
-    from webdriver_manager.chrome import ChromeDriverManager
-    from selenium.webdriver.chrome.service import Service
+    
+    BROWSER = os.environ.get("BROWSER", "chrome")
+    if BROWSER.lower() == "chrome":
+        from webdriver_manager.chrome import ChromeDriverManager
+        from selenium.webdriver.chrome.service import Service
+    elif BROWSER.lower() == "edge":
+        from webdriver_manager.microsoft import EdgeChromiumDriverManager
+        from selenium.webdriver.edge.service import Service
+    elif BROWSER.lower() == "firefox":
+        from webdriver_manager.firefox import GeckoDriverManager
+        from selenium.webdriver.firefox.options import Options
 else:
     HANDLE_DRIVER = False
+    BROWSER = 'chrome'
 
 # Whether to fully automate redemptions
 AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
@@ -207,6 +217,91 @@ def check_ip_address():
         else:
             print("IPv6 addresses match!")
     print()
+def getChromeDriver(isMobile = False):
+    try:
+        if not HANDLE_DRIVER:
+            chrome_options = Options()
+        else:
+            chrome_options = webdriver.ChromeOptions()
+
+        if proxy:
+            chrome_options.add_argument(f'--proxy-server={proxy}')
+            print(f"Set Chrome proxy to {proxy}")
+
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+
+        if (isMobile):   
+            mobile_emulation = {"deviceName": "Nexus 5"}
+            chrome_options.add_experimental_option(
+                "mobileEmulation", mobile_emulation)
+        else:
+            # Set to edge user agent if not mobile
+            user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
+            chrome_options.add_argument(f'user-agent={user_agent}')
+
+        if not HANDLE_DRIVER:
+            driver = webdriver.Chrome(options=chrome_options)
+        else:
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
+                options=chrome_options)
+    except:
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'{BOT_NAME}: Driver Error', body=f'Error creating driver for {BOT_NAME}\n\n...')
+        print(f'{traceback.format_exc()}\n\nAttempting to retry...\n\n')
+        sleep(100)
+        return getChromeDriver(isMobile)
+    driver.maximize_window()
+    return driver
+def getEdgeDriver(isMobile = False):
+    try:
+        edge_options = webdriver.EdgeOptions()
+
+        edge_options.add_argument('--no-sandbox')
+        edge_options.add_argument('--disable-dev-shm-usage')
+        edge_options.add_argument("--disable-blink-features=AutomationControlled")
+
+        if (isMobile):   
+            mobile_emulation = {"deviceName": "Nexus 5"}
+            edge_options.add_experimental_option("mobileEmulation", mobile_emulation)
+
+        driver = webdriver.Edge(
+            service=Service(EdgeChromiumDriverManager(cache_valid_range=30).install()),
+            options=edge_options)
+    except:
+        print(f'Driver could not be created.\n{traceback.format_exc()}\n\nAttempting to retry...\n\n')
+        return getEdgeDriver(isMobile)
+    driver.maximize_window()
+    return driver
+
+def getFirefoxDriver(isMobile = False):
+    firefox_options = webdriver.FirefoxOptions()
+    firefox_options.add_argument('--no-sandbox')
+    firefox_options.add_argument('--disable-dev-shm-usage')
+    firefox_options.add_argument("--disable-blink-features=AutomationControlled")
+
+    if (isMobile):   
+        mobile_emulation = {"deviceName": "Nexus 5"}
+        firefox_options.add_experimental_option("mobileEmulation", mobile_emulation)
+    else:
+        # Set to edge user agent if not mobile
+        user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
+        firefox_options.add_argument(f'user-agent={user_agent}')
+
+    return webdriver.Firefox(
+            service=Service(GeckoDriverManager(cache_valid_range=30).install()),
+            options=firefox_options)
+            
+def getDriver(isMobile = False):
+    if BROWSER.lower() == 'chrome':
+        return getChromeDriver(isMobile)
+    elif BROWSER.lower() == 'edge':
+        return getEdgeDriver(isMobile)
+    elif BROWSER.lower() == 'firefox':
+        return getFirefoxDriver(isMobile)
+
 
 def wait():
     currentHour = datetime.datetime.now(TZ).hour
@@ -604,45 +699,6 @@ def checkStreaks(driver, EMAIL):
     except:
         return "N/A"
     return "N/A"
-
-def getDriver(isMobile = False):
-    try:
-        if not HANDLE_DRIVER:
-            chrome_options = Options()
-        else:
-            chrome_options = webdriver.ChromeOptions()
-
-        if proxy:
-            chrome_options.add_argument(f'--proxy-server={proxy}')
-            print(f"Set Chrome proxy to {proxy}")
-
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-
-        if (isMobile):   
-            mobile_emulation = {"deviceName": "Nexus 5"}
-            chrome_options.add_experimental_option(
-                "mobileEmulation", mobile_emulation)
-        else:
-            # Set to edge user agent if not mobile
-            user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
-            chrome_options.add_argument(f'user-agent={user_agent}')
-
-        if not HANDLE_DRIVER:
-            driver = webdriver.Chrome(options=chrome_options)
-        else:
-            driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager(cache_valid_range=30).install()),
-                options=chrome_options)
-    except:
-        if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME}: Driver Error', body=f'Error creating driver for {BOT_NAME}\n\n...')
-        print(f'{traceback.format_exc()}\n\nAttempting to retry...\n\n')
-        sleep(100)
-        return getDriver(isMobile)
-    driver.maximize_window()
-    return driver
 
 def redeem(driver, EMAIL):
     driver.get("https://rewards.microsoft.com/")
