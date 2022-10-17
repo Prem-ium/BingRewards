@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
   gpg \
   python3 \ 
   python3-pip \
+  firefox \
   xvfb \
   xfonts-cyrillic \
   xfonts-100dpi \
@@ -22,11 +23,6 @@ RUN apt-get update && apt-get install -y \
   xfonts-scalable \
   gtk2-engines-pixbuf \
 && rm -rf /var/lib/apt/lists/*
-
-# Download and install Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
-    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
-RUN apt-get update && apt-get -y install google-chrome-stable && rm -rf /var/lib/apt/lists/*
 
 # Install bot Python deps
 ADD ./requirements.txt .
