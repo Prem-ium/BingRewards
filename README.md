@@ -65,7 +65,7 @@ To run this project, you will need to add the following environment variables to
 
 ### Optional .env Variables:
 
-`HANDLE_DRIVER` = Boolean (True/False) variable based on whether a user wants webdriver to be installed for them. Defaultly set to False.
+`HANDLE_DRIVER` = Boolean (True/False) variable based on whether a user wants webdriver to be installed for them. Defaultly set to True.
 
 `BROWSER` = 'edge' or 'firefox' -- Browser you'd like to use the bot with. In experimental mode. HANDLE_DRIVER must be set to True to use.
 
