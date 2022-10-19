@@ -1,4 +1,2 @@
 .env
 .vscode/
-.github/
-geckodriver.log
