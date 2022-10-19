@@ -67,7 +67,7 @@ To run this project, you will need to add the following environment variables to
 
 `HANDLE_DRIVER` = Boolean (True/False) variable based on whether a user wants webdriver to be installed for them. Defaultly set to True.
 
-`BROWSER` = 'edge' or 'firefox' -- Browser you'd like to use the bot with. In experimental mode. HANDLE_DRIVER must be set to True to use.
+`BROWSER` = `chrome`, `edge`, or `firefox` -- Browser you'd like to use the bot with. In experimental mode. `HANDLE_DRIVER` must be set to True to use. Defaults to `chrome`.
 
 `APPRISE_ALERTS` = Notifications and Alerts. See .env example for more details
 
@@ -87,7 +87,7 @@ To run this project, you will need to add the following environment variables to
 
 `PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
 
-`TZ` = Your desired Time-Zone. Defaults to America/New York
+`TZ` = Your desired Time-Zone. Should be formatted from the [IANA TZ Database](https://www.iana.org/time-zones). Defaults to `America/New York`
 
 `TIMER` = True or False. Whether you wish for the program to only run between certain time period.
 
