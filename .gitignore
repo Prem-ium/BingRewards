@@ -1,2 +1,4 @@
 .env
 .vscode/
+geckodriver.log
+test.py
