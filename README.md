@@ -21,7 +21,7 @@ The bot can be run using Python or Docker.
 1. Clone this repository, cd into it, and install dependancies:
 ```sh
    git clone https://github.com/sazncode/BingRewards.git
-   cd Bing-Rewards
+   cd BingRewards
    pip install -r requirements.txt
    ```
 2. Configure your `.env` file (See below and example for options)
