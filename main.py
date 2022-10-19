@@ -39,9 +39,13 @@ else:
 if (len(ACCOUNTS) > 5):
     raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
 
+# Set login URL
 if not os.environ["URL"]:
     raise Exception("URL env variable not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
+else:
+    URL = os.environ["URL"]
 
+# Search terms
 TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
          "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
@@ -50,19 +54,19 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 # Import bot name from .env
 BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 
-# Whether to use the chromewebdriver or not
-HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True")
-if (HANDLE_DRIVER.lower() == "true"):
+# Get browser and whether to use the chromewebdriver or not
+BROWSER = os.environ.get("BROWSER", "chrome").lower()
+HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
+# Import browser libraries
+if (HANDLE_DRIVER == "true"):
     HANDLE_DRIVER = True
-    
-    BROWSER = os.environ.get("BROWSER", "chrome")
-    if BROWSER.lower() == "chrome":
+    if BROWSER == "chrome":
         from webdriver_manager.chrome import ChromeDriverManager
         from selenium.webdriver.chrome.service import Service
-    elif BROWSER.lower() == "edge":
+    elif BROWSER == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
         from selenium.webdriver.edge.service import Service
-    elif BROWSER.lower() == "firefox":
+    elif BROWSER == "firefox":
         from webdriver_manager.firefox import GeckoDriverManager
         from selenium.webdriver.firefox.options import Options
 else:
@@ -70,10 +74,9 @@ else:
     BROWSER = 'chrome'
 
 # Whether to fully automate redemptions
-AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
-if (AUTO_REDEEM.lower() == "true"):
+AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False").lower()
+if (AUTO_REDEEM == "true"):
     AUTO_REDEEM = True
-
     GOAL = os.environ.get("GOAL", "amazon.com").lower()
 else:
     AUTO_REDEEM = False
@@ -115,8 +118,8 @@ proxies = {"http": f"{proxy}", "https": f"{proxy}"}
 TZ = timezone(os.environ.get("TZ", "America/New_York"))
 
 # Whether or not to use a timer, and if so, what time to use
-TIMER = os.environ.get("TIMER", "False")
-if TIMER.lower() == "true":
+TIMER = os.environ.get("TIMER", "False").lower()
+if TIMER == "true":
     TIMER = True
     # Get start and end time, defaulting to 4:00am and 8:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
@@ -208,48 +211,55 @@ def check_ip_address():
         else:
             print("IPv6 addresses match!")
     print()
+
 def getDriver(isMobile = False):
-    if BROWSER.lower() == "chrome":
+    # Set browser options
+    if BROWSER == "chrome":
         if not HANDLE_DRIVER:
             options = Options()
         else:
             options = webdriver.ChromeOptions()
-    elif BROWSER.lower() == "edge":
+    elif BROWSER == "edge":
         options = webdriver.EdgeOptions()
-    elif BROWSER.lower() == "firefox":
+    elif BROWSER == "firefox":
         options = webdriver.FirefoxOptions()
 
+    # Required flags for Docker and headless mode
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument("--disable-blink-features=AutomationControlled")
 
+    # Proxy settings
     if proxy:
             options.add_argument(f'--proxy-server={proxy}')
             print(f"Set Browser proxy to {proxy}")
 
+    # Mobile emulation
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
         options.add_experimental_option("mobileEmulation", mobile_emulation)
-    elif BROWSER.lower() != "edge":
+    elif BROWSER != "edge":
         # Set to edge user agent if not mobile
         user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
         options.add_argument(f'user-agent={user_agent}')
 
-    if BROWSER.lower() == "chrome":
+    # Create driver
+    if BROWSER == "chrome":
         if not HANDLE_DRIVER:
             driver = webdriver.Chrome(options=options)
         else:
             driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager(cache_valid_range=30).install()),
                 options=options)
-    elif BROWSER.lower() == "edge":
+    elif BROWSER == "edge":
         driver = webdriver.Edge(
             service=Service(EdgeChromiumDriverManager(cache_valid_range=30).install()),
             options=options)
-    elif BROWSER.lower() == "firefox":
+    elif BROWSER == "firefox":
         driver = webdriver.Firefox(
             service=Service(GeckoDriverManager(cache_valid_range=30).install()),
             options=options)
+
     driver.maximize_window()
     return driver
 
@@ -500,6 +510,7 @@ def guessTask(driver, p = "False"):
         driver._switch_to.window(p)
         driver.refresh()
         return False
+        
 def punchcard(driver):
     try:
         driver.get('https://rewards.microsoft.com/')
@@ -810,7 +821,7 @@ def getPoints(EMAIL, PASSWORD, driver):
 
 def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
-    driver.get(os.environ['URL'])
+    driver.get(URL)
     try:
         login(EMAIL, PASSWORD, driver)
     except:
@@ -885,7 +896,7 @@ def PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
 def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     rw = RandomWords()
     driver.implicitly_wait(4)
-    driver.get(os.environ['URL'])
+    driver.get(URL)
 
     try:
         driver.find_element(By.XPATH, value='//*[@id="mHamburger"]').click()
