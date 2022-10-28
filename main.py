@@ -27,7 +27,6 @@ except ImportError:
 
 # Load ENV
 load_dotenv()
-
 # LOGIN EXAMPLE:
 # "EMAIL:PASSWORD,EMAIL:PASSWORD"
 if not os.environ["LOGIN"]:
@@ -39,9 +38,13 @@ else:
 if (len(ACCOUNTS) > 5):
     raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
 
+# Set login URL
 if not os.environ["URL"]:
     raise Exception("URL env variable not set. Please enter a login URL in .env variable 'URL' obtained from the sign in button of https://bing.com/")
+else:
+    URL = os.environ["URL"]
 
+# Search terms
 TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
          "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
         "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
@@ -50,19 +53,19 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 # Import bot name from .env
 BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 
-# Whether to use the chromewebdriver or not
-HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True")
-if (HANDLE_DRIVER.lower() == "true"):
+# Get browser and whether to use the chromewebdriver or not
+BROWSER = os.environ.get("BROWSER", "chrome").lower()
+HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
+# Import browser libraries
+if (HANDLE_DRIVER == "true"):
     HANDLE_DRIVER = True
-    
-    BROWSER = os.environ.get("BROWSER", "chrome")
-    if BROWSER.lower() == "chrome":
+    if BROWSER == "chrome":
         from webdriver_manager.chrome import ChromeDriverManager
         from selenium.webdriver.chrome.service import Service
-    elif BROWSER.lower() == "edge":
+    elif BROWSER == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
         from selenium.webdriver.edge.service import Service
-    elif BROWSER.lower() == "firefox":
+    elif BROWSER == "firefox":
         from webdriver_manager.firefox import GeckoDriverManager
         from selenium.webdriver.firefox.options import Options
 else:
@@ -70,10 +73,9 @@ else:
     BROWSER = 'chrome'
 
 # Whether to fully automate redemptions
-AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False")
-if (AUTO_REDEEM.lower() == "true"):
+AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False").lower()
+if (AUTO_REDEEM == "true"):
     AUTO_REDEEM = True
-
     GOAL = os.environ.get("GOAL", "amazon.com").lower()
 else:
     AUTO_REDEEM = False
@@ -115,8 +117,8 @@ proxies = {"http": f"{proxy}", "https": f"{proxy}"}
 TZ = timezone(os.environ.get("TZ", "America/New_York"))
 
 # Whether or not to use a timer, and if so, what time to use
-TIMER = os.environ.get("TIMER", "False")
-if TIMER.lower() == "true":
+TIMER = os.environ.get("TIMER", "False").lower()
+if TIMER == "true":
     TIMER = True
     # Get start and end time, defaulting to 4:00am and 8:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
@@ -130,6 +132,7 @@ if TIMER.lower() == "true":
         END_TIME = temp
 else:
     TIMER = False
+
 
 # Methods
 def apprise_init():
