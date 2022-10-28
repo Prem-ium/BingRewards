@@ -5,3 +5,4 @@ python-dotenv
 webdriver_manager
 pytz
 apprise
+packaging
