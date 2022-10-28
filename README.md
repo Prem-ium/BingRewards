@@ -14,6 +14,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - Apprise Alerts
 - Streak Notifications
 - Suspended Account Notifications
+- Incorrect Account Credentials Detection
 
 ## Installation
 The bot can be run using Python or Docker.
