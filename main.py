@@ -133,6 +133,16 @@ if TIMER == "true":
 else:
     TIMER = False
 
+CURRENCY = os.environ.get("CURRENCY", "USD").lower()
+
+# More currencies to be added once we get more information on conversion rates across different currencies
+if CURRENCY == "usd" or CURRENCY == "$":
+    CURRENCY = 1300
+    CUR_SYMBOL = "$"
+elif CURRENCY == "euro" or CURRENCY == "€":
+    CURRENCY = 1500
+    CUR_SYMBOL = "€"
+
 
 # Methods
 def apprise_init():
@@ -144,38 +154,28 @@ def apprise_init():
           
 def get_current_ip(type, proxies):
     try:
-        current_ip = (
-            (requests.get(f"https://ip{type}.icanhazip.com", proxies=proxies)).text
-        ).strip("\n")
-        return current_ip
+        return ((requests.get(f"https://ip{type}.icanhazip.com", proxies=proxies)).text).strip("\n")
     except requests.ConnectionError:
         print(f"Unable to get IP{type} address")
         if type == "v4":
             # Send message to console and apprise alert if configured
             print(f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
             if APPRISE_ALERTS:
-                alerts.notify(
-                    title=f"Failed to connect to icanhazip.com over {type}",
-                    body=f"Is there a problem with your network?"
-                )
+                alerts.notify(title=f"Failed to connect to icanhazip.com over {type}",
+                    body=f"Is there a problem with your network?")
             # Wait some time (to prevent Docker containers from constantly restarting)
             sleep(300)
-            raise Exception(
-                f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
+            raise Exception(f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
         if type == "v6":
             # We can just fail softly if this error occurs with v6. Note that a ConnectionError is raised if a v4-only host tries to connect to a v6 site
             # We can make this fail hard once v6 is actually widely available....
             return None
     except Exception as e:
         # Catch all other errors.
-        print(
-            f"An exception occurred while trying to get your current IP address: {e}"
-        )
+        print(f"An exception occurred while trying to get your current IP address: {e}")
         if APPRISE_ALERTS:
-            alerts.notify(
-                title=f"An exception occurred while trying to get your current IP address",
-                body=f"{e}"
-            )
+            alerts.notify(title=f"An exception occurred while trying to get your current IP address",
+                body=f"{e}")
         # Wait some time (to prevent Docker containers from constantly restarting)
         sleep(60)
         raise Exception
@@ -192,10 +192,8 @@ def check_ip_address():
         if wanted_ipv4 != current_ipv4:
             print(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}")
             if APPRISE_ALERTS:
-                alerts.notify(title=f'IPv4 Address Mismatch', 
-                    body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
-            raise Exception(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}"
-            )
+                alerts.notify(title=f'IPv4 Address Mismatch',body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
+            raise Exception(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}")
         else:
             print("IPv4 addresses match!")
     # If declared in .env, check the IPv6 address
@@ -205,12 +203,11 @@ def check_ip_address():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'IPv6 Address Mismatch', 
                     body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
-            raise Exception(
-                f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}"
-            )
+            raise Exception(f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}")
         else:
             print("IPv6 addresses match!")
     print()
+
 def getDriver(isMobile = False):
     if BROWSER.lower() == "chrome":
         if not HANDLE_DRIVER:
@@ -491,7 +488,7 @@ def completeQuiz(driver):
             print(e)
             pass
 
-def guessTask(driver, p = "False"):
+def guessTask(driver, p = "false"):
     try:
         if p.lower() == "false":
             p = driver.window_handles[len(driver.window_handles) - 1]
@@ -702,7 +699,7 @@ def redeem(driver, EMAIL):
 
         if (points < total):
             print(f"\t{total - points} points left to redeem your goal!")
-            return f'\nPoints Remaining until {goal} Redeemption:\t{total - points} (${round((total - points) / 1300, 3)})\n'
+            return f'\nPoints Remaining until {goal} Redeemption:\t{total - points} ({CUR_SYMBOL}{round((total - points) / CURRENCY, 3)})\n'
         elif(points >= total):
             print("\tPoints are ready to be redeemed!\n\tIf this is the first time, manual SMS verification is required.")
     except Exception as e:
@@ -747,6 +744,8 @@ def redeem(driver, EMAIL):
                 return f"Phone Verification Required for {EMAIL}"
         except:
             pass
+        finally:
+            sleep(random.uniform(5, 8))
         try:
             error = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
             if ("issue with your account or order" in message.lower()):
@@ -1029,7 +1028,7 @@ def runRewards():
         if (points == -404):
             driver.quit()
             continue
-        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t${round(points/1300,3)}\n')
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
 
         PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
         
@@ -1045,7 +1044,7 @@ def runRewards():
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
-                            body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points} (${round(points/1300, 3)})\nStarting:\t{recordTime}\n...')
+                            body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points} ({CUR_SYMBOL}{round(points/CURRENCY, 3)})\nStarting:\t{recordTime}\n...')
             streaks = checkStreaks(driver, EMAIL)
             ranRewards = True
             
@@ -1066,8 +1065,8 @@ def runRewards():
 
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/1300, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth ${round(differenceReport/1300, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
-                report = f'Points:\t\t\t{points} (${round(points / 1300, 3)})\nEarned Points:\t\t\t{differenceReport} (${round(differenceReport/1300,3)})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/CURRENCY, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
+                report = f'Points:\t\t\t{points} ({CUR_SYMBOL}{round(points / CURRENCY, 3)})\nEarned Points:\t\t\t{differenceReport} ({CUR_SYMBOL}{round(differenceReport/CURRENCY,3)})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
                         body=f'Email:\t{EMAIL}\n{report}\n\n...')
@@ -1077,7 +1076,7 @@ def runRewards():
         totalDifference += differenceReport
         print(f'\tFinished: {datetime.datetime.now(TZ)}\n\n')
     if ranRewards and totalDifference > 0:
-        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport} (${round(totalPointsReport/1300, 3)})\n\nTotal Earned (in latest run):\t\t{totalDifference} (${round(totalDifference/1300, 3)})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
+        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3)})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3)})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 

@@ -14,6 +14,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - Apprise Alerts
 - Streak Notifications
 - Suspended Account Notifications
+- USD ($) & EURO (€) Currency Conversions (More coming)
 - Incorrect Account Credentials Detection
 
 ## Installation
@@ -80,13 +81,9 @@ To run this project, you will need to add the following environment variables to
 
 `AUTOMATE_PUNCHCARD` = True or False. Whether bot should automate punchcards.
 
+`CURRENCY` = Currency Symbol or Name, currently only supported by USD($) and EURO(€). Defaults to USD. Plan to add more as more users provide information on their local conversion rates. See .env.example file for an example.
+
 `BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
-
-`WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.
-
-`WANTED_IPV6` = Your desired external IPv6 address. Set this if you want the bot to not run if your IPv6 address is different than this.
-
-`PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
 
 `TZ` = Your desired Time-Zone. Should be formatted from the [IANA TZ Database](https://www.iana.org/time-zones). Defaults to `America/New York`
 
@@ -97,6 +94,11 @@ To run this project, you will need to add the following environment variables to
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 20, 8 PM
 
 
+`WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.
+
+`WANTED_IPV6` = Your desired external IPv6 address. Set this if you want the bot to not run if your IPv6 address is different than this.
+
+`PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
 
 ## Earning Potential:
 
@@ -115,4 +117,4 @@ This adds up to 9000 points, conservatively (not accounting for streak bonuses o
 
 ## Notes:
 
-- This bot uses the new $1.00 = 1300 points conversion rate. Older Bing Reward accounts may have the old conversion rate of $1.00 = 1050 points. 
+- This bot uses the new $1.00 = 1300 points conversion rate. Older Bing Reward accounts may have the old conversion rate of $1.00 = 1050 points. As well as €1.00 = 1500 points conversion rate for Euro based Bing Reward accounts.
