@@ -16,6 +16,7 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 - Suspended Account Notifications
 - USD ($) & EURO (€) Currency Conversions (More coming)
 - Incorrect Account Credentials Detection
+- Headless Option
 
 ## Installation
 The bot can be run using Python or Docker.
@@ -71,6 +72,8 @@ To run this project, you will need to add the following environment variables to
 
 `BROWSER` = `chrome`, `edge`, or `firefox` -- Browser you'd like to use the bot with. In experimental mode. `HANDLE_DRIVER` must be set to True to use. Defaults to `chrome`.
 
+`HEADLESS` = True or False-- Whether the program should run headless or not. Defaults to False.
+
 `APPRISE_ALERTS` = Notifications and Alerts. See .env example for more details
 
 `KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
@@ -91,7 +94,7 @@ To run this project, you will need to add the following environment variables to
 
 `START_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 4, 4 AM
 
-`END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 20, 8 PM
+`END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 19, 7 PM
 
 
 `WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.

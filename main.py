@@ -47,7 +47,9 @@ else:
 # Search terms
 TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", "what is the ", "what is the definition of ",
          "what is the example of ", "what is the pronunciation of ", "what is the synonym of ",
-        "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of "]
+        "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ","photos of ",
+        "images of ", "pictures of ", "pictures of ", "pictures of ", "pictures of ", "pictures of ", "pictures of ",
+        "information about ", "information on ", "information about the ", "information on the ", "information about the "]
 
 # Optional Variables
 # Import bot name from .env
@@ -59,6 +61,7 @@ HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
 # Import browser libraries
 if (HANDLE_DRIVER == "true"):
     HANDLE_DRIVER = True
+
     if BROWSER == "chrome":
         from webdriver_manager.chrome import ChromeDriverManager
         from selenium.webdriver.chrome.service import Service
@@ -70,11 +73,9 @@ if (HANDLE_DRIVER == "true"):
         from selenium.webdriver.firefox.options import Options
 else:
     HANDLE_DRIVER = False
-    BROWSER = 'chrome'
 
 # Whether to fully automate redemptions
-AUTO_REDEEM = os.environ.get("AUTO_REDEEM", "False").lower()
-if (AUTO_REDEEM == "true"):
+if (os.environ.get("AUTO_REDEEM", "False").lower() == "true"):
     AUTO_REDEEM = True
     GOAL = os.environ.get("GOAL", "amazon.com").lower()
 else:
@@ -102,14 +103,18 @@ if APPRISE_ALERTS:
         os.system("pip install apprise")
         import apprise
 
+HEADLESS = os.environ.get("HEADLESS", "False").lower()
+if (HEADLESS == "true"):
+    HEADLESS = True
+else:
+    HEADLESS = False
+
 # Get IPs if it's set in .env
 wanted_ipv4 = os.environ.get("WANTED_IPV4")
 wanted_ipv6 = os.environ.get("WANTED_IPV6")
-
 # Get proxy settings from .env
 # Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
 proxy = os.environ.get("PROXY", "")
-
 # Populate proxy dictionary for requests
 proxies = {"http": f"{proxy}", "https": f"{proxy}"}
 
@@ -120,9 +125,9 @@ TZ = timezone(os.environ.get("TZ", "America/New_York"))
 TIMER = os.environ.get("TIMER", "False").lower()
 if TIMER == "true":
     TIMER = True
-    # Get start and end time, defaulting to 4:00am and 8:00pm
+    # Get start and end time, defaulting to 4:00am and 7:00pm
     START_TIME = float(os.environ.get("START_TIME", "4"))
-    END_TIME = float(os.environ.get("END_TIME", "20"))
+    END_TIME = float(os.environ.get("END_TIME", "19"))
 
     # Make sure start and end times are valid, otherwise switch them
     if START_TIME > END_TIME:
@@ -209,44 +214,50 @@ def check_ip_address():
     print()
 
 def getDriver(isMobile = False):
-    if BROWSER.lower() == "chrome":
+    if BROWSER == "chrome":
         if not HANDLE_DRIVER:
             options = Options()
         else:
             options = webdriver.ChromeOptions()
-    elif BROWSER.lower() == "edge":
+    elif BROWSER == "edge":
         options = webdriver.EdgeOptions()
-    elif BROWSER.lower() == "firefox":
+    elif BROWSER == "firefox":
         options = webdriver.FirefoxOptions()
+
+    if HEADLESS:
+        if BROWSER == "chrome" or BROWSER == "edge":
+            options.add_argument("--headless")
+        elif BROWSER == "firefox":
+            options.headless = True
 
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument("--disable-blink-features=AutomationControlled")
 
     if proxy:
-            options.add_argument(f'--proxy-server={proxy}')
-            print(f"Set Browser proxy to {proxy}")
+        options.add_argument(f'--proxy-server={proxy}')
+        print(f"Set Browser proxy to {proxy}")
 
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
         options.add_experimental_option("mobileEmulation", mobile_emulation)
-    elif BROWSER.lower() != "edge":
+    elif BROWSER != "edge":
         # Set to edge user agent if not mobile
         user_agent = "mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko) chrome/64.0.3282.140 safari/537.36 edge/18.17763"
         options.add_argument(f'user-agent={user_agent}')
 
-    if BROWSER.lower() == "chrome":
+    if BROWSER == "chrome":
         if not HANDLE_DRIVER:
             driver = webdriver.Chrome(options=options)
         else:
             driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager(cache_valid_range=30).install()),
                 options=options)
-    elif BROWSER.lower() == "edge":
+    elif BROWSER == "edge":
         driver = webdriver.Edge(
             service=Service(EdgeChromiumDriverManager(cache_valid_range=30).install()),
             options=options)
-    elif BROWSER.lower() == "firefox":
+    elif BROWSER == "firefox":
         driver = webdriver.Firefox(
             service=Service(GeckoDriverManager(cache_valid_range=30).install()),
             options=options)
