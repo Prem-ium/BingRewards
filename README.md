@@ -23,7 +23,7 @@ The bot can be run using Python or Docker.
 ### Python Script
 1. Clone this repository, cd into it, and install dependancies:
 ```sh
-   git clone https://github.com/sazncode/BingRewards.git
+   git clone https://github.com/Prem-ium/BingRewards.git
    cd BingRewards
    pip install -r requirements.txt
    ```
