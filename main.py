@@ -58,6 +58,7 @@ BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 # Get browser and whether to use the chromewebdriver or not
 BROWSER = os.environ.get("BROWSER", "chrome").lower()
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
+
 # Import browser libraries
 if (HANDLE_DRIVER == "true"):
     HANDLE_DRIVER = True
@@ -213,7 +214,7 @@ def check_ip_address():
             print("IPv6 addresses match!")
     print()
 
-def getDriver(isMobile = False):
+def get_driver(isMobile = False):
     if BROWSER == "chrome":
         if not HANDLE_DRIVER:
             options = Options()
@@ -375,7 +376,7 @@ def login(EMAIL, PASSWORD, driver):
             driver.get('https://rewards.microsoft.com/')
         return True
 
-def completeSet(driver):
+def do_explore(driver):
     sleep(random.uniform(10, 15))
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
@@ -384,9 +385,9 @@ def completeSet(driver):
         pass
     finally:
         driver.refresh()
-    return
+        return
 
-def completePoll(driver):
+def do_poll(driver):
     try:
         driver.refresh()
         try:
@@ -409,7 +410,7 @@ def completePoll(driver):
     return
 
 # TODO: Clean up code
-def completeQuiz(driver):
+def do_quiz(driver):
     sleep(random.uniform(7, 14))
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
@@ -499,14 +500,14 @@ def completeQuiz(driver):
             print(e)
             pass
 
-def guessTask(driver, p = "false"):
+def assume_task(driver, p = "false"):
     try:
         if p.lower() == "false":
             p = driver.window_handles[len(driver.window_handles) - 1]
     except:
         pass
     try:
-        completeQuiz(driver)
+        do_quiz(driver)
         driver.close()
         driver._switch_to.window(p)
         driver.refresh()
@@ -514,7 +515,7 @@ def guessTask(driver, p = "false"):
     except:
         pass
     try:
-        completeSet(driver)
+        do_explore(driver)
         driver.close()
         driver._switch_to.window(p)
         driver.refresh()
@@ -522,7 +523,7 @@ def guessTask(driver, p = "false"):
     except:
         pass
     try:
-        completePoll(driver)
+        do_poll(driver)
         driver.close()
         driver._switch_to.window(p)
         driver.refresh()
@@ -532,7 +533,7 @@ def guessTask(driver, p = "false"):
         driver._switch_to.window(p)
         driver.refresh()
         return False
-def punchcard(driver):
+def complete_punchcard(driver):
     try:
         driver.get('https://rewards.microsoft.com/')
         sleep(5)
@@ -565,16 +566,16 @@ def punchcard(driver):
                 driver._switch_to.window(chwd[1])
             
             try:
-                guessTask(driver, p)
-                sleep(random.uniform(3, 5))
-            except:
-                sleep(random.uniform(3, 5))
+                assume_task(driver, p)
+            except: 
                 pass
+            finally:
+                sleep(random.uniform(3, 5))
     except Exception as e:
         print(traceback.format_exc())
         pass
 
-def completeMore(driver):
+def more_activities(driver):
     ran = False
     driver.get('https://rewards.microsoft.com/')
     try:
@@ -597,7 +598,7 @@ def completeMore(driver):
                     if (chwd[1]):
                         driver._switch_to.window(chwd[1])
                         try:
-                            ran = guessTask(driver, p)
+                            ran = assume_task(driver, p)
                         except:
                             print(traceback.format_exc())
                             pass
@@ -615,7 +616,7 @@ def completeMore(driver):
     return ran
 
 # TODO: Clean up code
-def dailySet(driver):
+def daily_set(driver):
         ranSets = False
         try:
             if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
@@ -623,7 +624,7 @@ def dailySet(driver):
                 driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
                 chwd = driver.window_handles
                 driver._switch_to.window(chwd[1])
-                completeSet(driver)
+                do_explore(driver)
                 driver.close()
                 driver._switch_to.window(p)
                 driver.refresh()
@@ -639,7 +640,7 @@ def dailySet(driver):
                 driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
                 chwd = driver.window_handles
                 driver._switch_to.window(chwd[1])
-                completePoll(driver)
+                do_poll(driver)
                 driver.close()
                 driver._switch_to.window(p)
                 driver.refresh()
@@ -654,7 +655,7 @@ def dailySet(driver):
                 driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
                 chwd = driver.window_handles
                 driver._switch_to.window(chwd[1])
-                completeQuiz(driver)
+                do_quiz(driver)
                 driver.close()
                 driver._switch_to.window(p)
                 driver.refresh()
@@ -666,7 +667,7 @@ def dailySet(driver):
 
         return ranSets
 
-def checkStreaks(driver, EMAIL):
+def retrieve_streaks(driver, EMAIL):
     try:
         driver.get('https://rewards.microsoft.com/')
         bonusNotification = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p/b').text
@@ -756,7 +757,7 @@ def redeem(driver, EMAIL):
         except:
             pass
         finally:
-            sleep(random.uniform(5, 8))
+            sleep(random.uniform(10, 20))
         try:
             error = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
             if ("issue with your account or order" in message.lower()):
@@ -777,7 +778,7 @@ def redeem(driver, EMAIL):
         print(e)
         return f"\tRan into an exception trying to redeem\n{traceback.format_exc()}\n"
 
-def getPoints(EMAIL, PASSWORD, driver):
+def get_points(EMAIL, PASSWORD, driver):
     points = -1
     driver.implicitly_wait(5)
     sleep(random.uniform(3, 5))
@@ -827,22 +828,27 @@ def getPoints(EMAIL, PASSWORD, driver):
         sleep(random.uniform(8, 20))
     try:
         try:
-            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-            return int(points)
+            points = driver.find_element(By.XPATH, '//*[@id="balanceToolTipDiv"]/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
         except:
-            points = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-            pass
-            return int(points)
+            try:
+                points = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+            except:
+                try:
+                    points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+                except:
+                    try:
+                        points = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+                    except:
+                        try:
+                            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+                        except:
+                            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text.strip().replace(',', '')
+        return int(points)
     except:
-        try:
-            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-            return int(points)
-        except:
-            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text.strip().replace(',', '')
-            pass
-            return int(points)
+        print('An error occured trying to get points. Returning -1 to indicate an error & run the main bot despite being unable to retrieve points.')
+        return -1
 
-def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
+def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
     driver.get(os.environ['URL'])
     try:
@@ -898,25 +904,25 @@ def PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES):
         print(f'\t{x} PC search of {PC_SEARCHES}. Now {int(x/PC_SEARCHES*100)}% done.')
     print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
+def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
     try:
-        PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES)
+        pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
         print('Attempting to restart PC search in 500 seconds')
         sleep(500)
         driver.quit()
-        driver = getDriver()
+        driver = get_driver()
         try:
-            PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
-            PCSearch(driver, EMAIL, PASSWORD, PC_SEARCHES)
+            PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
+            pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
         except Exception as e:
             print('PC search failed, again! Skipping PC search.')
         pass
     finally:
         driver.quit()
 
-def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
+def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     rw = RandomWords()
     driver.implicitly_wait(4)
     driver.get(os.environ['URL'])
@@ -958,28 +964,28 @@ def MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
         print(f'\t{x} mobile search of {MOBILE_SEARCHES}. Now {int(x/MOBILE_SEARCHES*100)}% done.')
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
-def Mobile_Search_Helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
-    driver = getDriver(True)
+def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
+    driver = get_driver(True)
     try:
-        MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
+        mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
     except Exception as e:
         print(traceback.format_exc())
         print('Attempting to restart Mobile search in 500 seconds')
         sleep(500)
         driver.quit()
-        driver = getDriver()
-        PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
+        driver = get_driver()
+        PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
         driver.quit()
-        driver = getDriver(True)
+        driver = get_driver(True)
         try:
-            MobileSearch(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
+            mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
         except Exception as e:
             pass
         pass
     finally:
         driver.quit()
   
-def updateSearches(driver):
+def update_searches(driver):
     driver.get('https://rewards.microsoft.com/pointsbreakdown')
     
     PC_SEARCHES = 34
@@ -1017,13 +1023,13 @@ def updateSearches(driver):
         print()
         return PC_SEARCHES, MOBILE_SEARCHES
 
-def runRewards():
+def start_rewards():
     totalPointsReport = totalDifference = differenceReport = 0
     ranRewards = False
     loopTime = datetime.datetime.now(TZ)
     print(f'\nStarting Bing Rewards Automation:\t{loopTime}\n')
     for x in ACCOUNTS:
-        driver = getDriver()
+        driver = get_driver()
 
         # Grab email
         colonIndex = x.index(":")+1
@@ -1035,19 +1041,19 @@ def runRewards():
         MOBILE_SEARCHES = 20
 
         # Retireve points before completing searches
-        points = getPoints(EMAIL, PASSWORD, driver)
+        points = get_points(EMAIL, PASSWORD, driver)
         if (points == -404):
             driver.quit()
             continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
 
-        PC_SEARCHES, MOBILE_SEARCHES = updateSearches(driver)
+        PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
         
         recordTime = datetime.datetime.now(TZ)
-        ranDailySets = dailySet(driver)
-        ranMoreActivities = completeMore(driver)
+        ranDailySets = daily_set(driver)
+        ranMoreActivities = more_activities(driver)
         if AUTOMATE_PUNCHCARD:
-            punchcard(driver)
+            complete_punchcard(driver)
  
         if AUTO_REDEEM:
             redeem(driver, EMAIL)
@@ -1056,20 +1062,20 @@ def runRewards():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
                             body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points} ({CUR_SYMBOL}{round(points/CURRENCY, 3)})\nStarting:\t{recordTime}\n...')
-            streaks = checkStreaks(driver, EMAIL)
+            streaks = retrieve_streaks(driver, EMAIL)
             ranRewards = True
             
             if (PC_SEARCHES > 0):
-                PC_Search_Helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
+                pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
             else:
                 driver.quit()
 
             if (MOBILE_SEARCHES > 0):
-                Mobile_Search_Helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
+                mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
 
-            driver = getDriver()
+            driver = get_driver()
             differenceReport = points
-            points = getPoints(EMAIL, PASSWORD, driver)
+            points = get_points(EMAIL, PASSWORD, driver)
             message = ''
             if AUTO_REDEEM:
                 message = redeem(driver, EMAIL)
@@ -1102,7 +1108,7 @@ def main():
             wait()
         try:
             # Run Bing Rewards Automation
-            runRewards()
+            start_rewards()
             hours = random.randint(3, 8)
             print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\nSleeping for {hours} hours before rechecking...\n\n')
             sleep(3600 * hours)
