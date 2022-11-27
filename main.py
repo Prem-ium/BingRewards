@@ -1061,7 +1061,7 @@ def start_rewards():
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
-                            body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points} ({CUR_SYMBOL}{round(points/CURRENCY, 3)})\nStarting:\t{recordTime}\n...')
+                            body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
             streaks = retrieve_streaks(driver, EMAIL)
             ranRewards = True
             
@@ -1082,8 +1082,8 @@ def start_rewards():
 
             differenceReport = points - differenceReport
             if differenceReport > 0:
-                print(f'\tTotal points:\t{points}\n\tValue of Points:\t{round(points/CURRENCY, 3)}\n\t{EMAIL} has gained a total of {differenceReport} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3)}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
-                report = f'Points:\t\t\t{points} ({CUR_SYMBOL}{round(points / CURRENCY, 3)})\nEarned Points:\t\t\t{differenceReport} ({CUR_SYMBOL}{round(differenceReport/CURRENCY,3)})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                print(f'\tTotal points:\t{points:,}\n\tValue of Points:\t{round(points/CURRENCY, 3):,}\n\t{EMAIL} has gained a total of {differenceReport:,} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3):,}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
+                report = f'Points:\t\t\t{points:,} ({CUR_SYMBOL}{round(points / CURRENCY, 3):,})\nEarned Points:\t\t\t{differenceReport:,} ({CUR_SYMBOL}{round(differenceReport/CURRENCY,3):,})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
                         body=f'Email:\t{EMAIL}\n{report}\n\n...')
@@ -1093,7 +1093,7 @@ def start_rewards():
         totalDifference += differenceReport
         print(f'\tFinished: {datetime.datetime.now(TZ)}\n\n')
     if ranRewards and totalDifference > 0:
-        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3)})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3)})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
+        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport:,} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3):,})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3):,})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 
