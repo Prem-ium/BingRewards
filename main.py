@@ -119,9 +119,11 @@ if (MULTITHREADING == "true"):
 else:
     MULTITHREADING = False
 
+
+
 # Get IPs if it's set in .env
-wanted_ipv4 = os.environ.get("WANTED_IPV4")
-wanted_ipv6 = os.environ.get("WANTED_IPV6")
+WANTED_IPV4 = os.environ.get("WANTED_IPV4")
+WANTED_IPV6 = os.environ.get("WANTED_IPV6")
 # Get proxy settings from .env
 # Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
 proxy = os.environ.get("PROXY", "")
@@ -203,22 +205,22 @@ def check_ip_address():
     if current_ipv6:
         print(f"Current IPv6 Address: {current_ipv6}")
     # If declared in .env, check the IPv4 address
-    if wanted_ipv4:
-        if wanted_ipv4 != current_ipv4:
-            print(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}")
+    if WANTED_IPV4:
+        if WANTED_IPV4 != current_ipv4:
+            print(f"IPv4 addresses do not match. Wanted {WANTED_IPV4} but got {current_ipv4}")
             if APPRISE_ALERTS:
-                alerts.notify(title=f'IPv4 Address Mismatch',body=f'Wanted {wanted_ipv4} but got {current_ipv4}')
-            raise Exception(f"IPv4 addresses do not match. Wanted {wanted_ipv4} but got {current_ipv4}")
+                alerts.notify(title=f'IPv4 Address Mismatch',body=f'Wanted {WANTED_IPV4} but got {current_ipv4}')
+            raise Exception(f"IPv4 addresses do not match. Wanted {WANTED_IPV4} but got {current_ipv4}")
         else:
             print("IPv4 addresses match!")
     # If declared in .env, check the IPv6 address
-    if wanted_ipv6 and current_ipv6:
-        if wanted_ipv6 != current_ipv6:
-            print(f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}")
+    if WANTED_IPV6 and current_ipv6:
+        if WANTED_IPV6 != current_ipv6:
+            print(f"IPv6 addresses do not match. Wanted {WANTED_IPV6} but got {current_ipv6}")
             if APPRISE_ALERTS:
                 alerts.notify(title=f'IPv6 Address Mismatch', 
-                    body=f'Wanted {wanted_ipv6} but got {current_ipv6}')
-            raise Exception(f"IPv6 addresses do not match. Wanted {wanted_ipv6} but got {current_ipv6}")
+                    body=f'Wanted {WANTED_IPV6} but got {current_ipv6}')
+            raise Exception(f"IPv6 addresses do not match. Wanted {WANTED_IPV6} but got {current_ipv6}")
         else:
             print("IPv6 addresses match!")
     print()
@@ -1035,8 +1037,6 @@ def update_searches(driver):
 
 def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, totalDifference = 0, differenceReport = 0):
     driver = get_driver()
-
-    # Set default search amount
     PC_SEARCHES = 34
     MOBILE_SEARCHES = 20
 
@@ -1046,19 +1046,17 @@ def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, tota
         driver.quit()
         return
     print(f'Email:\t{EMAIL}\n\tPoints:\t{points:,}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
-
     PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
     
     recordTime = datetime.datetime.now(TZ)
-    ranDailySets = daily_set(driver)
-    ranMoreActivities = more_activities(driver)
+    
     if AUTOMATE_PUNCHCARD:
         complete_punchcard(driver)
 
     if AUTO_REDEEM:
         redeem(driver, EMAIL)
 
-    if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
+    if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or daily_set(driver) or more_activities(driver)):
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
                         body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
@@ -1092,19 +1090,25 @@ def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, tota
     totalPointsReport += points
     totalDifference += differenceReport
     print(f'\tFinished {EMAIL}: {datetime.datetime.now(TZ)}\n\n')
-    return ranRewards, totalPointsReport, totalDifference, differenceReport
 
 def start_rewards():
     totalPointsReport = totalDifference = differenceReport = 0
     ranRewards = False
     loopTime = datetime.datetime.now(TZ)
     print(f'\nStarting Bing Rewards Automation:\t{loopTime}\n')
+
     if not MULTITHREADING:
         for x in ACCOUNTS:
             colonIndex = x.index(":")+1
             EMAIL = x[0:colonIndex-1]
             PASSWORD = x[colonIndex:len(x)]
-            ranRewards, totalPointsReport, totalDifference, differenceReport = run_rewards(EMAIL, PASSWORD, ranRewards, totalPointsReport, totalDifference, differenceReport)
+            try:
+                 ranRewards, totalPointsReport, totalDifference, differenceReport = run_rewards(EMAIL, PASSWORD, ranRewards, totalPointsReport, totalDifference, differenceReport)
+            except TypeError:
+                pass
+            except Exception as e:
+                print(traceback.format_exc())
+                pass
         
         if ranRewards and totalDifference > 0:
             report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport:,} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3):,})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3):,})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
