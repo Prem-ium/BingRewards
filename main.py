@@ -119,16 +119,14 @@ if (MULTITHREADING == "true"):
 else:
     MULTITHREADING = False
 
-
-
 # Get IPs if it's set in .env
 WANTED_IPV4 = os.environ.get("WANTED_IPV4")
 WANTED_IPV6 = os.environ.get("WANTED_IPV6")
 # Get proxy settings from .env
 # Note that we should set '' instead of None in case PROXY is not defined to prevent the proxies dict below from being invalid (which breaks our IP checker)
-proxy = os.environ.get("PROXY", "")
+PROXY = os.environ.get("PROXY", "")
 # Populate proxy dictionary for requests
-proxies = {"http": f"{proxy}", "https": f"{proxy}"}
+PROXIES = {"http": f"{PROXY}", "https": f"{PROXY}"}
 
 # Configure timezone
 TZ = timezone(os.environ.get("TZ", "America/New_York"))
@@ -159,7 +157,6 @@ if CURRENCY == "usd" or CURRENCY == "$":
 elif CURRENCY == "euro" or CURRENCY == "€":
     CURRENCY = 1500
     CUR_SYMBOL = "€"
-
 
 # Methods
 def apprise_init():
@@ -199,9 +196,9 @@ def get_current_ip(type, proxies):
 
 def check_ip_address():
     # Compares desired IP address with actual external IP address
-    current_ipv4 = get_current_ip("v4", proxies)
+    current_ipv4 = get_current_ip("v4", PROXIES)
     print(f"Current IPv4 Address: {current_ipv4}")
-    current_ipv6 = get_current_ip("v6", proxies)
+    current_ipv6 = get_current_ip("v6", PROXIES)
     if current_ipv6:
         print(f"Current IPv6 Address: {current_ipv6}")
     # If declared in .env, check the IPv4 address
@@ -246,9 +243,9 @@ def get_driver(isMobile = False):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument("--disable-blink-features=AutomationControlled")
 
-    if proxy:
-        options.add_argument(f'--proxy-server={proxy}')
-        print(f"Set Browser proxy to {proxy}")
+    if PROXY:
+        options.add_argument(f'--proxy-server={PROXY}')
+        print(f"Set Browser proxy to {PROXY}")
 
     if (isMobile):   
         mobile_emulation = {"deviceName": "Nexus 5"}
@@ -388,135 +385,225 @@ def login(EMAIL, PASSWORD, driver):
         return True
 
 def do_explore(driver):
-    sleep(random.uniform(10, 15))
     try:
+        # wait a random amount of time
+        sleep(random.uniform(10, 15))
+        # click the "continue" button & wait 8 seconds
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         sleep(8)
     except:
+        # if the button cannot be found, do nothing
         pass
     finally:
+        # refresh the page
         driver.refresh()
-        return
 
 def do_poll(driver):
     try:
+        # refresh the page
         driver.refresh()
         try:
+            # wait a random amount of time
             sleep(random.uniform(3, 5))
+            # click the "continue" button
             driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         except:
+            # if the button cannot be found, refresh the page and try again
             driver.refresh()
             sleep(random.uniform(2, 7))
             pass
+
         try:
+            # choose a random answer option
             driver.find_element(By.XPATH, value=f'//*[@id="btoption{int(random.uniform(2,10) % 2)}"]/div[2]/div[2]').click()
         except:
+            # if the random option cannot be found, choose the first option
             driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
 
+        # wait 8 seconds
         sleep(8)
         print('\tPoll completed!')
     except:
+        # if an error occurs, do nothing
         pass
+    # wait 3 seconds
     sleep(3)
-    return
 
-# TODO: Clean up code
 def do_quiz(driver):
+    # Wait a random amount of time
     sleep(random.uniform(7, 14))
+
+    # Try clicking on an element with a specific XPath
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         sleep(4)
     except:
         pass
+
+    # Refresh the page
     driver.refresh()
+
+    # Try completing the quiz
     try:
-        numberOfQuestions = (driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1])[:-1]
-        for i in range(int(numberOfQuestions)):
+        # Get the number of questions in the quiz
+        numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="QuestionPane0"]/div[2]').text.strip().split("of ")[1]
+        numberOfQuestions = int(numberOfQuestions[:-1])
+
+        # Loop through each question and select the first option
+        for i in range(numberOfQuestions):
             driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
             sleep(8)
+
+            # Submit the answer
             driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(Keys.ENTER)
             sleep(5)
+
+        # Print a message indicating that the quiz has been completed
         print('\tQuiz completed!')
         return
     except Exception as e:
         pass
+
     
     if (driver.find_elements(By.XPATH, value='//*[@id="rqStartQuiz"]') or driver.find_elements(By.CLASS_NAME, value='btOptions') or driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span') or driver.find_elements(By.CLASS_NAME, value='rq_button')):
         try:
-            start = driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]')
-            WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable(start)
-            )
-            start.click()
+            # find the start button element
+            start_button = driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]')
+
+            # wait up to 10 seconds for the start button to be clickable
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable(start_button))
+
+            # click the start button
+            start_button.click()
         except Exception as e:
+            # if an error occurs, try clicking the start button again
             try:
                 driver.find_element(By.XPATH, value='//*[@id="rqStartQuiz"]').click()
             except:
+                # if the button still cannot be clicked, do nothing
                 pass
+
         try:
             sleep(3)
-            if (driver.find_elements(By.XPATH, value='//*[@id="rqHeaderCredits"]')):
-                section = len(driver.find_element(By.XPATH, value='//*[@id="rqHeaderCredits"]').find_elements(By.XPATH, value='*'))
-                try:
-                    for i in range(section):
-                        try:
-                            choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
-                            for i in range(choices * 2):
-                                buttons = len(driver.find_elements(By.CLASS_NAME, value='rq_button'))
-                                sleep(5)
-                                option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
-                                option.click()
-                                sleep(10)
-                                try:
-                                    while (driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!'):
-                                        option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
-                                        option.click()
-                                        sleep(5)
-                                except:
-                                    pass
-                                if ("great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower()):
-                                    sleep(5)
-                                    break
-                            print('\tQuiz completed!')
-                            return
-                        except:
-                            pass
-                except:
-                    pass
-                for i in range(section):
+            # check if the quiz has credits sections
+            if driver.find_elements(By.XPATH, value='//*[@id="rqHeaderCredits"]'):
+                # get the number of sections in the quiz
+                sections = len(driver.find_element(By.XPATH, value='//*[@id="rqHeaderCredits"]').find_elements(By.XPATH, value='*'))
+
+                # loop through each section
+                for i in range(sections):
                     try:
+                        # get the number of choices in the current section
+                        choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
+                        # loop through each choice
+                        for i in range(choices * 2):
+                            # wait 5 seconds
+                            sleep(5)
+                            # get a random answer option
+                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                            # click the option
+                            option.click()
+                            # wait 10 seconds
+                            sleep(10)
+                            try:
+                                # if the answer was incorrect, choose another option
+                                while driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!':
+                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                                    option.click()
+                                    sleep(5)
+                            except:
+                                pass
+                            # if the quiz is complete, exit the loop
+                            if "great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower():
+                                sleep(5)
+                                break
+                        print('\tQuiz completed!')
+                        return
+                    except:
+                        pass
+                # if the quiz does not have credits sections
+                for i in range(sections):
+                    try:
+                        # get the number of choices in the current section
                         choices = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span').text
                         choices = int(choices[-1]) - int(choices[0])
                     except:
                         choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
                     try:
+                        # loop through each choice
                         for i in range(choices * 2):
+                            # wait 5 seconds
                             sleep(5)
+                            # get the ith answer option
                             option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{i}"]')
-                            if (option.get_attribute('iscorrectoption') == 'True'):
+                            # if the option is correct, click it
+                            if option.get_attribute('iscorrectoption') == 'True':
                                 option.click()
+                        print('\tQuiz completed!')
+                        return
                     except Exception:
                         continue
-                print('\tQuiz completed!')
-                return
-
             elif (driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]')):
+                # get the number of questions in the quiz
                 numberOfQuestions = driver.find_element(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div/div[2]/div[4]').text.strip().split("of ")[1]
+
+                # loop through each question
                 for i in range(int(numberOfQuestions)):
+                    # click the answer option card
                     driver.find_element(By.CLASS_NAME, value='btOptionCard').click()
+                    # wait 13 seconds
                     sleep(13)
+
                 print('\tQuiz completed!')
                 return
         except Exception as e:
             print(e)
             pass
+        
+def assume_task(driver, p="false"):
+    try:
+        # get the parent window handle
+        if p.lower() == "false":
+            p = driver.window_handles[len(driver.window_handles) - 1]
 
-def assume_task(driver, p = "false"):
+        # try to complete a quiz
+        if do_quiz(driver):
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            return True
+
+        # try to complete an explore task
+        if do_explore(driver):
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            return True
+
+        # try to complete a poll
+        if do_poll(driver):
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            return True
+
+        # if all tasks fail, close the window and refresh the parent window
+        driver.close()
+        driver._switch_to.window(p)
+        driver.refresh()
+        return False
+    except:
+        pass
+
+def assume_task0(driver, p="false"):
+    # try to get the parent window handle
     try:
         if p.lower() == "false":
             p = driver.window_handles[len(driver.window_handles) - 1]
     except:
         pass
+
+    # try to complete a quiz
     try:
         do_quiz(driver)
         driver.close()
@@ -525,6 +612,8 @@ def assume_task(driver, p = "false"):
         return True
     except:
         pass
+
+    # try to complete an explore task
     try:
         do_explore(driver)
         driver.close()
@@ -533,6 +622,8 @@ def assume_task(driver, p = "false"):
         return True
     except:
         pass
+
+    # try to complete a poll
     try:
         do_poll(driver)
         driver.close()
@@ -540,71 +631,109 @@ def assume_task(driver, p = "false"):
         driver.refresh()
         return True
     except:
+        # if all tasks fail, close the window and refresh the parent window
         driver.close()
         driver._switch_to.window(p)
         driver.refresh()
         return False
 def complete_punchcard(driver):
     try:
+        # go to the rewards dashboard
         driver.get('https://rewards.microsoft.com/')
+        # wait 5 seconds
         sleep(5)
+
+        # get all the clickable quest links on the page
         quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
+        # create a list of the links
         links = []
         for quest in quests:
             links.append(quest.get_attribute('href'))
 
+        # loop through each link
         for link in links:
+            # go to the link
             driver.get(link)
+            # wait a random amount of time
             sleep(random.uniform(1, 3))
+
             try:
+                # get the punchcard details
                 message = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[4]').text
                 message2 = driver.find_element(By.XPATH, '//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[2]').text
+
+                # if the card has already been completed, skip it
                 if message.lower() == 'congratulations!' or "rent" in message2.lower() or "buy" in message2.lower():
                     continue
-            except:
+
+                # store the current window handle
+                p = driver.current_window_handle
+
+                # wait a random amount of time
+                sleep(random.uniform(1, 3))
+
+                # try to click the "complete" button
+                try:
+                    driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
+                except:
+                    # if the "complete" button cannot be found, click the first offer
+                    sleep(5)
+                    offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
+                    offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
+
+                # get the window handles of all open windows
+                chwd = driver.window_handles
+                # switch to the new window
+                if (chwd[1]):
+                    driver._switch_to.window(chwd[1])
+
+                # try to complete the task in the new window
+                try:
+                    assume_task(driver, p)
+                except: 
+                    pass
+                finally:
+                    # wait a random amount of time
+                    sleep(random.uniform(3, 5))
+            except Exception as e:
+                print(traceback.format_exc())
                 pass
-            p = driver.current_window_handle
-            sleep(random.uniform(1, 3))
-            try:
-                driver.find_element(By.XPATH, value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
-            except:
-                sleep(5)
-                offers = driver.find_elements(By.CLASS_NAME, value = 'offer-cta')
-                offers[0].find_element(By.CLASS_NAME, value = 'btn').click()
-            chwd = driver.window_handles
-            p = driver.current_window_handle
-            if (chwd[1]):
-                driver._switch_to.window(chwd[1])
-            
-            try:
-                assume_task(driver, p)
-            except: 
-                pass
-            finally:
-                sleep(random.uniform(3, 5))
-    except Exception as e:
-        print(traceback.format_exc())
+    except:
         pass
 
 def more_activities(driver):
     ran = False
+
+    # Go to rewards page
     driver.get('https://rewards.microsoft.com/')
+
     try:
+        # Get the number of activity cards on the page
         count = len(driver.find_elements(By.CLASS_NAME, 'ds-card-sec')) - 6
+
         for i in range(count):
-            i+=1
+            i += 1
             try:
+                # Get the element for the current activity card
                 element = driver.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]')
+
+                # Get the class name for the element that indicates whether the activity is available or not
                 class_name = element.find_element(By.XPATH, value=f'/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-more-activities-card/mee-card-group/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a/mee-rewards-points/div/div/span[1]').get_attribute('class')
 
+                # Check if the activity is available
                 if (class_name == "mee-icon mee-icon-AddMedium" or class_name == "mee-icon mee-icon-HourGlass"):
+                    # Click on the activity to open it in a new window
                     assign = driver.find_element(By.XPATH, value=f'//*[@id="more-activities"]/div/mee-card[{i}]/div/card-content/mee-rewards-more-activities-card-item/div/a')
                     p = driver.current_window_handle
                     assign.click()
+
+                    # Click on the "I agree" button, if it is present
                     try:
                         driver.find_element(By.XPATH, value='//*[@id="legalTextBox"]/div/div/div[3]/a').click()
                     except:
                         pass
+
+                    # Switch to the new window and perform the activity
                     chwd = driver.window_handles
                     if (chwd[1]):
                         driver._switch_to.window(chwd[1])
@@ -626,57 +755,75 @@ def more_activities(driver):
         pass
     return ran
 
-# TODO: Clean up code
 def daily_set(driver):
-        ranSets = False
-        try:
-            if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
-                p = driver.current_window_handle
-                driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
-                chwd = driver.window_handles
-                driver._switch_to.window(chwd[1])
-                do_explore(driver)
-                driver.close()
-                driver._switch_to.window(p)
-                driver.refresh()
-                ranSets = True
-        except Exception as e:
-            driver.get('https://rewards.microsoft.com/')
-            print(e)
-            pass
+    ranSets = False
 
-        try:
-            if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
-                p = driver.current_window_handle
-                driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
-                chwd = driver.window_handles
-                driver._switch_to.window(chwd[1])
-                do_poll(driver)
-                driver.close()
-                driver._switch_to.window(p)
-                driver.refresh()
-                ranSets = True
-        except Exception as e:
-            driver.get('https://rewards.microsoft.com/')
-            print(e)
-            pass
-        try:
-            if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium" or driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") =="mee-icon mee-icon-HourGlass"):
-                p = driver.current_window_handle
-                driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
-                chwd = driver.window_handles
-                driver._switch_to.window(chwd[1])
-                do_quiz(driver)
-                driver.close()
-                driver._switch_to.window(p)
-                driver.refresh()
-                ranSets = True
-        except Exception as e:
-            driver.get('https://rewards.microsoft.com/')
-            print(e)
-            pass
+    # Check if the first activity is available
+    try:
+        if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
+            # Open the activity in a new window
+            p = driver.current_window_handle
+            driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+            chwd = driver.window_handles
+            driver._switch_to.window(chwd[1])
 
-        return ranSets
+            # Perform the activity
+            do_explore(driver)
+
+            # Close the window and refresh the page
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            ranSets = True
+    except Exception as e:
+        driver.get('https://rewards.microsoft.com/')
+        print(e)
+        pass
+
+    # Check if the second activity is available
+    try:
+        if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium"):
+            # Open the activity in a new window
+            p = driver.current_window_handle
+            driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[3]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+            chwd = driver.window_handles
+            driver._switch_to.window(chwd[1])
+
+            # Perform the activity
+            do_poll(driver)
+
+            # Close the window and refresh the page
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            ranSets = True
+    except Exception as e:
+        driver.get('https://rewards.microsoft.com/')
+        print(e)
+        pass
+    # Check if the third activity is available
+    try:
+        if (driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") == "mee-icon mee-icon-AddMedium" or driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a/mee-rewards-points/div/div/span[1]').get_attribute("class") =="mee-icon mee-icon-HourGlass"):
+            # Open the activity in a new window
+            p = driver.current_window_handle
+            driver.find_element(By.XPATH, value='//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[2]/div/card-content/mee-rewards-daily-set-item-content/div/a').click()
+            chwd = driver.window_handles
+            driver._switch_to.window(chwd[1])
+
+            # Perform the activity
+            do_quiz(driver)
+
+            # Close the window and refresh the page
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            ranSets = True
+    except Exception as e:
+        driver.get('https://rewards.microsoft.com/')
+        print(e)
+        pass
+
+    return ranSets
 
 def retrieve_streaks(driver, EMAIL):
     try:
@@ -695,8 +842,11 @@ def retrieve_streaks(driver, EMAIL):
     return "N/A"
 
 def redeem(driver, EMAIL):
+    # Navigate to rewards page
     driver.get("https://rewards.microsoft.com/")
+    
     try:
+        # Check if a goal needs to be set
         element = driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a/span/ng-transclude')
         setG = element.text
         if ("set goal" in setG.lower()):
@@ -712,7 +862,9 @@ def redeem(driver, EMAIL):
         pass
     finally:
         driver.get("https://rewards.microsoft.com/")
+    
     try:
+        # Check if points are ready to be redeemed
         position = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/p').text.replace(" ", "").split("/")
         points = int(position[0].replace(",", ""))
         total = int(position[1].replace(",", ""))
@@ -728,47 +880,51 @@ def redeem(driver, EMAIL):
     except Exception as e:
         print(traceback.format_exc())
         return f"Ran into an exception trying to redeem\n{traceback.format_exc()}\n"
+    # Try to click on the redeem button
     try:
-        try:
-            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
-            sleep(random.uniform(2, 4))
-        except:
-            sleep(random.uniform(3, 5))
-            driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
-        try:
-            url = driver.current_url
-            url = url.split('https://rewards.microsoft.com/redeem/')
-            id = url[1]
-            try:
-                driver.find_element(By.XPATH, value = f'//*[@id="redeem-pdp_{id}"]').click()
-                sleep(random.uniform(3, 5))
-            except:
-                driver.find_element(By.XPATH, value = f'//*[@id="redeem-pdp_{id}"]/span[1]').click()
-            try:
-                driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]').click()
-                sleep(random.uniform(3, 5))
-            except:
-                driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]/span[1]').click()
-        except Exception as e:
-            print(traceback.format_exc())
-            driver.get("https://rewards.microsoft.com/")
-            return f"Ran into an exception trying to redeem\n{traceback.format_exc()}\n"
-        # Handle phone verification landing page
-        try:
-            veri = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutChallenge"]/form/div[1]').text
-            if (veri.lower() == 'phone verification'):
-                print("\tPhone verification required!")
+        driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
+        sleep(random.uniform(2, 4))
+    except:
+        sleep(random.uniform(3, 5))
+        driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
 
-                if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME}: Phone Verification Required', body=f'{EMAIL} has enough points for redeeming your goal, but needs to verify phone number for first reward.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.\n\n...')
-                print('\tSleeping for a bit to allow manual verification...')
-                sleep(300)
-                driver.get("https://rewards.microsoft.com/")
-                return f"Phone Verification Required for {EMAIL}"
+    # Try to redeem the rewards
+    try:
+        # Get the id of the rewards
+        url = driver.current_url
+        url = url.split('https://rewards.microsoft.com/redeem/')
+        id = url[1]
+        try:
+            # Click on the rewards
+            driver.find_element(By.XPATH, value = f'//*[@id="redeem-pdp_{id}"]').click()
+            sleep(random.uniform(3, 5))
         except:
-            pass
-        finally:
-            sleep(random.uniform(10, 20))
+            driver.find_element(By.XPATH, value = f'//*[@id="redeem-pdp_{id}"]/span[1]').click()
+
+        # Confirm the rewards redemption
+        try:
+            driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]').click()
+            sleep(random.uniform(3, 5))
+        except:
+            driver.find_element(By.XPATH, value = '//*[@id="redeem-checkout-review-confirm"]/span[1]').click()
+    except Exception as e:
+        print(traceback.format_exc())
+        driver.get("https://rewards.microsoft.com/")
+        return f"Ran into an exception trying to redeem\n{traceback.format_exc()}\n"
+
+    # Handle phone verification landing page
+    try:
+        veri = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutChallenge"]/form/div[1]').text
+        if (veri.lower() == 'phone verification'):
+            print("\tPhone verification required!")
+
+        if APPRISE_ALERTS:
+                    alerts.notify(title=f'{BOT_NAME}: Phone Verification Required', body=f'{EMAIL} has enough points for redeeming your goal, but needs to verify phone number for first reward.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.\n\n...')
+                    print('\tSleeping for a bit to allow manual verification...')
+                    sleep(300)
+                    driver.get("https://rewards.microsoft.com/")
+                    return f"Phone Verification Required for {EMAIL}"
+        sleep(random.uniform(10, 20))
         try:
             error = driver.find_element(By.XPATH, value = '//*[@id="productCheckoutError"]/div/div[1]').text
             if ("issue with your account or order" in message.lower()):
@@ -781,8 +937,10 @@ def redeem(driver, EMAIL):
             pass
 
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME}: Reward Redeemed', body=f'{EMAIL}\'s Points have been redeemed for the set goal!\n\n...')
-        return f"\n{EMAIL} Points Redeemed"
+            alerts.notify(title=f'{BOT_NAME}: Rewards Redeemed!', body=f'{EMAIL} has successfully redeemed rewards!\n\n...')
+        print('\tRewards redeemed successfully!')
+        return f"{EMAIL} has successfully redeemed rewards!"
+
     except Exception as e:
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Redeem Error', body=f'An error occured trying to auto-redeem for: {EMAIL}\n\n{traceback.format_exc()}\n\n...')
@@ -790,14 +948,22 @@ def redeem(driver, EMAIL):
         return f"\tRan into an exception trying to redeem\n{traceback.format_exc()}\n"
 
 def get_points(EMAIL, PASSWORD, driver):
+    # Set initial value for points
     points = -1
+
+    # Wait for the page to load
     driver.implicitly_wait(5)
     sleep(random.uniform(3, 5))
+
     try:
+        # Go to the sign-in page
         driver.get('https://rewards.microsoft.com/Signin?idru=%2F')
+
+        # Attempt to login
         if not login(EMAIL, PASSWORD, driver):
             return -404
-        # If it's the first sign in, join microsoft rewards
+
+        # If it's the first sign in, join Microsoft Rewards
         if driver.current_url == 'https://rewards.microsoft.com/welcome':
             try:
                 join_rewards = driver.find_element(By.XPATH, value='//*[@id="start-earning-rewards-link"]')
@@ -805,24 +971,28 @@ def get_points(EMAIL, PASSWORD, driver):
                     EC.element_to_be_clickable(join_rewards)
                 )
                 join_rewards.click()
-                print(f'Joined microsoft rewards on account {EMAIL}')
+                print(f'Joined Microsoft Rewards on account {EMAIL}')
             except:
                 try:
                     driver.find_element(By.XPATH, value='//*[@id="start-earning-rewards-link"]').click()
-                    print(f'Joined microsoft rewards on account {EMAIL}')
+                    print(f'Joined Microsoft Rewards on account {EMAIL}')
                 except:
                     print(traceback.format_exc())
-                    print("Got rewards welcome page, but couldn't join rewards.")
+                    print("Got Rewards welcome page, but couldn't join Rewards.")
                     return -404
+
+            # Check if the user has completed the welcome tour
             try:
                 if driver.current_url == 'https://rewards.microsoft.com/welcometour':
                     driver.find_element(By.XPATH, value='//*[@id="welcome-tour"]/mee-rewards-slide/div/section/section/div/a[2]').click()
             except:
                 driver.get('https://rewards.microsoft.com/')
+
+        # Check if the user's account has been suspended
         if driver.title.lower() == 'rewards error':
             try:
                 message = driver.find_element(By.XPATH, value='//*[@id="error"]/h1').text
-                if "microsoft rewards account has been suspended" in message.lower():
+                if "microsoft Rewards account has been suspended" in message.lower():
                     print(f"\t{EMAIL} account has been suspended.")
 
                     if APPRISE_ALERTS:
@@ -837,27 +1007,25 @@ def get_points(EMAIL, PASSWORD, driver):
         pass
     finally:
         sleep(random.uniform(8, 20))
-    try:
+
+    xpaths = [
+        '//*[@id="balanceToolTipDiv"]/p/mee-rewards-counter-animation/span',
+        '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/div/p/mee-rewards-counter-animation/span',
+        '//*[@id="rewardsBanner"]/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span',
+        '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span',
+        '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span',
+        '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span',
+    ]
+
+    for xpath in xpaths:
         try:
-            points = driver.find_element(By.XPATH, '//*[@id="balanceToolTipDiv"]/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
+            element = driver.find_element(By.XPATH, xpath)
+            points = element.text.strip().replace(',', '')
+            return int(points)
         except:
-            try:
-                points = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-            except:
-                try:
-                    points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-                except:
-                    try:
-                        points = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/mee-rewards-user-status-banner/div/div/div/div/div[2]/div[1]/mee-rewards-user-status-banner-item/mee-rewards-user-status-banner-balance/div/div/div/div/div/p/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-                    except:
-                        try:
-                            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[3]/div[1]/mee-rewards-user-status-item/mee-rewards-user-status-balance/div/div/div/div/div/p[1]/mee-rewards-counter-animation/span').text.strip().replace(',', '')
-                        except:
-                            points = driver.find_element(By.XPATH, '//*[@id="rewardsBanner"]/div/div/div[2]/div[2]/span').text.strip().replace(',', '')
-        return int(points)
-    except:
-        print('An error occured trying to get points. Returning -1 to indicate an error & run the main bot despite being unable to retrieve points.')
-        return -1
+            pass
+    return -1
+
 
 def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
     rw = RandomWords()
@@ -917,21 +1085,28 @@ def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
 
 def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
     try:
+        # Perform the PC search
         pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
+        # Print the traceback and sleep for 500 seconds
         print(traceback.format_exc())
         print('Attempting to restart PC search in 500 seconds')
         sleep(500)
         driver.quit()
+        
+        # Get the driver again and update the searches
         driver = get_driver()
         try:
             PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
+            
+            # Perform the PC search again
             pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
         except Exception as e:
             print('PC search failed, again! Skipping PC search.')
-        pass
     finally:
+        # Quit the driver
         driver.quit()
+
 
 def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     rw = RandomWords()
@@ -976,29 +1151,37 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
 def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
-    driver = get_driver(True)
+    # Get the driver with mobile emulation enabled
+    driver = get_driver(mobile=True)
     try:
+        # Perform the mobile search
         mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
     except Exception as e:
+        # Print the traceback and sleep for 500 seconds
         print(traceback.format_exc())
         print('Attempting to restart Mobile search in 500 seconds')
         sleep(500)
         driver.quit()
+        
+        # Get the driver again and update the searches
         driver = get_driver()
         PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
         driver.quit()
-        driver = get_driver(True)
+        
+        # Get the driver with mobile emulation enabled and perform the search again
+        driver = get_driver(mobile=True)
         try:
             mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
         except Exception as e:
             pass
-        pass
     finally:
+        # Quit the driver
         driver.quit()
+
   
 def update_searches(driver):
     driver.get('https://rewards.microsoft.com/pointsbreakdown')
-    
+
     PC_SEARCHES = 34
     MOBILE_SEARCHES = 24
     try:
@@ -1035,6 +1218,7 @@ def update_searches(driver):
         return PC_SEARCHES, MOBILE_SEARCHES
 
 
+
 def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, totalDifference = 0, differenceReport = 0):
     driver = get_driver()
     PC_SEARCHES = 34
@@ -1055,8 +1239,10 @@ def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, tota
 
     if AUTO_REDEEM:
         redeem(driver, EMAIL)
+    ranMore = more_activities(driver)
+    ranSet = daily_set(driver)
 
-    if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or daily_set(driver) or more_activities(driver)):
+    if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranSet or ranMore):
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
                         body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
@@ -1103,7 +1289,7 @@ def start_rewards():
             EMAIL = x[0:colonIndex-1]
             PASSWORD = x[colonIndex:len(x)]
             try:
-                 ranRewards, totalPointsReport, totalDifference, differenceReport = run_rewards(EMAIL, PASSWORD, ranRewards, totalPointsReport, totalDifference, differenceReport)
+                ranRewards, totalPointsReport, totalDifference, differenceReport = run_rewards(EMAIL, PASSWORD, ranRewards, totalPointsReport, totalDifference, differenceReport)
             except TypeError:
                 pass
             except Exception as e:

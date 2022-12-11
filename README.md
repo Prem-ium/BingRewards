@@ -1,5 +1,5 @@
 # Bing Rewards Automation
-An awesome python script to automate bing searches, quizes, polls, and more across multiple Bing Reward accounts.
+An awesome python script to automate bing searches, quizzes, polls, and more across multiple Bing Reward accounts.
 
 ## Features
 
@@ -21,7 +21,9 @@ An awesome python script to automate bing searches, quizes, polls, and more acro
 
 ## Installation
 The bot can be run using Python or Docker.
+
 ### Python Script
+Run locally:
 1. Clone this repository, cd into it, and install dependancies:
 ```sh
    git clone https://github.com/Prem-ium/BingRewards.git
