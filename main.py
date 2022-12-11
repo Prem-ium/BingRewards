@@ -573,13 +573,6 @@ def assume_task(driver, p="false"):
             driver.refresh()
             return True
 
-        # try to complete an explore task
-        if do_explore(driver):
-            driver.close()
-            driver._switch_to.window(p)
-            driver.refresh()
-            return True
-
         # try to complete a poll
         if do_poll(driver):
             driver.close()
@@ -587,6 +580,13 @@ def assume_task(driver, p="false"):
             driver.refresh()
             return True
 
+        # try to complete an explore task
+        if do_explore(driver):
+            driver.close()
+            driver._switch_to.window(p)
+            driver.refresh()
+            return True
+
         # if all tasks fail, close the window and refresh the parent window
         driver.close()
         driver._switch_to.window(p)
@@ -595,47 +595,6 @@ def assume_task(driver, p="false"):
     except:
         pass
 
-def assume_task0(driver, p="false"):
-    # try to get the parent window handle
-    try:
-        if p.lower() == "false":
-            p = driver.window_handles[len(driver.window_handles) - 1]
-    except:
-        pass
-
-    # try to complete a quiz
-    try:
-        do_quiz(driver)
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return True
-    except:
-        pass
-
-    # try to complete an explore task
-    try:
-        do_explore(driver)
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return True
-    except:
-        pass
-
-    # try to complete a poll
-    try:
-        do_poll(driver)
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return True
-    except:
-        # if all tasks fail, close the window and refresh the parent window
-        driver.close()
-        driver._switch_to.window(p)
-        driver.refresh()
-        return False
 def complete_punchcard(driver):
     try:
         # go to the rewards dashboard
