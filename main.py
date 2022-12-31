@@ -116,6 +116,7 @@ if (MULTITHREADING == "true"):
     import threading
     MULTITHREADING = True
     print('Multithreading is enabled in .env.\nThis will allow you to run multiple accounts at once, but it may also increase the chance of being banned and leads to more CPU usage.\nUse at your own risk.')
+    print('Multithreading is EXPERIMENTAL and may not work properly. If you encounter any issues, please report them to the GitHub repository or try running without it enabled.')
 else:
     MULTITHREADING = False
 
@@ -1111,7 +1112,7 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
 
 def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
     # Get the driver with mobile emulation enabled
-    driver = get_driver(mobile=True)
+    driver = get_driver(True)
     try:
         # Perform the mobile search
         mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
@@ -1177,8 +1178,7 @@ def update_searches(driver):
         return PC_SEARCHES, MOBILE_SEARCHES
 
 
-
-def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, totalDifference = 0, differenceReport = 0):
+def multi_method(EMAIL, PASSWORD):
     driver = get_driver()
     PC_SEARCHES = 34
     MOBILE_SEARCHES = 20
@@ -1211,11 +1211,14 @@ def run_rewards(EMAIL, PASSWORD, ranRewards = False, totalPointsReport = 0, tota
         if (PC_SEARCHES > 0):
             pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
         else:
+            print(f'\tPC Searches Left:\t{PC_SEARCHES}')
             driver.quit()
 
         if (MOBILE_SEARCHES > 0):
+            print(f'\tMobile Searches Left:\t{MOBILE_SEARCHES}')
             mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
-
+        else:
+            print(MOBILE_SEARCHES, MOBILE_SEARCHES > 0)
         driver = get_driver()
         differenceReport = points
         points = get_points(EMAIL, PASSWORD, driver)
@@ -1241,39 +1244,91 @@ def start_rewards():
     ranRewards = False
     loopTime = datetime.datetime.now(TZ)
     print(f'\nStarting Bing Rewards Automation:\t{loopTime}\n')
+    for x in ACCOUNTS:
+        driver = get_driver()
 
-    if not MULTITHREADING:
-        for x in ACCOUNTS:
-            colonIndex = x.index(":")+1
-            EMAIL = x[0:colonIndex-1]
-            PASSWORD = x[colonIndex:len(x)]
-            try:
-                ranRewards, totalPointsReport, totalDifference, differenceReport = run_rewards(EMAIL, PASSWORD, ranRewards, totalPointsReport, totalDifference, differenceReport)
-            except TypeError:
-                pass
-            except Exception as e:
-                print(traceback.format_exc())
-                pass
+        # Grab email
+        colonIndex = x.index(":")+1
+        EMAIL = x[0:colonIndex-1]
+        PASSWORD = x[colonIndex:len(x)]
+
+        # Set default search amount
+        PC_SEARCHES = 34
+        MOBILE_SEARCHES = 20
+
+        # Retireve points before completing searches
+        points = get_points(EMAIL, PASSWORD, driver)
+        if (points == -404):
+            driver.quit()
+            continue
+        print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
+
+        PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
         
-        if ranRewards and totalDifference > 0:
-            report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport:,} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3):,})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3):,})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
-            print(report)
+        recordTime = datetime.datetime.now(TZ)
+        ranDailySets = daily_set(driver)
+        ranMoreActivities = more_activities(driver)
+        if AUTOMATE_PUNCHCARD:
+            complete_punchcard(driver)
+ 
+        if AUTO_REDEEM:
+            redeem(driver, EMAIL)
+
+        if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 
-                            body=f'{report}\n\n...')
-    else:
-        # Multithreading. 1 thread per account, run all accounts at the same time on different threads
+                alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
+                            body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
+            streaks = retrieve_streaks(driver, EMAIL)
+            ranRewards = True
+            
+            if (PC_SEARCHES > 0):
+                pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
+            else:
+                driver.quit()
+
+            if (MOBILE_SEARCHES > 0):
+                mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
+
+            driver = get_driver()
+            differenceReport = points
+            points = get_points(EMAIL, PASSWORD, driver)
+            message = ''
+            if AUTO_REDEEM:
+                message = redeem(driver, EMAIL)
+
+            differenceReport = points - differenceReport
+            if differenceReport > 0:
+                print(f'\tTotal points:\t{points:,}\n\tValue of Points:\t{round(points/CURRENCY, 3):,}\n\t{EMAIL} has gained a total of {differenceReport:,} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3):,}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
+                report = f'Points:\t\t\t{points:,} ({CUR_SYMBOL}{round(points / CURRENCY, 3):,})\nEarned Points:\t\t\t{differenceReport:,} ({CUR_SYMBOL}{round(differenceReport/CURRENCY,3):,})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
+                if APPRISE_ALERTS:
+                    alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
+                        body=f'Email:\t{EMAIL}\n{report}\n\n...')
+                    
+        driver.quit()
+        totalPointsReport += points
+        totalDifference += differenceReport
+        print(f'\tFinished: {datetime.datetime.now(TZ)}\n\n')
+    if ranRewards and totalDifference > 0:
+        report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport:,} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3):,})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3):,})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
+        print(report)
+        if APPRISE_ALERTS:
+            alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 
+                        body=f'{report}\n\n...')
+    return
+
+# Multi-Threading Function
+def multi_threading():
+    # Multithreading. 1 thread per account, run all accounts at the same time on different threads
         threads = []
         for x in ACCOUNTS:
             colonIndex = x.index(":")+1
             EMAIL = x[0:colonIndex-1]
             PASSWORD = x[colonIndex:len(x)]
-            t = threading.Thread(target=run_rewards, args=(EMAIL, PASSWORD))
+            t = threading.Thread(target=multi_method, args=(EMAIL, PASSWORD))
             threads.append(t)
             t.start()
         for thread in threads:
             thread.join()
-    return
 
 # Main function
 def main():
@@ -1282,8 +1337,11 @@ def main():
         if TIMER:
             wait()
         try:
-            # Run Bing Rewards Automation
-            start_rewards()
+            if MULTITHREADING:
+                multi_threading()
+            else:
+                # Run Bing Rewards Automation
+                start_rewards()
             hours = random.randint(3, 8)
             print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\nSleeping for {hours} hours before rechecking...\n\n')
             sleep(3600 * hours)
