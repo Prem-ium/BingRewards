@@ -1,8 +1,5 @@
-import os
-import random
-import traceback
-import requests
-import datetime
+import os, random, traceback, requests, datetime
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -951,8 +948,7 @@ def get_points(EMAIL, PASSWORD, driver):
         # Check if the user's account has been suspended
         if driver.title.lower() == 'rewards error':
             try:
-                message = driver.find_element(By.XPATH, value='//*[@id="error"]/h1').text
-                if "microsoft Rewards account has been suspended" in message.lower():
+                if "microsoft Rewards account has been suspended" in driver.find_element(By.XPATH, value='//*[@id="error"]/h1').text.lower() or "suspended" in driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/h1').text.lower():
                     print(f"\t{EMAIL} account has been suspended.")
 
                     if APPRISE_ALERTS:
