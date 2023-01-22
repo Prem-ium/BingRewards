@@ -91,6 +91,11 @@ if (os.environ.get("AUTOMATE_PUNCHCARD", "false").lower() == "true"):
 else:
     AUTOMATE_PUNCHCARD = False
 
+if (os.envion.get("SHOPPING", "false").lower() == "true"):
+    SHOPPING = True
+else:
+    SHOPPING = False
+
 # Apprise Alerts
 APPRISE_ALERTS = os.environ.get("APPRISE_ALERTS", "")
 if APPRISE_ALERTS:
@@ -1125,7 +1130,7 @@ def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
         driver.quit()
         
         # Get the driver with mobile emulation enabled and perform the search again
-        driver = get_driver(mobile=True)
+        driver = get_driver(True)
         try:
             mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES)
         except Exception as e:
@@ -1173,7 +1178,12 @@ def update_searches(driver):
         print()
         return PC_SEARCHES, MOBILE_SEARCHES
 
-
+def shopping_attempt(driver):
+    try:
+        driver.get('https://www.msn.com/en-us/shopping')
+        driver.execute_script('var msnShoppingGamePane = document.querySelector("shopping-page-base") ?.shadowRoot.querySelector("shopping-homepage") ?.shadowRoot.querySelector("msft-feed-layout")?.shadowRoot.querySelector("msn-shopping-game-pane");if(msnShoppingGamePane != null){msnShoppingGamePane.cardsPerGame = 1;msnShoppingGamePane.resetGame();}')
+    except:
+        pass
 def multi_method(EMAIL, PASSWORD):
     driver = get_driver()
     PC_SEARCHES = 34
@@ -1219,9 +1229,11 @@ def multi_method(EMAIL, PASSWORD):
         differenceReport = points
         points = get_points(EMAIL, PASSWORD, driver)
         message = ''
+        if SHOPPING:
+            shopping_attempt(driver)
         if AUTO_REDEEM:
             message = redeem(driver, EMAIL)
-
+        
         differenceReport = points - differenceReport
         if differenceReport > 0:
             print(f'\tTotal points:\t{points:,}\n\tValue of Points:\t{round(points/CURRENCY, 3):,}\n\t{EMAIL} has gained a total of {differenceReport:,} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3):,}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
@@ -1289,6 +1301,8 @@ def start_rewards():
             differenceReport = points
             points = get_points(EMAIL, PASSWORD, driver)
             message = ''
+            if SHOPPING:
+                shopping_attempt(driver)
             if AUTO_REDEEM:
                 message = redeem(driver, EMAIL)
 

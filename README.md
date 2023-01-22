@@ -85,6 +85,8 @@ To run this project, you will need to add the following environment variables to
 
 `AUTO_REDEEM` = Handle auto redeemption of rewards (checks goal). Amazon is chosen as default
 
+`SHOPPING` = True/False. Attempts to complete a new shopping quiz (Experimental). No contributing developer has access to this method of points to verify/debug functionality.
+
 `GOAL` = Selecting goal reward, defaults to Amazon. 
 
 `AUTOMATE_PUNCHCARD` = True or False. Whether bot should automate punchcards.
