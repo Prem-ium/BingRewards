@@ -91,7 +91,7 @@ if (os.environ.get("AUTOMATE_PUNCHCARD", "false").lower() == "true"):
 else:
     AUTOMATE_PUNCHCARD = False
 
-if (os.envion.get("SHOPPING", "false").lower() == "true"):
+if (os.environ.get("SHOPPING", "false").lower() == "true"):
     SHOPPING = True
 else:
     SHOPPING = False
@@ -160,6 +160,18 @@ if CURRENCY == "usd" or CURRENCY == "$":
 elif CURRENCY == "euro" or CURRENCY == "€":
     CURRENCY = 1500
     CUR_SYMBOL = "€"
+
+if os.environ.get("DELAY_SEARCH"):
+    try:
+        DELAY_SEARCH = int(os.environ["DELAY_SEARCH"])
+    except ValueError:
+        print("Invalid value for DELAY_SEARCH, using default of 5 seconds.")
+        DELAY_SEARCH = 5
+    except:
+        print("Unexpected error:", traceback.format_exc())
+        DELAY_SEARCH = 5
+else:
+    DELAY_SEARCH = False
 
 # Methods
 def apprise_init():
@@ -1018,7 +1030,10 @@ def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
 
     # Main search loop
     for x in range(1, PC_SEARCHES+1):
-        sleep(random.uniform(1, 6))
+        if DELAY_SEARCH:
+            sleep(DELAY_SEARCH)
+        else:
+            sleep(random.uniform(1, 6))
         # Create string to send
         value = random.choice(TERMS) + rw.random_word()
 
@@ -1086,7 +1101,10 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     
     # Main search loop
     for x in range(1, MOBILE_SEARCHES + 1):
-        sleep(random.uniform(1, 6))
+        if DELAY_SEARCH:
+            sleep(DELAY_SEARCH)
+        else:
+            sleep(random.uniform(1, 6))
         value = random.choice(TERMS) + rw.random_word()
         try:
             # Clear search bar

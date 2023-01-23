@@ -79,6 +79,8 @@ To run this project, you will need to add the following environment variables to
 
 `MULTITHREADING` = 'True' or 'False'-- Whether the program should run multiple threads to run all accounts at once or not. Defaults to False.
 
+`DELAY_SEARCH`= Integer value of how long the program should wait between making searches.
+
 `APPRISE_ALERTS` = Notifications and Alerts. See .env example for more details
 
 `KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
