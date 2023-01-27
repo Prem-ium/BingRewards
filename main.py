@@ -1281,48 +1281,68 @@ def start_rewards():
         # Set default search amount
         PC_SEARCHES = 34
         MOBILE_SEARCHES = 20
-
-        # Retireve points before completing searches
-        points = get_points(EMAIL, PASSWORD, driver)
+        try:
+            # Retireve points before completing searches
+            points = get_points(EMAIL, PASSWORD, driver)
+        except:
+            driver.quit()
+            driver = get_driver()
+            try:
+                points = get_points(EMAIL, PASSWORD, driver)
+            except:
+                driver.quit()
+                continue
         if (points == -404):
             driver.quit()
             continue
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
-
-        PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
-        
-        recordTime = datetime.datetime.now(TZ)
-        ranDailySets = daily_set(driver)
-        ranMoreActivities = more_activities(driver)
-        if AUTOMATE_PUNCHCARD:
-            complete_punchcard(driver)
- 
-        if AUTO_REDEEM:
-            redeem(driver, EMAIL)
+        try:
+            PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
+            
+            recordTime = datetime.datetime.now(TZ)
+            ranDailySets = daily_set(driver)
+            ranMoreActivities = more_activities(driver)
+            if AUTOMATE_PUNCHCARD:
+                complete_punchcard(driver)
+    
+            if AUTO_REDEEM:
+                redeem(driver, EMAIL)
+        except:
+            print(traceback.format_exc())
+            driver.quit()
+            driver = get_driver()
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
                             body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
-            streaks = retrieve_streaks(driver, EMAIL)
-            ranRewards = True
-            
-            if (PC_SEARCHES > 0):
-                pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
-            else:
+            try:
+                streaks = retrieve_streaks(driver, EMAIL)
+                ranRewards = True
+                
+                if (PC_SEARCHES > 0):
+                    pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
+            except:
+                print(traceback.format_exc())
+            finally:
+                driver.quit()
+            try:
+                if (MOBILE_SEARCHES > 0):
+                    mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
+
+                driver = get_driver()
+                differenceReport = points
+                points = get_points(EMAIL, PASSWORD, driver)
+                message = ''
+                if SHOPPING:
+                    shopping_attempt(driver)
+                if AUTO_REDEEM:
+                    message = redeem(driver, EMAIL)
+            except:
+                print(traceback.format_exc())
+            finally:
                 driver.quit()
 
-            if (MOBILE_SEARCHES > 0):
-                mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES)
-
-            driver = get_driver()
-            differenceReport = points
-            points = get_points(EMAIL, PASSWORD, driver)
-            message = ''
-            if SHOPPING:
-                shopping_attempt(driver)
-            if AUTO_REDEEM:
-                message = redeem(driver, EMAIL)
 
             differenceReport = points - differenceReport
             if differenceReport > 0:
@@ -1331,8 +1351,10 @@ def start_rewards():
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
                         body=f'Email:\t{EMAIL}\n{report}\n\n...')
-                    
-        driver.quit()
+        try:        
+            driver.quit()
+        except:
+            print(traceback.format_exc())
         totalPointsReport += points
         totalDifference += differenceReport
         print(f'\tFinished: {datetime.datetime.now(TZ)}\n\n')
