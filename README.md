@@ -1,6 +1,8 @@
 # Bing Rewards Automation
 An awesome python script to automate bing searches, quizzes, polls, and more across multiple Bing Reward accounts.
 
+<a href="https://www.buymeacoffee.com/prem.ium" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 ## Features
 
 - Multiple Bing Rewards Accounts
