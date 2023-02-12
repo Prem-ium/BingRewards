@@ -6,3 +6,4 @@ webdriver_manager
 pytz
 apprise
 packaging
+Flask
