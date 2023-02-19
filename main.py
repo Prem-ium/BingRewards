@@ -1,26 +1,27 @@
 import os, random, traceback, requests, datetime
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
-from time import sleep
-from dotenv import load_dotenv
+from selenium                                 import webdriver
+from selenium.webdriver.common.by             import By
+from selenium.webdriver.support.ui            import WebDriverWait
+from selenium.webdriver.support               import expected_conditions as EC
+from selenium.webdriver.chrome.options        import Options
+from selenium.webdriver.common.keys           import Keys
+from selenium.common.exceptions               import NoSuchElementException
+from time                                     import sleep
+from dotenv                                   import load_dotenv
+
 
 try:
-    from random_words import RandomWords
+    from random_words                         import RandomWords
 except ImportError:
     os.system("pip install RandomWords")
-    from random_words import RandomWords
+    from random_words                         import RandomWords
    
 try:
-    from pytz import timezone
+    from pytz                                 import timezone
 except ImportError:
     os.system("pip install pytz")
-    from pytz import timezone
+    from pytz                                 import timezone
 
 # Load ENV
 load_dotenv()
