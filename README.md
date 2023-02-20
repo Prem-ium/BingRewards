@@ -1,8 +1,6 @@
 # Bing Rewards Automation
 An awesome python script to automate bing searches, quizzes, polls, and more across multiple Bing Reward accounts.
 
-<a href="https://www.buymeacoffee.com/prem.ium" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
 ## Features
 
 - Multiple Bing Rewards Accounts
@@ -18,6 +16,7 @@ An awesome python script to automate bing searches, quizzes, polls, and more acr
 - Streak Notifications
 - Suspended Account Notifications
 - USD ($) & EURO (€) Currency Conversions (More coming)
+- Semi-International Accommodations/Support
 - Incorrect Account Credentials Detection
 - Headless Option
 
@@ -107,6 +106,7 @@ To run this project, you will need to add the following environment variables to
 
 `END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 19, 7 PM
 
+`POINTS_PER_SEARCH`=Amount of points per search rewards in your country. Used to calculate number of searches needed for maximum points. Defaults to 5.
 
 `WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.
 
@@ -114,6 +114,14 @@ To run this project, you will need to add the following environment variables to
 
 `PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
 
+## Donations
+If you find my project helpful and would like to support its development, please consider making a donation. Every little bit helps and is greatly appreciated!
+
+You can donate by clicking on the following button:
+
+<a href="https://www.buymeacoffee.com/prem.ium" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+Thank you for your support!
 ## Earning Potential:
 
 Conservatively calculating potential points/earnings per month using this bot w/ a lvl 2 account:

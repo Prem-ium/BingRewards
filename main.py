@@ -1,3 +1,25 @@
+# MIT License
+# 
+# Copyright (c) 2022 Prem-ium
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import os, random, traceback, requests, datetime
 
 from selenium                                 import webdriver
@@ -63,14 +85,14 @@ if (HANDLE_DRIVER == "true"):
     HANDLE_DRIVER = True
 
     if BROWSER == "chrome":
-        from webdriver_manager.chrome import ChromeDriverManager
-        from selenium.webdriver.chrome.service import Service
+        from webdriver_manager.chrome                                 import ChromeDriverManager
+        from selenium.webdriver.chrome.service                        import Service
     elif BROWSER == "edge":
-        from webdriver_manager.microsoft import EdgeChromiumDriverManager
-        from selenium.webdriver.edge.service import Service
+        from webdriver_manager.microsoft                              import EdgeChromiumDriverManager
+        from selenium.webdriver.edge.service                          import Service
     elif BROWSER == "firefox":
-        from webdriver_manager.firefox import GeckoDriverManager
-        from selenium.webdriver.firefox.options import Options
+        from webdriver_manager.firefox                                import GeckoDriverManager
+        from selenium.webdriver.firefox.options                       import Options
 else:
     HANDLE_DRIVER = False
 
@@ -83,7 +105,7 @@ else:
 
 # Whether to use keep_alive.py
 if (os.environ.get("KEEP_ALIVE", "False").lower() == "true"):
-    from keep_alive import keep_alive
+    from keep_alive                                                  import keep_alive
     keep_alive()
 
 # Whether to automate punch-cards.
@@ -173,6 +195,11 @@ if os.environ.get("DELAY_SEARCH"):
         DELAY_SEARCH = 5
 else:
     DELAY_SEARCH = False
+try:
+    POINTS_PER_SEARCH = int(os.environ.get("POINTS_PER_SEARCH", "5"))
+except ValueError:
+    print("Invalid value for POINTS_PER_SEARCH, using default of 5 points.")
+    POINTS_PER_SEARCH = 5
 
 # Methods
 def apprise_init():
@@ -1169,7 +1196,7 @@ def update_searches(driver):
         PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
         
         if (int(PC[0]) < int(PC[1])):
-            PC_SEARCHES = int((int(PC[1]) - int(PC[0])) / 5)
+            PC_SEARCHES = int((int(PC[1]) - int(PC[0])) / POINTS_PER_SEARCH)
             print(f'\tPC Searches Left:\t{PC_SEARCHES}')
         else:
             PC_SEARCHES = 0
@@ -1178,7 +1205,7 @@ def update_searches(driver):
         if (int(PC[1]) > 50):
             MOBILE = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[2]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
             if (int(MOBILE[0]) < int(MOBILE[1])):
-                MOBILE_SEARCHES = int((int(MOBILE[1]) - int(MOBILE[0])) / 5)
+                MOBILE_SEARCHES = int((int(MOBILE[1]) - int(MOBILE[0])) / POINTS_PER_SEARCH)
                 print(f'\tMobile Searches Left:\t{MOBILE_SEARCHES}')
             else:
                 MOBILE_SEARCHES = 0
@@ -1394,7 +1421,7 @@ def main():
                 # Run Bing Rewards Automation
                 start_rewards()
             hours = random.randint(3, 8)
-            print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\nSleeping for {hours} hours before rechecking...\n\n')
+            print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\n\n------------------------------------------------------------\n\nIf you like this project, please consider showing support to the developer!\nGitHub Profile:\t\t\t\thttps://github.com/Prem-ium\nBuy-Me-A-Coffee Donations:\thttps://www.buymeacoffee.com/prem.ium\n\n------------------------------------------------------------\n\nSleeping for {hours} hours before restarting Bing Rewards Automation.\nThank you for supporting Prem-ium\'s Github Repository!\n\n------------------------------------------------------------\n')
             sleep(3600 * hours)
         except Exception as e:
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
