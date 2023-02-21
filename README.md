@@ -31,7 +31,7 @@ Run locally:
    cd BingRewards
    pip install -r requirements.txt
    ```
-2. Configure your `.env` file and delete the ".example" in the `.env.example` filename (See below and example for options)
+2. Rename `.env.example` to `.env` and configure your `.env` file (See below and example for options)
 3. Run the script:
 ```sh
    python main.py
