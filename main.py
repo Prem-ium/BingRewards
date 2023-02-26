@@ -183,6 +183,9 @@ if CURRENCY == "usd" or CURRENCY == "$":
 elif CURRENCY == "euro" or CURRENCY == "€":
     CURRENCY = 1500
     CUR_SYMBOL = "€"
+elif CURRENCY == "inr" or CURRENCY == "₹":
+    CURRENCY = 16
+    CUR_SYMBOL = "₹"
 
 if os.environ.get("DELAY_SEARCH"):
     try:
