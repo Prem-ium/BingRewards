@@ -1,24 +1,24 @@
-# MIT License
-# 
+"""# MIT License
+#
 # Copyright (c) 2022 Prem-ium
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# SOFTWARE."""
 
 import os, random, traceback, requests, datetime
 
@@ -38,7 +38,7 @@ try:
 except ImportError:
     os.system("pip install RandomWords")
     from random_words                         import RandomWords
-   
+
 try:
     from pytz                                 import timezone
 except ImportError:
@@ -208,10 +208,11 @@ def apprise_init():
         for service in APPRISE_ALERTS:
             alerts.add(service)
         return alerts
-          
+
 def get_current_ip(type, proxies):
     try:
         return ((requests.get(f"https://ip{type}.icanhazip.com", proxies=proxies)).text).strip("\n")
+
     except requests.ConnectionError:
         print(f"Unable to get IP{type} address")
         if type == "v4":
@@ -258,7 +259,7 @@ def check_ip_address():
         if WANTED_IPV6 != current_ipv6:
             print(f"IPv6 addresses do not match. Wanted {WANTED_IPV6} but got {current_ipv6}")
             if APPRISE_ALERTS:
-                alerts.notify(title=f'IPv6 Address Mismatch', 
+                alerts.notify(title=f'IPv6 Address Mismatch',
                     body=f'Wanted {WANTED_IPV6} but got {current_ipv6}')
             raise Exception(f"IPv6 addresses do not match. Wanted {WANTED_IPV6} but got {current_ipv6}")
         else:
@@ -290,7 +291,7 @@ def get_driver(isMobile = False):
         options.add_argument(f'--proxy-server={PROXY}')
         print(f"Set Browser proxy to {PROXY}")
 
-    if (isMobile):   
+    if (isMobile):
         mobile_emulation = {"deviceName": "Nexus 5"}
         options.add_experimental_option("mobileEmulation", mobile_emulation)
     elif BROWSER != "edge":
@@ -345,7 +346,7 @@ def login(EMAIL, PASSWORD, driver):
         if("microsoft account doesn't exist" in message.lower()):
             print(f"Microsoft account {EMAIL} doesn't exist. Skipping this account & moving onto the next in env...")
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME} - Account does not exist.', 
+                alerts.notify(title=f'{BOT_NAME} - Account does not exist.',
                     body=f"Microsoft account {EMAIL} doesn't exist. Please review login env for spelling errors or create the account with {EMAIL} and restart the bot. Skipping this account...")
             return False
     except:
@@ -366,7 +367,7 @@ def login(EMAIL, PASSWORD, driver):
                 return False
     except:
         pass
-    
+
     # Find password and input it
     try:
         driver.find_element(By.XPATH, value='//*[@id="i0118"]').send_keys(PASSWORD)
@@ -388,7 +389,7 @@ def login(EMAIL, PASSWORD, driver):
         if("password is incorrect" in message.lower()):
             print(f"Microsoft account {EMAIL} has incorrect password in LOGIN env. Skipping...")
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME} - {EMAIL} incorrect password.', 
+                alerts.notify(title=f'{BOT_NAME} - {EMAIL} incorrect password.',
                     body=f"Microsoft account {EMAIL} has an incorrect password message. Please correct your LOGIN in env and restart the bot. Skipping this account & moving onto the next in env...")
             return False
     except:
@@ -405,7 +406,7 @@ def login(EMAIL, PASSWORD, driver):
             message = driver.find_element(By.XPATH, value='//*[@id="StartHeader"]').text
             if message.lower() == "your account has been locked":
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME}: Account Locked!', 
+                    alerts.notify(title=f'{BOT_NAME}: Account Locked!',
                         body=f'Your account {EMAIL} has been locked! Sign in and verify your account.\n\n...')
                 print(f"uh-oh, your account {EMAIL} has been locked by Microsoft! Sleeping for 15 minutes to allow you to verify your account.\nPlease restart the bot when you've verified.")
                 sleep(900)
@@ -417,7 +418,7 @@ def login(EMAIL, PASSWORD, driver):
             if message.lower() == "help us protect your account":
                 print(f"uh-oh, your account {EMAIL} will need to manually add an alternative email address!\nAttempting to skip in 50 seconds, if possible...")
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!', 
+                    alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!',
                         body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and add one to your account.\n\n\nAttempting to skip, if still possible...')
                 sleep(50)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
@@ -507,7 +508,7 @@ def do_quiz(driver):
     except Exception as e:
         pass
 
-    
+
     if (driver.find_elements(By.XPATH, value='//*[@id="rqStartQuiz"]') or driver.find_elements(By.CLASS_NAME, value='btOptions') or driver.find_elements(By.XPATH, value='//*[@id="currentQuestionContainer"]/div/div[1]/span/span') or driver.find_elements(By.CLASS_NAME, value='rq_button')):
         try:
             # find the start button element
@@ -543,7 +544,7 @@ def do_quiz(driver):
                             # wait 5 seconds
                             sleep(5)
                             # get a random answer option
-                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
                             # click the option
                             option.click()
                             # wait 10 seconds
@@ -551,7 +552,7 @@ def do_quiz(driver):
                             try:
                                 # if the answer was incorrect, choose another option
                                 while driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!':
-                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
                                     option.click()
                                     sleep(5)
                             except:
@@ -602,7 +603,7 @@ def do_quiz(driver):
         except Exception as e:
             print(e)
             pass
-        
+
 def assume_task(driver, p="false"):
     try:
         # get the parent window handle
@@ -692,7 +693,7 @@ def complete_punchcard(driver):
                 # try to complete the task in the new window
                 try:
                     assume_task(driver, p)
-                except: 
+                except:
                     pass
                 finally:
                     # wait a random amount of time
@@ -846,7 +847,7 @@ def retrieve_streaks(driver, EMAIL):
 def redeem(driver, EMAIL):
     # Navigate to rewards page
     driver.get("https://rewards.microsoft.com/")
-    
+
     try:
         # Check if a goal needs to be set
         element = driver.find_element(By.XPATH, value = '/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a/span/ng-transclude')
@@ -864,7 +865,7 @@ def redeem(driver, EMAIL):
         pass
     finally:
         driver.get("https://rewards.microsoft.com/")
-    
+
     try:
         # Check if points are ready to be redeemed
         position = driver.find_element(By.XPATH, value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/p').text.replace(" ", "").split("/")
@@ -1097,12 +1098,12 @@ def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         print('Attempting to restart PC search in 500 seconds')
         sleep(500)
         driver.quit()
-        
+
         # Get the driver again and update the searches
         driver = get_driver()
         try:
             PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
-            
+
             # Perform the PC search again
             pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
         except Exception as e:
@@ -1126,7 +1127,7 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     login(EMAIL, PASSWORD, driver)
     print(f"\n\tAccount {EMAIL} logged in successfully! Auto search initiated.\n")
     driver.get('https://www.bing.com/')
-    
+
     # Main search loop
     for x in range(1, MOBILE_SEARCHES + 1):
         if DELAY_SEARCH:
@@ -1169,12 +1170,12 @@ def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
         print('Attempting to restart Mobile search in 500 seconds')
         sleep(500)
         driver.quit()
-        
+
         # Get the driver again and update the searches
         driver = get_driver()
         PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
         driver.quit()
-        
+
         # Get the driver with mobile emulation enabled and perform the search again
         driver = get_driver(True)
         try:
@@ -1185,7 +1186,7 @@ def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
         # Quit the driver
         driver.quit()
 
-  
+
 def update_searches(driver):
     driver.get('https://rewards.microsoft.com/pointsbreakdown')
 
@@ -1194,7 +1195,7 @@ def update_searches(driver):
     try:
         sleep(10)
         PC = driver.find_element(By.XPATH, value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(" ", "").split("/")
-        
+
         if (int(PC[0]) < int(PC[1])):
             PC_SEARCHES = int((int(PC[1]) - int(PC[0])) / POINTS_PER_SEARCH)
             print(f'\tPC Searches Left:\t{PC_SEARCHES}')
@@ -1242,9 +1243,9 @@ def multi_method(EMAIL, PASSWORD):
         return
     print(f'Email:\t{EMAIL}\n\tPoints:\t{points:,}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
     PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
-    
+
     recordTime = datetime.datetime.now(TZ)
-    
+
     if AUTOMATE_PUNCHCARD:
         complete_punchcard(driver)
 
@@ -1255,11 +1256,11 @@ def multi_method(EMAIL, PASSWORD):
 
     if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranSet or ranMore):
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
+            alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n',
                         body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
         streaks = retrieve_streaks(driver, EMAIL)
         ranRewards = True
-        
+
         if (PC_SEARCHES > 0):
             pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
         else:
@@ -1279,15 +1280,15 @@ def multi_method(EMAIL, PASSWORD):
             shopping_attempt(driver)
         if AUTO_REDEEM:
             message = redeem(driver, EMAIL)
-        
+
         differenceReport = points - differenceReport
         if differenceReport > 0:
             print(f'\tTotal points:\t{points:,}\n\tValue of Points:\t{round(points/CURRENCY, 3):,}\n\t{EMAIL} has gained a total of {differenceReport:,} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3):,}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
             report = f'Points:\t\t\t{points:,} ({CUR_SYMBOL}{round(points / CURRENCY, 3):,})\nEarned Points:\t\t\t{differenceReport:,} ({CUR_SYMBOL}{round(differenceReport/CURRENCY,3):,})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
+                alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n',
                     body=f'Email:\t{EMAIL}\n{report}\n\n...')
-                
+
     driver.quit()
     totalPointsReport += points
     totalDifference += differenceReport
@@ -1326,13 +1327,13 @@ def start_rewards():
         print(f'Email:\t{EMAIL}\n\tPoints:\t{points}\n\tCash Value:\t{CUR_SYMBOL}{round(points/CURRENCY,3)}\n')
         try:
             PC_SEARCHES, MOBILE_SEARCHES = update_searches(driver)
-            
+
             recordTime = datetime.datetime.now(TZ)
             ranDailySets = daily_set(driver)
             ranMoreActivities = more_activities(driver)
             if AUTOMATE_PUNCHCARD:
                 complete_punchcard(driver)
-    
+
             if AUTO_REDEEM:
                 redeem(driver, EMAIL)
         except:
@@ -1342,12 +1343,12 @@ def start_rewards():
 
         if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranDailySets or ranMoreActivities):
             if APPRISE_ALERTS:
-                alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n', 
+                alerts.notify(title=f'{BOT_NAME}: Account Automation Starting\n\n',
                             body=f'Email:\t\t{EMAIL}\nPoints:\t\t{points:,} ({CUR_SYMBOL}{round(points/CURRENCY, 3):,})\nStarting:\t{recordTime}\n...')
             try:
                 streaks = retrieve_streaks(driver, EMAIL)
                 ranRewards = True
-                
+
                 if (PC_SEARCHES > 0):
                     pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES)
             except:
@@ -1377,9 +1378,9 @@ def start_rewards():
                 print(f'\tTotal points:\t{points:,}\n\tValue of Points:\t{round(points/CURRENCY, 3):,}\n\t{EMAIL} has gained a total of {differenceReport:,} points!\n\tThat is worth {CUR_SYMBOL}{round(differenceReport/CURRENCY, 3):,}!\nStreak Status:{streaks}\n\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}\n\n\n...')
                 report = f'Points:\t\t\t{points:,} ({CUR_SYMBOL}{round(points / CURRENCY, 3):,})\nEarned Points:\t\t\t{differenceReport:,} ({CUR_SYMBOL}{round(differenceReport/CURRENCY,3):,})\n{message}\nStart Time:\t{recordTime}\nEnd Time:\t{datetime.datetime.now(TZ)}'
                 if APPRISE_ALERTS:
-                    alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n', 
+                    alerts.notify(title=f'{BOT_NAME}: Account Automation Completed!:\n',
                         body=f'Email:\t{EMAIL}\n{report}\n\n...')
-        try:        
+        try:
             driver.quit()
         except:
             print(traceback.format_exc())
@@ -1390,7 +1391,7 @@ def start_rewards():
         report = f'\nAll accounts for {BOT_NAME} have been automated.\nTotal Points (across all accounts):\t\t{totalPointsReport:,} ({CUR_SYMBOL}{round(totalPointsReport/CURRENCY, 3):,})\n\nTotal Earned (in latest run):\t\t{totalDifference} ({CUR_SYMBOL}{round(totalDifference/CURRENCY, 3):,})\n\nStart Time: {loopTime}\nEnd Time:{datetime.datetime.now(TZ)}'
         print(report)
         if APPRISE_ALERTS:
-            alerts.notify(title=f'{BOT_NAME}: Automation Complete\n', 
+            alerts.notify(title=f'{BOT_NAME}: Automation Complete\n',
                         body=f'{report}\n\n...')
     return
 
