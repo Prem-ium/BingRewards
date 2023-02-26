@@ -94,7 +94,7 @@ To run this project, you will need to add the following environment variables to
 
 `AUTOMATE_PUNCHCARD` = True or False. Whether bot should automate punchcards.
 
-`CURRENCY` = Currency Symbol or Name, currently only supported by USD($) and EURO(€). Defaults to USD. Plan to add more as more users provide information on their local conversion rates. See .env.example file for an example.
+`CURRENCY` = Currency Symbol or Name, currently only supported by USD($), EURO(€) and INR(₹). Defaults to USD. Plan to add more as more users provide information on their local conversion rates. See .env.example file for an example.
 
 `BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
 
