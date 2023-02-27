@@ -1,4 +1,4 @@
-"""# MIT License
+# MIT License
 #
 # Copyright (c) 2022 Prem-ium
 #
@@ -18,7 +18,7 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE."""
+# SOFTWARE.
 
 import os, random, traceback, requests, datetime
 
@@ -186,6 +186,9 @@ if CURRENCY == "usd" or CURRENCY == "$":
 elif CURRENCY == "euro" or CURRENCY == "€":
     CURRENCY = 1500
     CUR_SYMBOL = "€"
+elif CURRENCY == "inr" or CURRENCY == "₹":
+    CURRENCY = 16
+    CUR_SYMBOL = "₹"
 
 if os.environ.get("DELAY_SEARCH"):
     try:
