@@ -733,7 +733,7 @@ def more_activities(driver):
                     p = driver.current_window_handle
                     assign.click()
 
-                    # Click on the "I agree" button, if it is present
+                    # Click on the "I agree" , if it is present
                     try:
                         driver.find_element(By.XPATH, value='//*[@id="legalTextBox"]/div/div/div[3]/a').click()
                     except:
