@@ -2,4 +2,4 @@
 .vscode/
 geckodriver.log
 test.py
-logs/
+reward.log
