@@ -18,6 +18,7 @@ An awesome python script to automate bing searches, quizzes, polls, and more acr
 - USD ($) & EURO (€) Currency Conversions (More coming)
 - Semi-International Accommodations/Support
 - Incorrect Account Credentials Detection
+- Docker Support & DockerQuickstart.bat 
 - Headless Option
 
 ## Installation
@@ -56,6 +57,8 @@ View on [Docker Hub](https://hub.docker.com/repository/docker/nelsondane/bing-re
    Both methods will create a new container called `bing-rewards`. Make sure you have the correct path to your `.env` file you created.
 
 4. Let the bot log in and begin working. DO NOT PRESS `CTRL-c`. This will kill the container and the bot. To exit the logs view, press `CTRL-p` then `CTRL-q`. This will exit the logs view but let the bot keep running.
+
+You can also open `DockerQuickstart.bat` in a text editor, edit the exisitng path in the file with your own of the BingRewards folder directory and run it to quickly stop and start docker container instances. 
 
 ### Available Docker Hub Tags
 Replace the `<tag>` above with one of these (defaults to `latest`)
@@ -118,10 +121,11 @@ To run this project, you will need to add the following environment variables to
 If you find my project helpful and would like to support its development, please consider making a donation. Every little bit helps and is greatly appreciated!
 
 You can donate by clicking on the following button:
-
-<a href="https://www.buymeacoffee.com/prem.ium" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<div style="display:grid;justify-content:center;"><a href="https://www.buymeacoffee.com/prem.ium" target="_blank">
+        <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a></div>
 
 Thank you for your support!
+
 ## Earning Potential:
 
 Conservatively calculating potential points/earnings per month using this bot w/ a lvl 2 account:
