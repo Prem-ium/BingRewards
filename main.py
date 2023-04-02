@@ -543,7 +543,7 @@ def do_quiz(driver):
                             # wait 5 seconds
                             sleep(5)
                             # get a random answer option
-                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
                             # click the option
                             option.click()
                             # wait 10 seconds
@@ -551,7 +551,7 @@ def do_quiz(driver):
                             try:
                                 # if the answer was incorrect, choose another option
                                 while driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!':
-                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
+                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
                                     option.click()
                                     sleep(5)
                             except:
