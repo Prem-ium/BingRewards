@@ -55,8 +55,8 @@ else:
     ACCOUNTS = os.environ["LOGIN"].replace(" ", "").split(",")
 
 # Check number of accounts (limit to 6 per IP address to avoid bans)
-if (len(ACCOUNTS) > 6):
-    raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
+#if (len(ACCOUNTS) > 6):
+#    raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
 
 # Set login URL
 if not os.environ["URL"]:
