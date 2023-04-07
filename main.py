@@ -80,6 +80,8 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 # Import bot name from .env
 BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 
+GLOBAL_SLEEP_FACTOR = os.environ.get("NORMAL_SLEEP_FACTOR", 1.0)
+
 # Get browser and whether to use the chromewebdriver or not
 BROWSER = os.environ.get("BROWSER", "chrome").lower()
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
@@ -234,7 +236,7 @@ def get_current_ip(type, proxies):
                 alerts.notify(title=f"Failed to connect to icanhazip.com over {type}",
                               body=f"Is there a problem with your network?")
             # Wait some time (to prevent Docker containers from constantly restarting)
-            sleep(300)
+            sleep(GLOBAL_SLEEP_FACTOR * 300)
             raise Exception(f"Failed to connect to icanhazip.com over {type}. Is there a problem with your network?")
         if type == "v6":
             # We can just fail softly if this error occurs with v6. Note that a ConnectionError is raised if a v4-only host tries to connect to a v6 site
@@ -247,7 +249,7 @@ def get_current_ip(type, proxies):
             alerts.notify(title=f"An exception occurred while trying to get your current IP address",
                           body=f"{e}")
         # Wait some time (to prevent Docker containers from constantly restarting)
-        sleep(60)
+        sleep(GLOBAL_SLEEP_FACTOR * 60)
         raise Exception
 
 
@@ -338,7 +340,7 @@ def wait():
         range = (START_TIME - currentHour) if (currentHour < START_TIME) else ((24 - currentHour) + START_TIME)
         print(
             f'Timer is enabled.\nStart Time: {START_TIME}.\nEnd Time: {END_TIME}.\n\nCurrent time: {currentHour}.\nCurrent time is not within range. Sleeping for {range} hours.')
-        sleep((range) * 3600)
+        sleep(GLOBAL_SLEEP_FACTOR * (range) * 3600)
     return
 
 
@@ -357,7 +359,7 @@ def login(EMAIL, PASSWORD, driver):
             username_field.send_keys(Keys.ENTER)
         except:
             return False
-    sleep(random.uniform(2, 4))
+    sleep(GLOBAL_SLEEP_FACTOR * random.uniform(2, 4))
     try:
         message = driver.find_element(By.XPATH, value='//*[@id="usernameError"]').text
         if ("microsoft account doesn't exist" in message.lower()):
@@ -378,7 +380,7 @@ def login(EMAIL, PASSWORD, driver):
                     EC.element_to_be_clickable(personal)
                 )
                 personal.click()
-                sleep(random.uniform(2, 4))
+                sleep(GLOBAL_SLEEP_FACTOR * random.uniform(2, 4))
             except:
                 print(f'Personal/Work prompt was present for account {EMAIL} but unable to get past it.')
                 return False
@@ -400,7 +402,7 @@ def login(EMAIL, PASSWORD, driver):
         except:
             print(f'Unable to find password field for account {EMAIL}')
             return False
-    sleep(random.uniform(3, 6))
+    sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 6))
     try:
         message = driver.find_element(By.XPATH, value='//*[@id="passwordError"]').text
         if ("password is incorrect" in message.lower()):
@@ -427,7 +429,7 @@ def login(EMAIL, PASSWORD, driver):
                                   body=f'Your account {EMAIL} has been locked! Sign in and verify your account.\n\n...')
                 print(
                     f"uh-oh, your account {EMAIL} has been locked by Microsoft! Sleeping for 15 minutes to allow you to verify your account.\nPlease restart the bot when you've verified.")
-                sleep(900)
+                sleep(GLOBAL_SLEEP_FACTOR * 900)
                 return False
         except NoSuchElementException as e:
             pass
@@ -439,7 +441,7 @@ def login(EMAIL, PASSWORD, driver):
                 if APPRISE_ALERTS:
                     alerts.notify(title=f'{BOT_NAME}: Account Secuirity Notice!',
                                   body=f'Your account {EMAIL} requires you to add an alternative email address or a phone number!\nPlease sign in and add one to your account.\n\n\nAttempting to skip, if still possible...')
-                sleep(50)
+                sleep(GLOBAL_SLEEP_FACTOR * 50)
                 driver.find_element(By.XPATH, value='//*[@id="iNext"]').click()
         except:
             driver.find_element(By.XPATH, value='//*[@id="idSIButton9"]').click()
@@ -451,10 +453,10 @@ def login(EMAIL, PASSWORD, driver):
 def do_explore(driver):
     try:
         # wait a random amount of time
-        sleep(random.uniform(10, 15))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(10, 15))
         # click the "continue" button & wait 8 seconds
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        sleep(8)
+        sleep(GLOBAL_SLEEP_FACTOR * 8)
     except:
         # if the button cannot be found, do nothing
         pass
@@ -469,13 +471,13 @@ def do_poll(driver):
         driver.refresh()
         try:
             # wait a random amount of time
-            sleep(random.uniform(3, 5))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 5))
             # click the "continue" button
             driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
         except:
             # if the button cannot be found, refresh the page and try again
             driver.refresh()
-            sleep(random.uniform(2, 7))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(2, 7))
             pass
 
         try:
@@ -487,23 +489,23 @@ def do_poll(driver):
             driver.find_element(By.XPATH, value='//*[@id="btoption0"]/div[2]/div[2]').click()
 
         # wait 8 seconds
-        sleep(8)
+        sleep(GLOBAL_SLEEP_FACTOR * 8)
         print('\tPoll completed!')
     except:
         # if an error occurs, do nothing
         pass
     # wait 3 seconds
-    sleep(3)
+    sleep(GLOBAL_SLEEP_FACTOR * 3)
 
 
 def do_quiz(driver):
     # Wait a random amount of time
-    sleep(random.uniform(7, 14))
+    sleep(GLOBAL_SLEEP_FACTOR * random.uniform(7, 14))
 
     # Try clicking on an element with a specific XPath
     try:
         driver.find_element(By.XPATH, value='/html/body/div[2]/div[2]/span/a').click()
-        sleep(4)
+        sleep(GLOBAL_SLEEP_FACTOR * 4)
     except:
         pass
 
@@ -520,12 +522,12 @@ def do_quiz(driver):
         # Loop through each question and select the first option
         for i in range(numberOfQuestions):
             driver.find_element(By.CLASS_NAME, value='wk_OptionClickClass').click()
-            sleep(8)
+            sleep(GLOBAL_SLEEP_FACTOR * 8)
 
             # Submit the answer
             driver.find_element(By.CLASS_NAME, value='wk_buttons').find_elements(By.XPATH, value='*')[0].send_keys(
                 Keys.ENTER)
-            sleep(5)
+            sleep(GLOBAL_SLEEP_FACTOR * 5)
 
         # Print a message indicating that the quiz has been completed
         print('\tQuiz completed!')
@@ -555,7 +557,7 @@ def do_quiz(driver):
                 pass
 
         try:
-            sleep(3)
+            sleep(GLOBAL_SLEEP_FACTOR * 3)
             # check if the quiz has credits sections
             if driver.find_elements(By.XPATH, value='//*[@id="rqHeaderCredits"]'):
                 # get the number of sections in the quiz
@@ -571,14 +573,14 @@ def do_quiz(driver):
                         # loop through each choice
                         for i in range(choices * 2):
                             # wait 5 seconds
-                            sleep(5)
+                            sleep(GLOBAL_SLEEP_FACTOR * 5)
                             # get a random answer option
                             option = driver.find_element(By.XPATH,
                                                          value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
                             # click the option
                             option.click()
                             # wait 10 seconds
-                            sleep(10)
+                            sleep(GLOBAL_SLEEP_FACTOR * 10)
                             try:
                                 # if the answer was incorrect, choose another option
                                 while driver.find_element(By.XPATH,
@@ -586,13 +588,13 @@ def do_quiz(driver):
                                     option = driver.find_element(By.XPATH,
                                                                  value=f'//*[@id="rqAnswerOption{random.randint(0, buttons - 1)}"]')
                                     option.click()
-                                    sleep(5)
+                                    sleep(GLOBAL_SLEEP_FACTOR * 5)
                             except:
                                 pass
                             # if the quiz is complete, exit the loop
                             if "great job - you just earned" in driver.find_element(By.XPATH,
                                                                                     value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower():
-                                sleep(5)
+                                sleep(GLOBAL_SLEEP_FACTOR * 5)
                                 break
                         print('\tQuiz completed!')
                         return
@@ -612,7 +614,7 @@ def do_quiz(driver):
                         # loop through each choice
                         for i in range(choices * 2):
                             # wait 5 seconds
-                            sleep(5)
+                            sleep(GLOBAL_SLEEP_FACTOR * 5)
                             # get the ith answer option
                             option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{i}"]')
                             # if the option is correct, click it
@@ -633,7 +635,7 @@ def do_quiz(driver):
                     # click the answer option card
                     driver.find_element(By.CLASS_NAME, value='btOptionCard').click()
                     # wait 13 seconds
-                    sleep(13)
+                    sleep(GLOBAL_SLEEP_FACTOR * 13)
 
                 print('\tQuiz completed!')
                 return
@@ -683,7 +685,7 @@ def complete_punchcard(driver):
         # go to the rewards dashboard
         driver.get('https://rewards.microsoft.com/')
         # wait 5 seconds
-        sleep(5)
+        sleep(GLOBAL_SLEEP_FACTOR * 5)
 
         # get all the clickable quest links on the page
         quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
@@ -697,7 +699,7 @@ def complete_punchcard(driver):
             # go to the link
             driver.get(link)
             # wait a random amount of time
-            sleep(random.uniform(1, 3))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(1, 3))
 
             try:
                 # get the punchcard details
@@ -714,7 +716,7 @@ def complete_punchcard(driver):
                 p = driver.current_window_handle
 
                 # wait a random amount of time
-                sleep(random.uniform(1, 3))
+                sleep(GLOBAL_SLEEP_FACTOR * random.uniform(1, 3))
 
                 # try to click the "complete" button
                 try:
@@ -722,7 +724,7 @@ def complete_punchcard(driver):
                                         value='//*[@id="rewards-dashboard-punchcard-details"]/div[2]/div[2]/div[7]/div[3]/div[1]/a/b').click()
                 except:
                     # if the "complete" button cannot be found, click the first offer
-                    sleep(5)
+                    sleep(GLOBAL_SLEEP_FACTOR * 5)
                     offers = driver.find_elements(By.CLASS_NAME, value='offer-cta')
                     offers[0].find_element(By.CLASS_NAME, value='btn').click()
 
@@ -739,7 +741,7 @@ def complete_punchcard(driver):
                     pass
                 finally:
                     # wait a random amount of time
-                    sleep(random.uniform(3, 5))
+                    sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 5))
             except Exception as e:
                 print(traceback.format_exc())
                 pass
@@ -793,9 +795,9 @@ def more_activities(driver):
                             print(traceback.format_exc())
                             pass
                         finally:
-                            sleep(5)
+                            sleep(GLOBAL_SLEEP_FACTOR * 5)
                             driver.refresh()
-                            sleep(5)
+                            sleep(GLOBAL_SLEEP_FACTOR * 5)
                     else:
                         driver.get('https://rewards.microsoft.com/')
             except:
@@ -917,7 +919,7 @@ def redeem(driver, EMAIL):
         setG = element.text
         if ("set goal" in setG.lower()):
             element.click()
-            sleep(3)
+            sleep(GLOBAL_SLEEP_FACTOR * 3)
             elements = driver.find_elements(By.CLASS_NAME, "c-image")
             for e in elements:
                 if (GOAL in e.get_attribute("alt").lower()):
@@ -954,9 +956,9 @@ def redeem(driver, EMAIL):
     try:
         driver.find_element(By.XPATH,
                             value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]/span/ng-transclude').click()
-        sleep(random.uniform(2, 4))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(2, 4))
     except:
-        sleep(random.uniform(3, 5))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 5))
         driver.find_element(By.XPATH,
                             value='/html/body/div[1]/div[2]/main/div/ui-view/mee-rewards-dashboard/main/div/mee-rewards-redeem-info-card/div/mee-card-group/div/div[1]/mee-card/div/card-content/mee-rewards-redeem-goal-card/div/div[2]/div/a[1]').click()
 
@@ -969,14 +971,14 @@ def redeem(driver, EMAIL):
         try:
             # Click on the rewards
             driver.find_element(By.XPATH, value=f'//*[@id="redeem-pdp_{id}"]').click()
-            sleep(random.uniform(3, 5))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 5))
         except:
             driver.find_element(By.XPATH, value=f'//*[@id="redeem-pdp_{id}"]/span[1]').click()
 
         # Confirm the rewards redemption
         try:
             driver.find_element(By.XPATH, value='//*[@id="redeem-checkout-review-confirm"]').click()
-            sleep(random.uniform(3, 5))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 5))
         except:
             driver.find_element(By.XPATH, value='//*[@id="redeem-checkout-review-confirm"]/span[1]').click()
     except Exception as e:
@@ -994,10 +996,10 @@ def redeem(driver, EMAIL):
             alerts.notify(title=f'{BOT_NAME}: Phone Verification Required',
                           body=f'{EMAIL} has enough points for redeeming your goal, but needs to verify phone number for first reward.\nPlease verify your phone number.\nNext redemption will be automatic, if enabled.\n\n...')
             print('\tSleeping for a bit to allow manual verification...')
-            sleep(300)
+            sleep(GLOBAL_SLEEP_FACTOR * 300)
             driver.get("https://rewards.microsoft.com/")
             return f"Phone Verification Required for {EMAIL}"
-        sleep(random.uniform(10, 20))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(10, 20))
         try:
             error = driver.find_element(By.XPATH, value='//*[@id="productCheckoutError"]/div/div[1]').text
             if ("issue with your account or order" in message.lower()):
@@ -1029,7 +1031,7 @@ def get_points(EMAIL, PASSWORD, driver):
 
     # Wait for the page to load
     driver.implicitly_wait(5)
-    sleep(random.uniform(3, 5))
+    sleep(GLOBAL_SLEEP_FACTOR * random.uniform(3, 5))
 
     try:
         # Go to the sign-in page
@@ -1078,14 +1080,14 @@ def get_points(EMAIL, PASSWORD, driver):
                                       body=f'Unfortunately, {EMAIL}\'s Bing Rewards account has been suspended. Please remove login details from the bot.\n\n...')
                     return -404
             except:
-                sleep(random.uniform(2, 4))
+                sleep(GLOBAL_SLEEP_FACTOR * random.uniform(2, 4))
                 driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
         print(e)
         pass
     finally:
-        sleep(random.uniform(8, 20))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(8, 20))
 
     xpaths = [
         '//*[@id="balanceToolTipDiv"]/p/mee-rewards-counter-animation/span',
@@ -1123,13 +1125,13 @@ def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
 
     try:
         driver.find_element(By.ID, 'id_l').click()
-        sleep(2)
+        sleep(GLOBAL_SLEEP_FACTOR * 2)
         driver.refresh()
     except:
         pass
 
     # First test search
-    sleep(random.uniform(1, 6))
+    sleep(GLOBAL_SLEEP_FACTOR * random.uniform(1, 6))
     first = driver.find_element(By.ID, value="sb_form_q")
     first.send_keys("test")
     first.send_keys(Keys.RETURN)
@@ -1137,9 +1139,9 @@ def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
     # Main search loop
     for x in range(1, PC_SEARCHES + 1):
         if DELAY_SEARCH:
-            sleep(DELAY_SEARCH)
+            sleep(GLOBAL_SLEEP_FACTOR * DELAY_SEARCH)
         else:
-            sleep(random.uniform(1, 6))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(1, 6))
         # Create string to send
         value = random.choice(TERMS) + rw.random_word()
 
@@ -1151,7 +1153,7 @@ def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
         ping.send_keys(value)
 
         # add delay to prevent ban
-        sleep(4)
+        sleep(GLOBAL_SLEEP_FACTOR * 4)
         try:
             go = driver.find_element(By.ID, value="sb_form_go")
             go.click()
@@ -1161,7 +1163,7 @@ def pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES):
             pass
 
         # add delay to prevent ban
-        sleep(random.uniform(5, 25))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(5, 25))
         print(f'\t{x} PC search of {PC_SEARCHES}. Now {int(x / PC_SEARCHES * 100)}% done.')
     print(f'\n\t{EMAIL} PC Searches completed: {datetime.datetime.now(TZ)}\n')
 
@@ -1174,7 +1176,7 @@ def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         # Print the traceback and sleep for 500 seconds
         print(traceback.format_exc())
         print('Attempting to restart PC search in 500 seconds')
-        sleep(500)
+        sleep(GLOBAL_SLEEP_FACTOR * 500)
         driver.quit()
 
         # Get the driver again and update the searches
@@ -1209,9 +1211,9 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     # Main search loop
     for x in range(1, MOBILE_SEARCHES + 1):
         if DELAY_SEARCH:
-            sleep(DELAY_SEARCH)
+            sleep(GLOBAL_SLEEP_FACTOR * DELAY_SEARCH)
         else:
-            sleep(random.uniform(1, 6))
+            sleep(GLOBAL_SLEEP_FACTOR * random.uniform(1, 6))
         value = random.choice(TERMS) + rw.random_word()
         try:
             # Clear search bar
@@ -1222,7 +1224,7 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
             ping.send_keys(value)
         except:
             driver.get('https://www.bing.com/')
-            sleep(7)
+            sleep(GLOBAL_SLEEP_FACTOR * 7)
             # Clear search bar
             ping = driver.find_element(By.ID, value="sb_form_q").send_keys(value)
             pass
@@ -1232,7 +1234,7 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
         except Exception:
             ping.send_keys(Keys.ENTER)
             pass
-        sleep(random.uniform(5, 25))
+        sleep(GLOBAL_SLEEP_FACTOR * random.uniform(5, 25))
         print(f'\t{x} mobile search of {MOBILE_SEARCHES}. Now {int(x / MOBILE_SEARCHES * 100)}% done.')
     print(f'\n\t{EMAIL} Mobile Searches completed: {datetime.datetime.now(TZ)}\n')
 
@@ -1247,7 +1249,7 @@ def mobile_helper(EMAIL, PASSWORD, MOBILE_SEARCHES):
         # Print the traceback and sleep for 500 seconds
         print(traceback.format_exc())
         print('Attempting to restart Mobile search in 500 seconds')
-        sleep(500)
+        sleep(GLOBAL_SLEEP_FACTOR * 500)
         driver.quit()
 
         # Get the driver again and update the searches
@@ -1272,7 +1274,7 @@ def update_searches(driver):
     PC_SEARCHES = 34
     MOBILE_SEARCHES = 24
     try:
-        sleep(10)
+        sleep(GLOBAL_SLEEP_FACTOR * 10)
         PC = driver.find_element(By.XPATH,
                                  value='//*[@id="userPointsBreakdown"]/div/div[2]/div/div[1]/div/div[2]/mee-rewards-user-points-details/div/div/div/div/p[2]').text.replace(
             " ", "").split("/")
@@ -1515,7 +1517,7 @@ def main():
             hours = random.randint(3, 8)
             print(
                 f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\n\n------------------------------------------------------------\n\nIf you like this project, please consider showing support to the developer!\nGitHub Profile:\t\t\t\thttps://github.com/Prem-ium\nBuy-Me-A-Coffee Donations:\thttps://www.buymeacoffee.com/prem.ium\n\n------------------------------------------------------------\n\nSleeping for {hours} hours before restarting Bing Rewards Automation.\nThank you for supporting Prem-ium\'s Github Repository!\n\n------------------------------------------------------------\n')
-            sleep(3600 * hours)
+            sleep(GLOBAL_SLEEP_FACTOR * 3600 * hours)
         except Exception as e:
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
             print(
@@ -1523,7 +1525,7 @@ def main():
             if APPRISE_ALERTS:
                 alerts.notify(title=f'{BOT_NAME}: Failed!',
                               body=f'EXCEPTION: {e} \n\n{traceback.format_exc()} \nAttempting to restart in 10 minutes...\n\n ')
-            sleep(600)
+            sleep(GLOBAL_SLEEP_FACTOR * 600)
             continue
 
 
