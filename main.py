@@ -80,7 +80,7 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
 # Import bot name from .env
 BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 
-GLOBAL_SLEEP_FACTOR = os.environ.get("NORMAL_SLEEP_FACTOR", 1.0)
+GLOBAL_SLEEP_FACTOR = float(os.environ.get("NORMAL_SLEEP_FACTOR", "1.0"))
 
 # Get browser and whether to use the chromewebdriver or not
 BROWSER = os.environ.get("BROWSER", "chrome").lower()
