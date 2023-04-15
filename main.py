@@ -540,25 +540,17 @@ def do_quiz(driver):
                 for i in range(sections):
                     try:
                         # get the number of choices in the current section
-                        choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
+                        choices = len(driver.find_elements(By.XPATH, value='//div[@class="b_cards" && @class="btcc"]'))
                         # loop through each choice
-                        for i in range(choices * 2):
+                        for i in range(choices):
                             # wait 5 seconds
                             sleep(5)
                             # get a random answer option
-                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
+                            option = driver.find_elements(By.XPATH, value=f'//div[@class="b_cards" && @class="btcc"]')[i]
                             # click the option
                             option.click()
                             # wait 10 seconds
                             sleep(10)
-                            try:
-                                # if the answer was incorrect, choose another option
-                                while driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!':
-                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
-                                    option.click()
-                                    sleep(5)
-                            except:
-                                pass
                             # if the quiz is complete, exit the loop
                             if "great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower():
                                 sleep(5)
