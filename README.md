@@ -117,6 +117,10 @@ To run this project, you will need to add the following environment variables to
 
 `PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
 
+`LOGGING` = True or False. Whether you wish to log the bot's error and stacktrace. Defaults to False.
+
+`DAILY_SETS`= True or False. Whether you wish to complete daily sets, this feature is unavailable in a few markets like India. Defaults to True.
+
 ## Donations
 If you find my project helpful and would like to support its development, please consider making a donation. Every little bit helps and is greatly appreciated!
 
