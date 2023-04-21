@@ -80,6 +80,19 @@ BOT_NAME = os.environ.get("BOT_NAME", "Bing Rewards Automation")
 BROWSER = os.environ.get("BROWSER", "chrome").lower()
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
 
+# Enable/Disable detailed logging with stacktrace
+if (os.environ.get("LOGGING", "False").lower() == "true"):
+    LOGGING = True
+else:
+    LOGGING = False
+
+# Enable/Disable Daily Set
+if (os.environ.get("DAILY_SET", "True").lower() == "true"):
+    DAILY_SET = True
+else:
+    DAILY_SET = False
+
+
 # Import browser libraries
 if (HANDLE_DRIVER == "true"):
     HANDLE_DRIVER = True
@@ -603,7 +616,10 @@ def do_quiz(driver):
                 print('\tQuiz completed!')
                 return
         except Exception as e:
-            print(e)
+            if LOGGING:
+                print(e)
+            else:
+                print('\tQuiz failed!')
             pass
         
 def assume_task(driver, p="false"):
@@ -782,7 +798,10 @@ def daily_set(driver):
             ranSets = True
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        print(e)
+        if (LOGGING):
+            print(e)
+        else:
+            print("Error: Could not complete daily set activity 1")
         pass
 
     # Check if the second activity is available
@@ -804,7 +823,10 @@ def daily_set(driver):
             ranSets = True
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        print(e)
+        if (LOGGING):
+            print(e)
+        else:
+            print("Error: Could not complete daily set activity 2")
         pass
     # Check if the third activity is available
     try:
@@ -825,7 +847,10 @@ def daily_set(driver):
             ranSets = True
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        print(e)
+        if (LOGGING):
+            print(e)
+        else:
+            print("Error: Could not complete daily set activity 3")
         pass
 
     return ranSets
@@ -949,7 +974,10 @@ def redeem(driver, EMAIL):
     except Exception as e:
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Redeem Error', body=f'An error occured trying to auto-redeem for: {EMAIL}\n\n{traceback.format_exc()}\n\n...')
-        print(e)
+        if LOGGING:
+            print(e)
+        else:
+            print("Ran into an exception trying to redeem\n")
         return f"\tRan into an exception trying to redeem\n{traceback.format_exc()}\n"
 
 def get_points(EMAIL, PASSWORD, driver):
@@ -1007,7 +1035,10 @@ def get_points(EMAIL, PASSWORD, driver):
                 driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        print(e)
+        if LOGGING:
+            print(e)
+        else:
+            print("Ran into an exception trying to login and getting your points\n")
         pass
     finally:
         sleep(random.uniform(8, 20))
@@ -1096,7 +1127,9 @@ def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
         # Print the traceback and sleep for 500 seconds
-        print(traceback.format_exc())
+        if(LOGGING):
+            print(traceback.format_exc())
+        print('PC Search failed.')
         print('Attempting to restart PC search in 500 seconds')
         sleep(500)
         driver.quit()
@@ -1254,7 +1287,9 @@ def multi_method(EMAIL, PASSWORD):
     if AUTO_REDEEM:
         redeem(driver, EMAIL)
     ranMore = more_activities(driver)
-    ranSet = daily_set(driver)
+    ranSet = False
+    if DAILY_SET:
+        ranSet = daily_set(driver)
 
     if (PC_SEARCHES > 0 or MOBILE_SEARCHES > 0 or ranSet or ranMore):
         if APPRISE_ALERTS:
