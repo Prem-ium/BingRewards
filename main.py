@@ -1130,8 +1130,8 @@ def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         if(LOGGING):
             print(traceback.format_exc())
         print('PC Search failed.')
-        print('Attempting to restart PC search in 100 seconds')
-        sleep(100)
+        print('Attempting to restart PC search in 500 seconds')
+        sleep(500)
         driver.quit()
         
         # Get the driver again and update the searches
