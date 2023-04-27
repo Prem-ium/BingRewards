@@ -81,10 +81,10 @@ BROWSER = os.environ.get("BROWSER", "chrome").lower()
 HANDLE_DRIVER = os.environ.get("HANDLE_DRIVER", "True").lower()
 
 # Enable/Disable detailed logging with stacktrace
-if (os.environ.get("LOGGING", "False").lower() == "true"):
-    LOGGING = True
+if (os.environ.get("DEBUGGING", "False").lower() == "true"):
+    DEBUGGING = True
 else:
-    LOGGING = False
+    DEBUGGING = False
 
 # Enable/Disable Daily Set
 if (os.environ.get("DAILY_SET", "True").lower() == "true"):
@@ -616,7 +616,7 @@ def do_quiz(driver):
                 print('\tQuiz completed!')
                 return
         except Exception as e:
-            if LOGGING:
+            if DEBUGGING:
                 print(e)
             else:
                 print('\tQuiz failed!')
@@ -798,7 +798,7 @@ def daily_set(driver):
             ranSets = True
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        if (LOGGING):
+        if DEBUGGING:
             print(e)
         else:
             print("Error: Could not complete daily set activity 1")
@@ -823,7 +823,7 @@ def daily_set(driver):
             ranSets = True
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        if (LOGGING):
+        if (DEBUGGING):
             print(e)
         else:
             print("Error: Could not complete daily set activity 2")
@@ -847,7 +847,7 @@ def daily_set(driver):
             ranSets = True
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        if (LOGGING):
+        if (DEBUGGING):
             print(e)
         else:
             print("Error: Could not complete daily set activity 3")
@@ -974,7 +974,7 @@ def redeem(driver, EMAIL):
     except Exception as e:
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Redeem Error', body=f'An error occured trying to auto-redeem for: {EMAIL}\n\n{traceback.format_exc()}\n\n...')
-        if LOGGING:
+        if DEBUGGING:
             print(e)
         else:
             print("Ran into an exception trying to redeem\n")
@@ -1035,7 +1035,7 @@ def get_points(EMAIL, PASSWORD, driver):
                 driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        if LOGGING:
+        if DEBUGGING:
             print(e)
         else:
             print("Ran into an exception trying to login and getting your points\n")
@@ -1127,11 +1127,15 @@ def pc_search_helper(driver, EMAIL, PASSWORD, PC_SEARCHES):
         pc_search(driver, EMAIL, PASSWORD, PC_SEARCHES)
     except Exception as e:
         # Print the traceback and sleep for 500 seconds
-        if(LOGGING):
-            print(traceback.format_exc())
         print('PC Search failed.')
-        print('Attempting to restart PC search in 500 seconds')
-        sleep(500)
+        if(DEBUGGING):
+            print(traceback.format_exc())
+            print('Attempting to restart PC search in 500 seconds')
+            sleep(500)
+        else:
+            print('Attempting to restart PC search in 60 seconds')
+            sleep(60)
+            
         driver.quit()
         
         # Get the driver again and update the searches
@@ -1254,7 +1258,10 @@ def update_searches(driver):
             driver.get('https://rewards.microsoft.com/')
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
-        print(traceback.format_exc())
+        print("Error fetching points breakdown.")
+        if(DEBUGGING):
+            print(traceback.format_exc())
+        
         pass
     finally:
         print()
