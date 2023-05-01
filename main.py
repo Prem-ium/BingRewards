@@ -1168,7 +1168,8 @@ def mobile_search(driver, EMAIL, PASSWORD, MOBILE_SEARCHES):
     driver.get('https://www.bing.com/')
     
     # Main search loop
-    for x in range(1, MOBILE_SEARCHES + 1):
+    # Attempt (MOBILE_SEARCHES+1) searches to make sure the mobile_search finishes completely
+    for x in range(1, MOBILE_SEARCHES + 2):
         if DELAY_SEARCH:
             sleep(DELAY_SEARCH)
         else:
