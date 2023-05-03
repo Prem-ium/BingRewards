@@ -548,38 +548,44 @@ def do_quiz(driver):
             if driver.find_elements(By.XPATH, value='//*[@id="rqHeaderCredits"]'):
                 # get the number of sections in the quiz
                 sections = len(driver.find_element(By.XPATH, value='//*[@id="rqHeaderCredits"]').find_elements(By.XPATH, value='*'))
+                # Identify if this is a Warp Speed Quiz or not
+                is_warpspeed_quiz = len(driver.find_elements(By.XPATH, value='//div[@id="currentQuestionContainer"]/div[@class="textBasedMultiChoice"]/div[@class="rq_button"]')) > 0
 
-                # loop through each section
-                for i in range(sections):
-                    try:
-                        # get the number of choices in the current section
-                        choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
-                        # loop through each choice
-                        for i in range(choices * 2):
-                            # wait 5 seconds
-                            sleep(5)
-                            # get a random answer option
-                            option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
-                            # click the option
-                            option.click()
-                            # wait 10 seconds
-                            sleep(10)
-                            try:
-                                # if the answer was incorrect, choose another option
-                                while driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!':
-                                    option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
-                                    option.click()
-                                    sleep(5)
-                            except:
-                                pass
-                            # if the quiz is complete, exit the loop
-                            if "great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower():
+                if is_warpspeed_quiz == True:
+                    do_warpspeed_quiz(driver, sections)
+                else:
+                    # loop through each section
+                    for i in range(sections):
+                        try:
+                            # get the number of choices in the current section
+                            choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
+                            # loop through each choice
+                            for i in range(choices * 2):
+                                # wait 5 seconds
                                 sleep(5)
-                                break
-                        print('\tQuiz completed!')
-                        return
-                    except:
-                        pass
+                                # get a random answer option
+                                option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
+                                # click the option
+                                option.click()
+                                # wait 10 seconds
+                                sleep(10)
+                                try:
+                                    # if the answer was incorrect, choose another option
+                                    while driver.find_element(By.XPATH, value='//*[@id="rqAnsStatus"]').text.lower() == 'oops, try again!':
+                                        option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
+                                        option.click()
+                                        sleep(5)
+                                except Exception as e:
+                                    print(e)
+                                    pass
+                                # if the quiz is complete, exit the loop
+                                if "great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower():
+                                    sleep(5)
+                                    break
+                            print('\tQuiz completed!')
+                            return
+                        except:
+                            pass
                 # if the quiz does not have credits sections
                 for i in range(sections):
                     try:
@@ -621,7 +627,34 @@ def do_quiz(driver):
             else:
                 print('\tQuiz failed!')
             pass
-        
+
+def do_warpspeed_quiz(driver, sections):
+    for i in range(sections):
+        try:
+            # get the number of choices in the current section
+            choices = len(driver.find_elements(By.XPATH, value='//*[contains(@class, "rqOption")]'))
+            # loop through each choice
+            for j in range(choices):
+                # wait 5 seconds
+                sleep(5)
+                # pick options one by one
+                option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{j}"]')
+                # click the option
+                option.click()
+                # wait 10 seconds
+                sleep(10)
+                # look for incorrect choices; If none were found after click(s), it means we moved on to the next quiz or the quizzes are done
+                if len(driver.find_elements(By.CLASS_NAME, value='rqwrongAns')) == 0:
+                    break
+            print('\tQuiz completed!')
+        except Exception as e:
+            if DEBUGGING:
+                print(e)
+            else:
+                print('\tQuiz failed!')
+            pass
+    return
+
 def assume_task(driver, p="false"):
     try:
         # get the parent window handle
