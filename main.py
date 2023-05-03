@@ -558,13 +558,13 @@ def do_quiz(driver):
                     for i in range(sections):
                         try:
                             # get the number of choices in the current section
-                            choices = len(driver.find_element(By.CLASS_NAME, value='rqCredits').find_elements(By.XPATH, value='*'))
+                            choices = len(driver.find_elements(By.XPATH, value='//div[@class="b_cards" && @class="btcc"]'))
                             # loop through each choice
-                            for i in range(choices * 2):
+                            for i in range(choices):
                                 # wait 5 seconds
                                 sleep(5)
-                                # get a random answer option
-                                option = driver.find_element(By.XPATH, value=f'//*[@id="rqAnswerOption{random.randint(0, choices - 1)}"]')
+                                # get a correct answer option
+                                option = driver.find_elements(By.XPATH, value='//div[@class="b_cards" && @class="btcc"]')[i]
                                 # click the option
                                 option.click()
                                 # wait 10 seconds
