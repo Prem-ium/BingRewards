@@ -576,7 +576,9 @@ def do_quiz(driver):
                                         option.click()
                                         sleep(5)
                                 except Exception as e:
-                                    print(e)
+                                    print("Quiz failed.")
+                                    if(DEBUGGING):
+                                        print(e)
                                     pass
                                 # if the quiz is complete, exit the loop
                                 if "great job - you just earned" in driver.find_element(By.XPATH, value='//*[@id="quizCompleteContainer"]/div/div[1]').text.lower():
