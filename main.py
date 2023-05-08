@@ -648,12 +648,9 @@ def do_warpspeed_quiz(driver, sections):
                 # look for incorrect choices; If none were found after click(s), it means we moved on to the next quiz or the quizzes are done
                 if len(driver.find_elements(By.CLASS_NAME, value='rqwrongAns')) == 0:
                     break
-            print('\tQuiz completed!')
-        except Exception as e:
+        except Exception:
             if DEBUGGING:
-                print(e)
-            else:
-                print('\tQuiz failed!')
+                print(traceback.format_exc())
             pass
     return
 
