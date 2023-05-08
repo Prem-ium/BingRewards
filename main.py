@@ -625,7 +625,7 @@ def do_quiz(driver):
                 return
         except Exception as e:
             if DEBUGGING:
-                print(e)
+                print(traceback.format_exc())
             else:
                 print('\tQuiz failed!')
             pass
@@ -831,7 +831,7 @@ def daily_set(driver):
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
         if DEBUGGING:
-            print(e)
+            print(traceback.format_exc())
         else:
             print("Error: Could not complete daily set activity 1")
         pass
@@ -1007,7 +1007,7 @@ def redeem(driver, EMAIL):
         if APPRISE_ALERTS:
             alerts.notify(title=f'{BOT_NAME}: Redeem Error', body=f'An error occured trying to auto-redeem for: {EMAIL}\n\n{traceback.format_exc()}\n\n...')
         if DEBUGGING:
-            print(e)
+            print(traceback.format_exc())
         else:
             print("Ran into an exception trying to redeem\n")
         return f"\tRan into an exception trying to redeem\n{traceback.format_exc()}\n"
@@ -1068,7 +1068,7 @@ def get_points(EMAIL, PASSWORD, driver):
     except Exception as e:
         driver.get('https://rewards.microsoft.com/')
         if DEBUGGING:
-            print(e)
+            print(traceback.format_exc())
         else:
             print("Ran into an exception trying to login and getting your points\n")
         pass
