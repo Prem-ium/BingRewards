@@ -145,6 +145,12 @@ Daily Sets: (30*30) = 900
 
 This adds up to 9000 points, conservatively (not accounting for streak bonuses or more activities which usually net very high, random amount of points), which ends up being a minimum of $6.92/per month per account on level 2. $34.61/ per month with an instance of 5 level 2 reward accounts.
 
+## License & Contributing
+
+This repository is using the [MIT](https://choosealicense.com/licenses/mit/) license.
+
+If you are a developer who wishes to contribute to this repository, please make a pull-request and request a review when ready for a review. [A special thanks to all those who have contributed to this project.](https://github.com/Prem-ium/BingRewards/graphs/contributors)
+
 ## Notes:
 
 - This bot uses the new $1.00 = 1300 points conversion rate. Older Bing Reward accounts may have the old conversion rate of $1.00 = 1050 points. As well as €1.00 = 1500 points conversion rate for Euro based Bing Reward accounts.
