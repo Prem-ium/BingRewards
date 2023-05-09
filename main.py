@@ -703,7 +703,7 @@ def complete_punchcard(driver, skip_movie = False):
 
         # get all the clickable quest links on the page
         if (skip_movie):
-            quests = driver.find_elements(By.XPATH, '//*[contains(@class, "lickable-link") and not(contains(@href, "MoviesandTV"))]')
+            quests = driver.find_elements(By.XPATH, '//*[contains(@class, "clickable-link") and not(contains(@href, "MoviesandTV"))]')
         else:
             quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
         # create a list of the links
