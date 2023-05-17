@@ -1,6 +1,7 @@
-# Bing Rewards Automation
+<h1 align="center">📊 Bing Rewards Automation 🤖 </h1>
 
-An awesome python script to automate bing searches, quizzes, polls, and more across multiple Bing Reward accounts.
+<p align="center">An <i>awesome</i> Python script to automate bing searches, quizzes, polls, and more across multiple Bing Reward accounts.</p>
+
 <p align="right"> 
         <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54"/><img src="https://img.shields.io/badge/-selenium-%43B02A?style=for-the-badge&logo=selenium&logoColor=white"/><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"/><a href="https://www.buymeacoffee.com/prem.ium" target="_blank"> <img align="right" src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"/></a>
 </p>
@@ -126,12 +127,26 @@ To run this project, you will need to add the following environment variables to
 `DAILY_SETS`= True or False. Whether you wish to complete daily sets, this feature is unavailable in a few markets like India. Defaults to True.
 
 ## Donations
-If you find my project helpful and would like to support its development, please consider making a donation. Every little bit helps and is greatly appreciated!
+I've been working on this project for a few months now, and I'm really happy with how it's turned out. It's also been a helpful tool for users to earn some extra money with Bing Rewards. I'm currently working on adding new features to the script and working on other similar programs to generate passive income. I'm also working on making the script more user-friendly and accessible to a wider audience.
 
-You can donate by clicking on the following button:
-<div style="display:grid;justify-content:center;"><a href="https://www.buymeacoffee.com/prem.ium" target="_blank">
-        <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a></div>
+I'm accepting donations through BuyMeCoffee or GitHub Sponsors. Any amount you can donate will be greatly appreciated.
 
+<div style="display: grid; grid-template-columns: 1fr 1fr; justify-content: center; gap: 10px;">
+    <div style="display: grid; justify-content: center;">
+        <span>Buy Me a Coffee:</span>
+        <a href="https://www.buymeacoffee.com/prem.ium" target="_blank">
+            <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" style="height: 41px !important; width: 174px !important; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important; -webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;">
+        </a>
+    </div>
+    <div style="display: grid; justify-content: center;">
+        <span>GitHub Sponsors:</span>
+        <a href="https://github.com/sponsors/Prem-ium" target="_blank">
+            <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA" alt="GitHub Sponsor" style="height: 41px !important; width: 174px !important; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important; -webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;">
+        </a>
+    </div>
+</div>
+
+Your donations will help me to cover the costs of hosting the project, developing new features, and marketing the project to a wider audience.
 Thank you for your support!
 
 ## Earning Potential:
