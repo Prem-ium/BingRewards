@@ -694,7 +694,7 @@ def assume_task(driver, p="false"):
     except:
         pass
 
-def complete_punchcard(driver, skip_movie = False):
+def complete_punchcard(driver):
     try:
         # go to the rewards dashboard
         driver.get('https://rewards.microsoft.com/')
@@ -702,7 +702,7 @@ def complete_punchcard(driver, skip_movie = False):
         sleep(5)
 
         # get all the clickable quest links on the page
-        if (skip_movie):
+        if (SKIP_MOVIES_AND_TV_PUNCHCARD):
             quests = driver.find_elements(By.XPATH, '//*[contains(@class, "clickable-link") and not(contains(@href, "MoviesandTV"))]')
         else:
             quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
@@ -1330,7 +1330,7 @@ def multi_method(EMAIL, PASSWORD):
     recordTime = datetime.datetime.now(TZ)
     
     if AUTOMATE_PUNCHCARD:
-        complete_punchcard(driver, SKIP_MOVIES_AND_TV_PUNCHCARD)
+        complete_punchcard(driver)
 
     if AUTO_REDEEM:
         redeem(driver, EMAIL)
@@ -1417,7 +1417,7 @@ def start_rewards():
             ranDailySets = daily_set(driver)
             ranMoreActivities = more_activities(driver)
             if AUTOMATE_PUNCHCARD:
-                complete_punchcard(driver, SKIP_MOVIES_AND_TV_PUNCHCARD)
+                complete_punchcard(driver)
     
             if AUTO_REDEEM:
                 redeem(driver, EMAIL)
