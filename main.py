@@ -127,6 +127,11 @@ if (os.environ.get("AUTOMATE_PUNCHCARD", "false").lower() == "true"):
 else:
     AUTOMATE_PUNCHCARD = False
 
+if (os.environ.get("SKIP_MOVIES_AND_TV_PUNCHCARD", "false").lower() == "true"):
+    SKIP_MOVIES_AND_TV_PUNCHCARD = True
+else:
+    SKIP_MOVIES_AND_TV_PUNCHCARD = False
+
 if (os.environ.get("SHOPPING", "false").lower() == "true"):
     SHOPPING = True
 else:
@@ -697,7 +702,10 @@ def complete_punchcard(driver):
         sleep(5)
 
         # get all the clickable quest links on the page
-        quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
+        if (SKIP_MOVIES_AND_TV_PUNCHCARD):
+            quests = driver.find_elements(By.XPATH, '//*[contains(@class, "clickable-link") and not(contains(@href, "MoviesandTV"))]')
+        else:
+            quests = driver.find_elements(By.CLASS_NAME, value='clickable-link')
         # create a list of the links
         links = []
         for quest in quests:
