@@ -120,6 +120,8 @@ I'm accepting donations through BuyMeCoffee or GitHub Sponsors. Any amount you c
     <a href="https://www.buymeacoffee.com/prem.ium" target="_blank" style="text-decoration: none;">
             <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" style="height: 80px; width: 320px; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5);">
         </a>
+</div>   
+<div style="display: grid; grid-template-columns: 1fr 1fr; justify-content: center; gap: 10px;">
     <b>GitHub Sponsors:</b>
         <a href="https://github.com/sponsors/Prem-ium" target="_blank" style="text-decoration: none;">
             <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA" alt="GitHub Sponsor" style="height: 80px; width: 320px; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5);">
