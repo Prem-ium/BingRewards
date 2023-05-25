@@ -72,61 +72,43 @@ Replace the `<tag>` above with one of these (defaults to `latest`)
 
 ## Environment Variables:
 
-To run this project, you will need to add the following environment variables to your `.env` file. 
+To run this project, you will need to add the following environment variables to your `.env` file. Refer to `.env.example` for further clarification.
 
-`LOGIN` = A string of Bing Rewards login information. Email and Password are seperated using a colon and accounts are seperated using commas. Check `.env.example` for how an example.
+### Required Variables:
 
-`URL` = Sign in link obtained through https://bing.com/
+| Variable  | Description                                                                                                                     |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------|
+| `LOGIN`   | A string of Bing Rewards login information. Email and Password are separated using a colon and accounts are separated using commas. Check `.env.example` for an example. |
+| `URL`     | Sign in link obtained through https://bing.com/                                                                                 |
 
-### Optional .env Variables:
+### Optional Variables:
 
-`HANDLE_DRIVER` = Boolean (True/False) variable based on whether a user wants webdriver to be installed for them. Defaultly set to True.
-
-`BROWSER` = `chrome`, `edge`, or `firefox` -- Browser you'd like to use the bot with. In experimental mode. `HANDLE_DRIVER` must be set to True to use. Defaults to `chrome`.
-
-`HEADLESS` = True or False-- Whether the program should run headless or not. Defaults to False.
-
-`MULTITHREADING` = 'True' or 'False'-- Whether the program should run multiple threads to run all accounts at once or not. Defaults to False.
-
-`DELAY_SEARCH`= Integer value of how long the program should wait between making searches.
-
-`APPRISE_ALERTS` = Notifications and Alerts. See .env example for more details
-
-`KEEP_ALIVE` = True or False-- whether you wish to use Flask Threading or not.
-
-`AUTO_REDEEM` = Handle auto redeemption of rewards (checks goal). Amazon is chosen as default
-
-`SHOPPING` = True/False. Attempts to complete a new shopping quiz (Experimental). No contributing developer has access to this method of points to verify/debug functionality.
-
-`GOAL` = Selecting goal reward, defaults to Amazon. 
-
-`AUTOMATE_PUNCHCARD` = True or False. Whether bot should automate punchcards.
-
-`SKIP_MOVIES_AND_TV_PUNCHCARD` = True or False. Whether the bot should skip the punchcard for Movies and TV shows.
-
-`CURRENCY` = Currency Symbol or Name, currently only supported by USD($), EURO(€) and INR(₹). Defaults to USD. Plan to add more as more users provide information on their local conversion rates. See .env.example file for an example.
-
-`BOT_NAME` = Bot name, helpful for multiple instances of the bot running with proxy. 
-
-`TZ` = Your desired Time-Zone. Should be formatted from the [IANA TZ Database](https://www.iana.org/time-zones). Defaults to `America/New York`
-
-`TIMER` = True or False. Whether you wish for the program to only run between certain time period.
-
-`START_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 4, 4 AM
-
-`END_TIME` = 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 19, 7 PM
-
-`POINTS_PER_SEARCH`=Amount of points per search rewards in your country. Used to calculate number of searches needed for maximum points. Defaults to 5.
-
-`WANTED_IPV4` = Your desired external IPV4 address. Set this if you want the bot to not run if your IPv4 address is different than this.
-
-`WANTED_IPV6` = Your desired external IPv6 address. Set this if you want the bot to not run if your IPv6 address is different than this.
-
-`PROXY` = Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678)
-
-`DEBUGGING` = True or False. Whether you wish to log the bot's error and stacktrace. Defaults to False.
-
-`DAILY_SETS`= True or False. Whether you wish to complete daily sets, this feature is unavailable in a few markets like India. Defaults to True.
+| Variable              | Description                                                                                                                     |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `HANDLE_DRIVER`       | Boolean (True/False) variable based on whether a user wants webdriver to be installed for them. Defaultly set to True.           |
+| `BROWSER`             | `chrome`, `edge`, or `firefox` -- Browser you'd like to use the bot with. In experimental mode. `HANDLE_DRIVER` must be set to True to use. Defaults to `chrome`. |
+| `HEADLESS`            | True or False -- Whether the program should run headless or not. Defaults to False.                                            |
+| `MULTITHREADING`      | 'True' or 'False' -- Whether the program should run multiple threads to run all accounts at once or not. Defaults to False.     |
+| `DELAY_SEARCH`        | Integer value of how long the program should wait between making searches.                                                       |
+| `APPRISE_ALERTS`      | Notifications and Alerts. See .env example for more details.                                                                    |
+| `KEEP_ALIVE`          | True or False -- Whether you wish to use Flask Threading or not.                                                                |
+| `AUTO_REDEEM`         | Handle auto redemption of rewards (checks goal). Amazon is chosen as default.                                                   |
+| `SHOPPING`            | True or False -- Attempts to complete a new shopping quiz (Experimental).                                                      |
+| `GOAL`                | Selecting goal reward, defaults to Amazon.                                                                                      |
+| `AUTOMATE_PUNCHCARD`  | True or False -- Whether bot should automate punchcards.                                                                        |
+| `SKIP_MOVIES_AND_TV_PUNCHCARD` | True or False -- Whether the bot should skip the punchcard for Movies and TV shows.                                         |
+| `CURRENCY`            | Currency Symbol or Name, currently only supported by USD($), EURO(€) and INR(₹). Defaults to USD.                             |
+| `BOT_NAME`            | Bot name, helpful for multiple instances of the bot running with proxy.                                                        |
+| `TZ`                  | Your desired Time-Zone. Should be formatted from the [IANA TZ Database](https://www.iana.org/time-zones). Defaults to `America/New York`. |
+| `TIMER`               | True or False -- Whether you wish for the program to only run between certain time period.                                      |
+| `START_TIME`          | 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 4, 4 AM.                              |
+| `END_TIME`            | 24 hour format hour you would like to start the program, if timer is enabled. Defaults to 19, 7 PM.                             |
+| `POINTS_PER_SEARCH`   | Amount of points per search rewards in your country. Used to calculate the number of searches needed for maximum points. Defaults to 5. |
+| `WANTED_IPV4`         | Your desired external IPv4 address. Set this if you want the bot to not run if your IPv4 address is different than this.         |
+| `WANTED_IPV6`         | Your desired external IPv6 address. Set this if you want the bot to not run if your IPv6 address is different than this.         |
+| `PROXY`               | Configure a HTTP(S) or SOCKS5 proxy through which all of the bot's traffic will go. Should be in a URI format (e.g., https://1.2.3.4:5678). |
+| `DEBUGGING`           | True or False -- Whether you wish to log the bot's error and stacktrace. Defaults to False.                                    |
+| `DAILY_SETS`          | True or False -- Whether you wish to complete daily sets, this feature is unavailable in a few markets like India. Defaults to True. |
 
 ## Donations
 I've been working on this project for a few months now, and I'm really happy with how it's turned out. It's also been a helpful tool for users to earn some extra money with Bing Rewards. I'm currently working on adding new features to the script and working on other similar programs to generate passive income. I'm also working on making the script more user-friendly and accessible to a wider audience.
@@ -134,18 +116,14 @@ I've been working on this project for a few months now, and I'm really happy wit
 I'm accepting donations through BuyMeCoffee or GitHub Sponsors. Any amount you can donate will be greatly appreciated.
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; justify-content: center; gap: 10px;">
-    <div style="display: grid; justify-content: center;">
-        <span>Buy Me a Coffee:</span>
-        <a href="https://www.buymeacoffee.com/prem.ium" target="_blank">
-            <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" style="height: 41px !important; width: 174px !important; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important; -webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;">
+    <b>Buy Me a Coffee:</b>
+    <a href="https://www.buymeacoffee.com/prem.ium" target="_blank" style="text-decoration: none;">
+            <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" style="height: 80px; width: 320px; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5);">
         </a>
-    </div>
-    <div style="display: grid; justify-content: center;">
-        <span>GitHub Sponsors:</span>
-        <a href="https://github.com/sponsors/Prem-ium" target="_blank">
-            <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA" alt="GitHub Sponsor" style="height: 41px !important; width: 174px !important; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important; -webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;">
+    <b>GitHub Sponsors:</b>
+        <a href="https://github.com/sponsors/Prem-ium" target="_blank" style="text-decoration: none;">
+            <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA" alt="GitHub Sponsor" style="height: 80px; width: 320px; box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5);">
         </a>
-    </div>
 </div>
 
 Your donations will help me to cover the costs of hosting the project, developing new features, and marketing the project to a wider audience.
