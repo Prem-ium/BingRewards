@@ -65,11 +65,6 @@ View on [Docker Hub](https://hub.docker.com/repository/docker/nelsondane/bing-re
 
 You can also open `DockerQuickstart.bat` in a text editor, edit the exisitng path in the file with your own of the BingRewards folder directory and run it to quickly stop and start docker container instances. 
 
-### Available Docker Hub Tags
-Replace the `<tag>` above with one of these (defaults to `latest`)
-- `latest`: latest stable release on [Sazn's GitHub](https://github.com/sazncode/Bing-Rewards)
-- `beta`: latest beta release on [NelsonDane's GitHub](https://github.com/NelsonDane/Bing-Rewards)
-
 ## Environment Variables:
 
 To run this project, you will need to add the following environment variables to your `.env` file. Refer to `.env.example` for further clarification.
