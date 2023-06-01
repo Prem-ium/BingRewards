@@ -125,7 +125,9 @@ I'm accepting donations through BuyMeCoffee or GitHub Sponsors. Any amount you c
 
 Your donations will help me to cover the costs of hosting the project, developing new features, and marketing the project to a wider audience.
 Thank you for your support!
-
+## Helper(s)
+You can use this Selenium IDE script to help create new Microsoft Accounts slightly faster. (Semi-Automation, captcha and email verification manual):
+You can find the script in the [Selenium-IDE-Scripts/Bing](https://github.com/Prem-ium/Selenium-IDE-Scripts/tree/master/Bing) directory of my Selenium IDE Project(s) repository.
 ## Earning Potential:
 
 Conservatively calculating potential points/earnings per month using this bot w/ a lvl 2 account:
