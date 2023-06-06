@@ -105,7 +105,7 @@ if (HANDLE_DRIVER == "true"):
         from selenium.webdriver.edge.service                          import Service
     elif BROWSER == "firefox":
         from webdriver_manager.firefox                                import GeckoDriverManager
-        from selenium.webdriver.firefox.options                       import Options
+        from selenium.webdriver.firefox.service                       import Service 
 else:
     HANDLE_DRIVER = False
 
@@ -298,10 +298,7 @@ def get_driver(isMobile = False):
         options = webdriver.FirefoxOptions()
 
     if HEADLESS:
-        if BROWSER == "chrome" or BROWSER == "edge":
-            options.add_argument("--headless")
-        elif BROWSER == "firefox":
-            options.headless = True
+        options.add_argument("--headless")
 
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
