@@ -44,6 +44,8 @@ try:
 except ImportError:
     os.system("pip install pytz")
     from pytz                                 import timezone
+finally:
+    from pytz                                 import UnknownTimeZoneError
 
 # Load ENV
 load_dotenv()
@@ -171,9 +173,12 @@ WANTED_IPV6 = os.environ.get("WANTED_IPV6")
 PROXY = os.environ.get("PROXY", "")
 # Populate proxy dictionary for requests
 PROXIES = {"http": f"{PROXY}", "https": f"{PROXY}"}
-
-# Configure timezone
-TZ = timezone(os.environ.get("TZ", "America/New_York"))
+try:
+    # Configure timezone
+    TZ = timezone(os.environ.get("TZ", "America/New_York"))
+except UnknownTimeZoneError:
+    print("Invalid timezone specified in .env, defaulting to America/New_York. Please check https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of valid timezones.")
+    TZ = timezone("America/New_York")
 
 # Whether or not to use a timer, and if so, what time to use
 TIMER = os.environ.get("TIMER", "False").lower()
