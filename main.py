@@ -49,8 +49,7 @@ finally:
 
 # Load ENV
 load_dotenv()
-# LOGIN EXAMPLE:
-# "EMAIL:PASSWORD,EMAIL:PASSWORD"
+
 if not os.environ["LOGIN"]:
     raise Exception("LOGIN not set. Please enter your login information in .env variable 'LOGIN' in the following format: 'EMAIL:PASSWORD,EMAIL2:PASSWORD2,EMAIL3:PASSWORD3'")
 else:
@@ -58,7 +57,7 @@ else:
 
 # Check number of accounts (limit to 6 per IP address to avoid bans)
 if (len(ACCOUNTS) > 6):
-    raise Exception(f"You can only have 5 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 5 or less accounts and restart the program.")
+    raise Exception(f"You can only have 6 accounts per IP address. Using more increases your chances of being banned by Microsoft Rewards. You have {len(ACCOUNTS)} accounts within your LOGIN env variable. Please adjust it to have 6 or less accounts and restart the program.")
 
 # Set login URL
 if not os.environ["URL"]:
@@ -72,7 +71,10 @@ TERMS = ["define ", "explain ", "example of ", "how to pronounce ", "what is ", 
          "what is the antonym of ", "what is the hypernym of ", "what is the meronym of ", "photos of ",
          "images of ", "pictures of ", "pictures of ", "pictures of ", "pictures of ", "pictures of ", "pictures of ",
          "information about ", "information on ", "information about the ", "information on the ", "information about the ",
-         "synonym of ", "antonym of ", "hypernym of ", "meronym of ", "synonym for ", "antonym for ", "hypernym for "]
+         "synonym of ", "antonym of ", "hypernym of ", "meronym of ", "synonym for ", "antonym for ", "hypernym for ",
+         "meronym for ", "pronunciation of ", "pronounce ", "how to pronounce ", "how to say ", "how to say the ",
+         "interesting facts about ", "interesting facts on ", "interesting facts about the ", "interesting facts on the ",
+]
 
 # Optional Variables
 # Import bot name from .env
@@ -173,6 +175,7 @@ WANTED_IPV6 = os.environ.get("WANTED_IPV6")
 PROXY = os.environ.get("PROXY", "")
 # Populate proxy dictionary for requests
 PROXIES = {"http": f"{PROXY}", "https": f"{PROXY}"}
+
 try:
     # Configure timezone
     TZ = timezone(os.environ.get("TZ", "America/New_York"))
@@ -1509,7 +1512,7 @@ def main():
                 # Run Bing Rewards Automation
                 start_rewards()
             hours = random.randint(3, 8)
-            print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\n\n------------------------------------------------------------\n\nIf you like this project, please consider showing support to the developer!\nGitHub Profile:\t\t\t\thttps://github.com/Prem-ium\nBuy-Me-A-Coffee Donations:\thttps://www.buymeacoffee.com/prem.ium\n\n------------------------------------------------------------\n\nSleeping for {hours} hours before restarting Bing Rewards Automation.\nThank you for supporting Prem-ium\'s Github Repository!\n\n------------------------------------------------------------\n')
+            print(f'Bing Rewards Automation Complete!\n{datetime.datetime.now(TZ)}\n\n------------------------------------------------------------\n\nIf you like this project, please consider showing support to the developer!\nGitHub Profile:\t\t\t\thttps://github.com/Prem-ium\nGitHub Sponsor Donations (No fees):\thttps://github.com/sponsors/Prem-ium\nBuy-Me-A-Coffee Donations:\thttps://www.buymeacoffee.com/prem.ium\n\n------------------------------------------------------------\n\nSleeping for {hours} hours before restarting Bing Rewards Automation.\nThank you for supporting Prem-ium\'s Github Repository!\n\n------------------------------------------------------------\n')
             sleep(3600 * hours)
         except Exception as e:
             # Catch any errors, print them, and restart (in hopes of it being non-fatal)
