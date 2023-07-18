@@ -121,9 +121,13 @@ I'm accepting donations through <a href="https://github.com/sponsors/Prem-ium">G
 
 Your donations will help me to cover the costs of hosting the project, developing new features, and marketing the project to a wider audience.
 Thank you for your support!
-## Account Creator Helper(s)
+
+## Other Bing Automation
 You can use this Selenium IDE script to help create new Microsoft Accounts slightly faster. (Semi-Automation, captcha and email verification manual):
 You can find the script in the [Selenium-IDE-Scripts/Bing](https://github.com/Prem-ium/Selenium-IDE-Scripts/tree/master/Bing) directory of my Selenium IDE Project(s) repository.
+
+I have also created an automation script that can close any suspend accounts you have of Bing that you can gain access to by placing a donation of $15+ on my GitHub Sponsor. It is only really useful for people like myself who manages multiple accounts at once. After placing a donation, contact me you would like to receive the script.
+
 ## Earning Potential:
 The following is a conservatively prediction of potential points/earnings per month using this bot w/ lvl 2 account:
 
