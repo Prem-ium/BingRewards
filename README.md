@@ -7,6 +7,9 @@
         <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AA" alt="Github Sponsor"/></a>
 </p>
 
+## Archived 
+As of 7/20/2023, this project is archived. No further updates, feature additions, or technical support will be provided. A read-only mode is hereby instated.
+
 ## Features
 
 - Multiple Bing Rewards Accounts
