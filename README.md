@@ -7,11 +7,19 @@
         <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AA" alt="Github Sponsor"/></a>
 </p>
 
-## Archived 
-As of 7/20/2023, this project is archived. No further updates, feature additions, or technical support will be provided. A read-only mode is hereby instated.
+---
+## Archived 📁
 
+This repository has been archived and will no longer receive public updates. However, sponsors may continue to receive updates or fixes.
+
+### Need Help? 🛠️
+
+I do not respond to issues in this repository. If you need assistance, please consider sponsoring me below to receive direct support
+
+[![Sponsor](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white)](https://github.com/sponsors/Prem-ium)
+
+---
 ## Features
-
 - Multiple Bing Rewards Accounts
 - Multi-Threading (Optional)
 - PC & Mobile Search Automation
@@ -30,6 +38,7 @@ As of 7/20/2023, this project is archived. No further updates, feature additions
 - Docker Support & DockerQuickstart.bat 
 - Headless Option
 
+---
 ## Installation
 The bot can be run using Python or Docker.
 
@@ -69,6 +78,7 @@ View on [Docker Hub](https://hub.docker.com/repository/docker/nelsondane/bing-re
 
 You can also open `DockerQuickstart.bat` in a text editor, edit the exisitng path in the file with your own of the BingRewards folder directory and run it to quickly stop and start docker container instances. 
 
+---
 ## Environment Variables:
 
 To run this project, you will need to add the following environment variables to your `.env` file. Refer to `.env.example` for further clarification.
@@ -109,28 +119,35 @@ To run this project, you will need to add the following environment variables to
 | `DEBUGGING`           | True or False -- Whether you wish to log the bot's error and stacktrace. Defaults to False.                                    |
 | `DAILY_SETS`          | True or False -- Whether you wish to complete daily sets, this feature is unavailable in a few markets like India. Defaults to True. |
 
-## Donations
+---
+## Donations ❤️
+
 I've been working on this project for a few months now, and I'm really happy with how it's turned out. It's also been a helpful tool for users to earn some extra money with Bing Rewards. I'm currently working on adding new features to the script and working on other similar programs to generate passive income. I'm also working on making the script more user-friendly and accessible to a wider audience.
 
-I'm accepting donations through <a href="https://github.com/sponsors/Prem-ium">GitHub Sponsors (No Fees!)</a> or <a href="https://www.buymeacoffee.com/prem.ium">Buy-Me-Coffee</a>. Any amount you can donate will be greatly appreciated.
-  
-<a href="https://github.com/sponsors/Prem-ium" target="_blank">
-        <img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA" alt="GitHub Sponsor" img width="15%">
-</a>
-<a href="https://www.buymeacoffee.com/prem.ium" target="_blank">
-        <img src="https://raw.githubusercontent.com/Prem-ium/youtube-analytics-bot/main/output-examples/media/coffee-logo.png" alt="Buy Me A Coffee" img width="15%">
-</a>
+If you appreciate my work and would like to show your support, there are two convenient ways to make a donation:
 
+1. **GitHub Sponsors**
+   - [Donate via GitHub Sponsors](https://github.com/sponsors/Prem-ium)
+   - Preferred because this donation method is fee-free and offers perks for your contribution.
+   - [![GitHub Sponsor](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA)](https://github.com/sponsors/Prem-ium)
 
-Your donations will help me to cover the costs of hosting the project, developing new features, and marketing the project to a wider audience.
-Thank you for your support!
+2. **Buy Me A Coffee**
+   - [Donate via Buy Me A Coffee](https://www.buymeacoffee.com/prem.ium)
+   - [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/prem.ium)
+3. **Referral Links**  
+   - If you're unable to make a monetary donation, you can still support my work by using my curated [Referral Links](https://github.com/Prem-ium/Referral-Link-Me/blob/main/README.md). Earn bonuses and rewards while contributing to my projects at the same time.  
+   - [Explore Referral Links](https://github.com/Prem-ium/Referral-Link-Me/blob/main/README.md)  
 
+Your generous donations will go a long way in helping me cover the expenses associated with developing new features and promoting the project to a wider audience. I extend my heartfelt gratitude to all those who have already contributed. Thank you for your support!
+
+---
 ## Other Bing Automation
 You can use this Selenium IDE script to help create new Microsoft Accounts slightly faster. (Semi-Automation, captcha and email verification manual):
 You can find the script in the [Selenium-IDE-Scripts/Bing](https://github.com/Prem-ium/Selenium-IDE-Scripts/tree/master/Bing) directory of my Selenium IDE Project(s) repository.
 
 I have also created an automation script that can close any suspend accounts you have of Bing that you can gain access to by placing a donation of $15+ on my GitHub Sponsor. It is only really useful for people like myself who manages multiple accounts at once. After placing a donation, contact me you would like to receive the script.
 
+---
 ## Earning Potential:
 The following is a conservatively prediction of potential points/earnings per month using this bot w/ lvl 2 account:
 
@@ -145,12 +162,14 @@ Daily Sets: (30*30) = 900
 
 This adds up to 9000 points, conservatively (not accounting for streak bonuses or more activities which usually net very high, random amount of points), which ends up being a minimum of $6.92/per month per account on level 2. $41.52/ per month with an instance of 6 conncurrent level 2 reward accounts.
 
+---
 ## License & Contributing
 
 This repository is using the [MIT](https://choosealicense.com/licenses/mit/) license.
 
 If you are a developer who wishes to contribute to this repository, please make a pull-request and request a review when ready for a review. [A special thanks to all those who have contributed to this project.](https://github.com/Prem-ium/BingRewards/graphs/contributors)
 
+---
 ## Notes:
 
 - This bot uses the new $1.00 = 1300 points conversion rate, which is standard for most US based Bing accounts. Older Bing Reward accounts may have the old conversion rate of $1.00 = 1050 points. As well as €1.00 = 1500 points conversion rate for Euro based Bing Reward accounts.
